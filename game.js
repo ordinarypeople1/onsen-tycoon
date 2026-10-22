@@ -23,7 +23,7 @@ const DEF={
  torii:{n:'토리이',tab:'deco',img:'torii',fp:1,sc:1.6,cost:2200,beauty:9,star:1,desc:'붉은 토리이, 신성한 입구'},
  bamboo:{n:'대나무 숲 석등',tab:'deco',img:'bamboo',fp:1,sc:1.7,cost:1800,beauty:8,star:1,light:[[0,-0.45]],desc:'바람에 사각이는 대숲'},
  sandgarden:{n:'모래 정원',tab:'deco',img:'sandgarden',fp:2,sc:1,cost:4000,beauty:15,star:2,desc:'갈퀴로 다듬은 고요한 가레산스이'},
- bridge:{n:'붉은 아치 다리',tab:'deco',img:'bridge',fp:2,sc:1,cost:5000,beauty:16,star:2,desc:'작은 개울 위 다이코바시'},
+ bridge:{n:'붉은 아치 다리',tab:'deco',img:'bridge',fp:2,walk:1,sc:1,cost:5000,beauty:16,star:2,desc:'작은 개울 위 다이코바시'},
  waterwheel:{n:'물레방아',tab:'deco',img:'waterwheel',fp:2,sc:1,cost:6000,beauty:18,star:3,desc:'졸졸 물소리와 함께 도는 물레방아'},
  wisteria:{n:'등나무 정자',tab:'deco',img:'wisteria',fp:2,sc:1.05,cost:4500,beauty:16,star:2,desc:'보랏빛 등꽃 아래 돌벤치'},
  lantern:{n:'석등롱',tab:'deco',img:'lantern',fp:1,sc:1.25,cost:600,beauty:5,star:1,light:[[0,-0.55]],desc:'밤이면 은은히 빛나요'},
@@ -502,7 +502,7 @@ function drawBackdrop(lt){if(!BG.complete||!BG.naturalWidth)return;const iw=BG.n
  cx.imageSmoothingEnabled=true;cx.drawImage(BG,VW/2-w/2+px,VH*0.46-h/2+py,w,h);cx.imageSmoothingEnabled=false;
  const se=SEA_T[season()];if(se){cx.fillStyle=se;cx.fillRect(0,0,VW,VH)}
  cx.globalCompositeOperation='multiply';cx.fillStyle=`rgba(${lt.sky},0.32)`;cx.fillRect(0,0,VW,VH);cx.globalCompositeOperation='source-over';
- if(lt.night>0.05){cx.fillStyle=`rgba(12,18,40,${Math.min(0.55,lt.night*0.55)})`;cx.fillRect(0,0,VW,VH)}
+ if(lt.night>0.05){cx.fillStyle=`rgba(16,24,48,${Math.min(0.4,lt.night*0.4)})`;cx.fillRect(0,0,VW,VH)}
  const mg=cx.createLinearGradient(0,VH*0.15,0,VH*0.6);mg.addColorStop(0,'rgba(240,244,246,0)');mg.addColorStop(0.5,`rgba(235,240,244,${0.10+0.08*Math.sin(performance.now()/9000)})`);mg.addColorStop(1,'rgba(240,244,246,0)');cx.fillStyle=mg;cx.fillRect(0,0,VW,VH)}
 function drawForest(lt){if(!FOREST){const x0=-60*TW/2,y0=-160,W=(N+12)*TW,H=(N+8)*TH/2+200;const c=mk(W*2,H*2),g=c.getContext('2d');g.scale(2,2);g.translate(-x0,-y0);const _cx=cx;cx=g;drawForest_();cx=_cx;FOREST={c,x0,y0,W,H}}cx.drawImage(FOREST.c,FOREST.x0,FOREST.y0,FOREST.W,FOREST.H)}
 function drawForest_(){const r=rng(42);for(let i=0;i<160;i++){const side=i%2;const k=r()*N;const x=side?-1.5-r()*3:k,y=side?k:-1.5-r()*3;const[X,Y]=iso(x,y);

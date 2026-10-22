@@ -9,6 +9,7 @@ for p in sorted(glob.glob('assets/*_lv[1-5]*.png')):
     a=np.asarray(Image.open(p).convert('RGBA')).astype(int);r,g,b,al=[a[...,i] for i in range(4)];op=al>200
     lan=op&(r>185)&(r-g>70)&(g>60)&(b<130)
     if not lan.any() and k.split('_')[0] in ('teishoku','izakaya') and not k.endswith('_b'): lan=op&(r>150)&(r-g>55)&(b<120)  # 어두운 등롱 팔레트용 완화 기준
+    if not lan.any() and k.split('_')[0] in ('teishoku','izakaya') and not k.endswith('_b'): lan=op&(r>130)&(r-g>45)&(b<110)
     win=op&(r>200)&(g>165)&(b>100)&(b<200)&(r-b>55)&(g-b>25)
     fl=op&(r>235)&(g>220)&(b<190)
     H,W=op.shape;area=H*W;m=np.zeros((H,W),float)
