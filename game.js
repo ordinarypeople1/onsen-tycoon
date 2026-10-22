@@ -187,7 +187,7 @@ function ensureGate(){if(gateObj())return;OCC=occ();let sp=null,bd=1e9;for(let x
  if(!sp)return;placeGate(sp);const gi=gateInfo(),b=S.objs.find(o=>DEF[o.k].bath);OCC=occ();if(b){const d=doorTile(b);const p=d&&findPath(gi.m[0],gi.m[1],d[0],d[1]);if(p)for(const[px,py]of p){const x=px|0,y=py|0;if(!OCC[x+','+y])S.objs.push({k:'path',x,y,lv:1,price:0,uses:0,earn:0})}}OCC=occ();groundDirty=true}
 function placeGate(sp){const t=gTiles(sp.x,sp.y,sp.dir);const set=new Set(t.map(p=>p.join(',')));S.objs=S.objs.filter(o=>!(DEF[o.k].isPath&&set.has(o.x+','+o.y)));let g=gateObj();if(!g){g={k:'gate',lv:1,price:0,uses:0,earn:0};S.objs.push(g)}g.x=sp.x;g.y=sp.y;g.dir=sp.dir}
 let OCC={};let moving=null,infoT=null;
-function startMove(o){if(window.READONLY)return;clearTimeout(infoT);if(moving)cancelMove();$('info').style.display='none';mode=null;
+function startMove(o){if(window.READONLY)return;clearTimeout(infoT);if(moving)cancelMove();hideInfo();mode=null;
  guests.forEach(g=>{if(g.cur===o)finish(g);if(g.target===o){g.target=null;g.path=[]}});
  moving=o;o._from=[o.x,o.y,o.dir];ghost=o.k;OCC=occ();groundDirty=true;$('moveBar').style.display='flex';toast('놓을 곳을 눌러주세요 (Esc·우클릭 취소)')}
 function dropMove(x,y){const o=moving;if(o.k=='gate'){const sp=gateSpot(x,y);if(!sp){toast('대문은 열린 땅의 가장자리에만 놓을 수 있어요');return}endMove();placeGate(sp);OCC=occ();groundDirty=true;guests.forEach(g=>{if(g.st=='walk'){g.target=null;g.path=[]}});save();return}if(!canPlace(o.k,x,y)){toast('여기엔 놓을 수 없어요');return}clearPaths(o.k,x,y);o.x=x;o.y=y;endMove();anims['o'+S.objs.indexOf(o)]={t:0};
@@ -326,9 +326,11 @@ let ghost=null,hoverT=null,mode=null;
 function offscreen(X,Y,W,h){const z=cam.z,sx=X*z+cam.x,sy=Y*z+cam.y;return sx+W*z<0||sx-W*z>VW||sy<0||sy-h*z>VH}
 function drawSprite(key,o,X,Y,W,lt,sv,alpha){ // X,Y: 바닥 중앙(월드), W: 폭(월드)
  const v=VAR[key];if(!v)return;const h=W*v.base.height/v.base.width;if(offscreen(X,Y,W,h))return h;
+ if(o&&(o===window.HOVER||o===INFO_O)&&!ghost&&!moving&&key===skey(o)){const wl=whiteSil(key,v);const q=1.1/cam.z+0.25;cx.globalAlpha=o===INFO_O?0.95:0.7;for(const[dx,dy]of[[-q,0],[q,0],[0,-q],[0,q]])cx.drawImage(wl,X-W/2+dx,Y-h+dy,W,h)}
  cx.globalAlpha=alpha??1;cx.drawImage(v.base,X-W/2,Y-h,W,h);
  if(lt.sun>0.15){cx.globalAlpha=(alpha??1)*lt.sun*0.55;cx.drawImage(sv.left?v.rimL:v.rimR,X-W/2,Y-h,W,h)}
  cx.globalAlpha=1;return h}
+const WSIL={};function whiteSil(key,v){if(WSIL[key])return WSIL[key];const c=document.createElement('canvas');c.width=v.base.width;c.height=v.base.height;const g=c.getContext('2d');g.drawImage(v.base,0,0);g.globalCompositeOperation='source-in';g.fillStyle='#fff6d8';g.fillRect(0,0,c.width,c.height);return WSIL[key]=c}
 function drawShadow(key,X,Y,W,lt,sv,str){const v=VAR[key];if(!v||lt.sun<0.1)return;const h=W*v.base.height/v.base.width;if(offscreen(X,Y+h,W*2,h*2))return;
  cx.save();cx.globalAlpha=0.28*lt.sun*(str||1);cx.translate(X,Y);cx.transform(1,0,-sv.kx,sv.ky,0,0);cx.drawImage(v.sil,-W/2,-h,W,h);cx.restore()}
 // ===== 블롭 스프라이트 캐시 (프레임당 그라디언트 생성 제거) =====
@@ -369,7 +371,7 @@ function render(t){
  // 손님: 반드시 앞서야 하는 마지막 오브젝트 뒤에 삽입
  for(const g of GS){let i=0;for(let j=0;j<sorted.length;j++){const o=sorted[j];if(o.g){if(o.z<=g.z)i=Math.max(i,j+1);continue}if(ov(o,g)&&cmp(o,g)<0)i=j+1;else if(!ov(o,g)&&o.z<=g.z)i=Math.max(i,j+1)}
   for(let j=i-1;j>=0;j--){const o=sorted[j];if(!o.g&&ov(o,g)&&cmp(o,g)>0){i=j}}sorted.splice(i,0,g)}
- list.length=0;list.push(...sorted);
+ list.length=0;list.push(...sorted);window._order=list.filter(it=>it.o&&!it.part).map(it=>it.o);
  // 뒤에 가려진 손님/커서가 있으면 건물 반투명
  const hidden=new Set();for(const it of list){if(!it.o)continue;const o=it.o,G=objGeom(o);
   const pts=guests.filter(g=>!g.hide&&!g.inBath&&g.x<it.x1&&g.y<it.y1&&!(g.x>=it.x0&&g.y>=it.y0)&&(g.x+g.y)<it.x1+it.y1-0.5).map(g=>iso(g.x,g.y));
@@ -500,7 +502,7 @@ function drawPlots(t,lt){const P=N/PS;window._signs=[];
    window._signs.push({px,py,X:sX,Y:sY-16,price:plotPrice(px,py)})}}}
 function drawText(t,lt){ // 고해상도 텍스트 레이어
  tx.setTransform(TDPR,0,0,TDPR,0,0);tx.clearRect(0,0,VW,VH);tx.textAlign='center';tx.textBaseline='middle';
- for(const s of (document.body.classList.contains('zen')||window.READONLY)?[]:window._signs||[]){const[X,Y]=toScreen(s.X,s.Y);const fs=Math.max(9,Math.min(15,3.2*cam.z));tx.font=`700 ${fs}px Pretendard`;const t_='🔒 ¥'+fmt(s.price);const w=tx.measureText(t_).width+18;tx.fillStyle='#f3e0b6';tx.strokeStyle='#7a5432';tx.lineWidth=2;rr(tx,X-w/2,Y-fs,w,fs*2,6);tx.fill();tx.stroke();tx.fillStyle='#5b3e22';tx.fillText(t_,X,Y+1);}
+ for(const s of (document.body.classList.contains('zen')||window.READONLY)?[]:window._signs||[]){const[X,Y]=toScreen(s.X,s.Y);const fs=Math.max(9,Math.min(15,3.2*cam.z));tx.font=`700 ${fs}px Pretendard`;const t_='¥'+fmt(s.price);const isz=fs>12?32:16;const w=tx.measureText(t_).width+22+isz;tx.fillStyle='#f7efdc';tx.strokeStyle='#6b4024';tx.lineWidth=2;rr(tx,X-w/2,Y-fs,w,fs*2,5);tx.fill();tx.stroke();if(window.ICURL){const im=LOCKIMG||(LOCKIMG=Object.assign(new Image(),{src:ICURL('lock')}));tx.imageSmoothingEnabled=false;tx.drawImage(im,Math.round(X-w/2+6),Math.round(Y-isz/2),isz,isz)}tx.fillStyle='#2b1d14';tx.fillText(t_,X+isz/2+2,Y+1);}
  const ZN=document.body.classList.contains('zen');for(const f of ZN?[]:floats){const[X,Y]=toScreenT(f.x,f.y);const a=Math.min(1,f.l);tx.globalAlpha=a;tx.font='800 15px Pretendard';tx.lineWidth=3;tx.strokeStyle='#6b4310';const yy=Y-40-(1.6-f.l)*30;tx.strokeText(f.t,X,yy);tx.fillStyle='#ffd65a';tx.fillText(f.t,X,yy)}
  tx.globalAlpha=1;
  if(paint&&paintCursor){const{t,cost}=paintPlan();const s_=(DEF[ghost].erase?'환불 ':'')+`${t.length}칸 · ¥${fmt(Math.abs(cost))}`;tx.font='700 14px Pretendard';const w=tx.measureText(s_).width+20;tx.fillStyle='rgba(74,51,32,0.92)';rr(tx,paintCursor[0]+14,paintCursor[1]-34,w,26,8);tx.fill();tx.fillStyle='#fff';tx.textAlign='left';tx.fillText(s_,paintCursor[0]+24,paintCursor[1]-21);tx.textAlign='center'}
@@ -525,17 +527,38 @@ function hud(){const lt=light();$('yen').textContent=fmt(S.yen);const n=S.fin.hi
  $('temp').textContent=`· ${STEMP[season()]+Math.round(Math.sin((h-9)/24*6.28)*4)}°C · 손님 ${guests.length}명`;
  const s=stars();$('stars').innerHTML='★'.repeat(s)+'<span style="color:#cdbb9c">'+'★'.repeat(5-s)+'</span>';if(s!=lastStars){if(lastStars&&s>lastStars)toast(`🎉 료칸 등급 ${s}★ 달성! 새 시설이 해금됐어요`);lastStars=s;buildCards()}
  if(document.activeElement!==$('zs'))$('zs').value=cam.z;}
-function placeInfo(){const el=$('info'),q=$('quest');if(innerWidth>700){const r=q&&getComputedStyle(q).display!='none'&&q.offsetHeight?q.getBoundingClientRect():null;el.style.top=(r&&r.left<280?Math.round(r.bottom+8):70)+'px';el.style.maxHeight=`calc(100vh - ${parseInt(el.style.top)+150}px)`;el.style.overflow='auto'}else{el.style.top='';el.style.maxHeight=''}}
-function showInfo(o){requestAnimationFrame(placeInfo);if(o.k=='gate'){const el=$('info');el.style.display='block';el.innerHTML=`<h3>⛩️ 대문</h3><div style="color:#7a5a3a;margin-bottom:6px">손님이 드나드는 유일한 입구예요. 철거할 수 없고, 열린 땅 가장자리로 이동만 할 수 있어요.</div><button class="b" id="iMove">이동</button><button class="b g" id="iCl">닫기</button>`;$('iMove').onclick=()=>startMove(o);$('iCl').onclick=()=>el.style.display='none';return}const d=DEF[o.k];const el=$('info');el.style.display='block';const up=Math.round(d.cost*Math.pow(1.7,o.lv));
- const users=guests.filter(g=>g.cur===o).length;
- el.innerHTML=`<h3>${d.n} <small>Lv.${o.lv}</small></h3><div style="color:#7a5a3a;margin-bottom:6px">${d.desc}</div>`+
- (d.price?`<div class="row"><span>이용 요금</span><b>¥${fmt(o.price)}</b></div>${(()=>{const fr=fairPrice(o),r=o.price/fr;const [c,t]=r<0.9?["#6fbf73","저렴 · 손님 만족 ↑"]:r<1.15?["#8fc7e8","적정가"]:r<1.4?["#e8b85a","조금 비쌈 · 만족 ↓"]:["#e07a6a","너무 비쌈 · 손님이 거절해요"];const pos=Math.max(0,Math.min(100,(r-0.6)/1.0*100));return `<div class="pfb"><div class="pbar"><i style="left:${pos}%;background:${c}"></i></div><small style="color:${c}">${t}</small><small style="opacity:.7"> · 추천 ¥${fmt(Math.round(fr*1.1/10)*10)}${o.rej?` · 거절 ${o.rej}회`:""}</small></div>`})()}<div style="display:flex;gap:4px;margin:4px 0"><button class="b g" data-p="-0.1">−10%</button><button class="b g" data-p="0.1">+10%</button><button class="b g" data-p="0">기본</button><button class="b g" data-p="rec">추천가</button></div>
-  <div class="row"><span>이용 중</span><b>${users}/${capOf(o)}</b></div><div class="row"><span>누적 이용</span><b>${o.uses||0}회</b></div><div class="row"><span>누적 매출</span><b>¥${fmt(o.earn||0)}</b></div><div class="row"><span>직원 급여</span><b>¥${fmt(d.wage*(1+0.5*(o.lv-1)))}/시</b></div>
-  `:`<div class="row"><span>아름다움</span><b>+${d.beauty}</b></div>`)+
- `<div style="margin-top:6px">${o.lv<5&&d.price?`<button class="b" id="iUp">업그레이드 ¥${fmt(up)}</button>`:''}<button class="b g" id="iMove">이동</button><button class="b g" id="iDel">철거</button><button class="b g" id="iCl">닫기</button></div>`;
+function placeInfo_old(){const el=$('info'),q=$('quest');if(innerWidth>700){const r=q&&getComputedStyle(q).display!='none'&&q.offsetHeight?q.getBoundingClientRect():null;el.style.top=(r&&r.left<280?Math.round(r.bottom+8):70)+'px';el.style.maxHeight=`calc(100vh - ${parseInt(el.style.top)+150}px)`;el.style.overflow='auto'}else{el.style.top='';el.style.maxHeight=''}}
+// ===== 정확한 클릭 판정: 스프라이트 알파 + 풋프린트 + 여유 패딩, 깊이상 맨 위 우선 =====
+const AM={};function amask(key){if(AM[key])return AM[key];const v=VAR[key];if(!v)return null;const w=Math.min(128,v.base.width),h=Math.max(1,Math.round(w*v.base.height/v.base.width));const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.drawImage(v.base,0,0,w,h);const d=g.getImageData(0,0,w,h).data,m=new Uint8Array(w*h);for(let i=0;i<w*h;i++)m[i]=d[i*4+3]>60?1:0;return AM[key]={w,h,m}}
+let _coarse=matchMedia('(pointer:coarse)').matches;
+function pickObj(sx,sy){const wx=(sx-cam.x)/cam.z,wy=(sy-cam.y)/cam.z;const padS=_coarse?12:5,pad=padS/cam.z;const[tx_,ty_]=toTile(sx,sy);
+ const ord=window._order||S.objs;for(let i=ord.length-1;i>=0;i--){const o=ord[i];if(!o||DEF[o.k].isPath)continue;const G=objGeom(o);const x0=G.X-G.W/2,y0=G.Y-G.H;
+  if(wx<x0-pad||wx>x0+G.W+pad||wy<y0-pad||wy>G.Y+pad){continue}
+  const mk=amask(skey(o));if(mk){const u=(wx-x0)/G.W*mk.w,v=(wy-y0)/G.H*mk.h,r=Math.max(1,Math.ceil(pad/G.W*mk.w));let hit=false;
+   for(let dy=-r;dy<=r&&!hit;dy++)for(let dx=-r;dx<=r;dx++){const px=Math.floor(u+dx),py=Math.floor(v+dy);if(px>=0&&py>=0&&px<mk.w&&py<mk.h&&mk.m[py*mk.w+px]){hit=true;break}}if(hit)return o}
+  for(const[a,b]of tilesOf(o))if(tx_>=a-0.15&&tx_<a+1.15&&ty_>=b-0.15&&ty_<b+1.15)return o}
+ const t=OCC[Math.floor(tx_)+','+Math.floor(ty_)];return t&&!DEF[t.k].isPath?t:t}
+// ===== 오브젝트 팝오버 메뉴 =====
+let INFO_O=null,POPSEC=null,LOCKIMG=null;
+function popPlace(){const el=$('info');if(!INFO_O||el.style.display=='none')return;const o=INFO_O;if(!S.objs.includes(o)){el.style.display='none';INFO_O=null;return}const G=objGeom(o);
+ const[ax,ay]=toScreen(G.X,G.Y-G.H*0.92),[bx,by]=toScreen(G.X,G.Y);const w=el.offsetWidth,h=el.offsetHeight;let x=ax-w/2,y=ay-h-12,below=false;
+ if(y<64){y=by+10;below=true}if(y+h>VH-8)y=Math.max(64,VH-8-h);x=Math.max(8,Math.min(VW-w-8,x));el.style.left=x+'px';el.style.top=y+'px';el.classList.toggle('below',below);el.style.setProperty('--ax',Math.max(14,Math.min(w-14,ax-x))+'px')}
+BUS.on('frame',popPlace);
+function showInfo(o){const el=$('info');if(INFO_O!==o)POPSEC=null;INFO_O=o;el.classList.add('pop');el.style.right='auto';el.style.bottom='auto';el.style.maxHeight='';el.style.display='block';
+ if(o.k=='gate'){el.innerHTML=`<div class="ph"><b>${IC('gate')} 대문</b><button class="px" id="iCl">${IC('close')}</button></div><div class="pdesc">손님이 드나드는 유일한 입구예요. 열린 땅 가장자리로 이동만 할 수 있어요.</div><div class="pacts"><button class="pa" id="iMove">${IC('move')}<i>이동</i></button></div>`;$('iMove').onclick=()=>startMove(o);$('iCl').onclick=()=>hideInfo();requestAnimationFrame(popPlace);return}
+ const d=DEF[o.k];const up=Math.round(d.cost*Math.pow(1.7,o.lv));const users=guests.filter(g=>g.cur===o).length;
+ const gauge=d.price?(()=>{const fr=fairPrice(o),r=o.price/fr;const [c,t]=r<0.9?["#5f9e5a","저렴 · 손님 만족 ↑"]:r<1.15?["#3f6aa0","적정가"]:r<1.4?["#c98a2c","조금 비쌈 · 만족 ↓"]:["#c0442e","너무 비쌈 · 손님이 거절해요"];const pos=Math.max(0,Math.min(100,(r-0.6)/1.0*100));return `<div class="pfb"><div class="pbar"><i style="left:${pos}%;background:${c}"></i></div><small style="color:${c}">${t}</small><small style="opacity:.7"> · 추천 ¥${fmt(Math.round(fr*1.1/10)*10)}${o.rej?` · 거절 ${o.rej}회`:""}</small></div>`})():'';
+ const stars='◆'.repeat(o.lv)+'◇'.repeat(5-o.lv);
+ el.innerHTML=`<div class="ph"><b>${d.n}</b><span class="lv" title="Lv.${o.lv}">${d.price?stars:''}</span><button class="px" id="iCl" aria-label="닫기">${IC('close')}</button></div>
+ <div class="pq">${d.price?`<span>${IC('yen')}¥${fmt(o.price)}</span><span>${IC('guest')}${users}/${capOf(o)}</span>`:`<span>${IC('sakura')}아름다움 +${d.beauty}</span>`}</div>
+ <div class="pacts"><button class="pa${POPSEC=='info'?' on':''}" data-s="info">${IC('scroll')}<i>정보</i></button>${o.lv<5&&d.price?`<button class="pa up" id="iUp">${IC('hammer')}<i>업그레이드<br><small>¥${fmt(up)}</small></i></button>`:''}<button class="pa" id="iMove">${IC('move')}<i>이동</i></button>${d.price?`<button class="pa${POPSEC=='price'?' on':''}" data-s="price">${IC('yen')}<i>가격</i></button>`:''}<button class="pa del" id="iDel">${IC('demolish')}<i>철거</i></button></div>
+ <div class="psec" data-sec="info" ${POPSEC=='info'?'':'hidden'}><div class="pdesc">${d.desc}</div>${d.price?`<div class="row"><span>이용 중</span><b>${users}/${capOf(o)}</b></div><div class="row"><span>누적 이용</span><b>${o.uses||0}회</b></div><div class="row"><span>누적 매출</span><b>¥${fmt(o.earn||0)}</b></div><div class="row"><span>직원 급여</span><b>¥${fmt(d.wage*(1+0.5*(o.lv-1)))}/시</b></div>`:`<div class="row"><span>아름다움</span><b>+${d.beauty}</b></div>`}<div class="row"><span>철거 환급</span><b>¥${fmt(Math.floor(d.cost*0.4))}</b></div></div>
+ ${d.price?`<div class="psec" data-sec="price" ${POPSEC=='price'?'':'hidden'}><div class="row"><span>이용 요금</span><b>¥${fmt(o.price)}</b></div>${gauge}<div class="prow"><button class="b g" data-p="-0.1">−10%</button><button class="b g" data-p="0.1">+10%</button><button class="b g" data-p="0">기본</button><button class="b g" data-p="rec">추천가</button></div></div>`:''}`;
+ el.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{POPSEC=POPSEC==b.dataset.s?null:b.dataset.s;showInfo(o)});
  el.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{if(b.dataset.p=='rec'){o.price=Math.round(fairPrice(o)*1.1/10)*10;o.rej=0;showInfo(o);return}const p=+b.dataset.p;o.price=p==0?d.price:Math.max(50,Math.round(o.price*(1+p)/10)*10);showInfo(o)});
- if($('iUp'))$('iUp').onclick=()=>{if(S.yen<up)return toast('엔이 부족해요');S.yen-=up;S.fin.exp+=up;o.lv++;anims['o'+S.objs.indexOf(o)]={t:0};upFx(o);BUS.emit('upgrade',o);toast(`${d.n} Lv.${o.lv}!${o.lv==3||o.lv==5?' 외관이 바뀌었어요 ✨':''}`);showInfo(o);save()};
- $('iDel').onclick=()=>remove(o);$('iMove').onclick=()=>startMove(o);$('iCl').onclick=()=>el.style.display='none';BUS.emit('info',o,el);}
+ if($('iUp'))$('iUp').onclick=()=>{if(S.yen<up)return toast('엔이 부족해요');S.yen-=up;S.fin.exp+=up;o.lv++;anims['o'+S.objs.indexOf(o)]={t:0};upFx(o);BUS.emit('upgrade',o);toast(`${d.n} Lv.${o.lv}!`);showInfo(o);save()};
+ $('iDel').onclick=()=>{const b=$('iDel');if(!b.classList.contains('confirm')){b.classList.add('confirm');b.querySelector('i').textContent='한번 더';return}remove(o)};$('iMove').onclick=()=>{hideInfo();startMove(o)};$('iCl').onclick=()=>hideInfo();BUS.emit('info',o,el);requestAnimationFrame(popPlace)}
+function hideInfo(){$('info').style.display='none';INFO_O=null}
 function remove(o){if(window.READONLY)return;if(o.k=='gate')return toast('대문은 철거할 수 없어요. 이동만 가능해요');if(S.objs.length<=1)return;S.yen+=Math.floor(DEF[o.k].cost*0.4);guests.forEach(g=>{if(g.cur===o)finish(g);if(g.target===o)g.target=null});S.objs.splice(S.objs.indexOf(o),1);OCC=occ();groundDirty=true;$('info').style.display='none';save()}
 function modalFin(){const m=$('modal');const up=S.objs.filter(o=>!DEF[o.k].isPath&&!DEF[o.k].wage).length*4,wages=S.objs.reduce((a,o)=>a+(DEF[o.k].wage||0)*(1+0.5*(o.lv-1)),0);
  const rows=S.objs.filter(o=>DEF[o.k].price).sort((a,b)=>(b.earn||0)-(a.earn||0)).slice(0,8).map(o=>`<div class="row"><span>${DEF[o.k].n} Lv.${o.lv}</span><b>¥${fmt(o.earn||0)}</b></div>`).join('');
@@ -554,23 +577,23 @@ function onTap(sx,sy){const[fx,fy]=toTile(sx,sy);const x=Math.floor(fx),y=Math.f
  if(ghost){if(!canPlace(ghost,x,y))return toast(tileOpen(x,y)?'여기엔 지을 수 없어요':'잠긴 구역이에요. 표지판을 눌러 열어주세요');const d=DEF[ghost];if(S.yen<d.cost)return toast('엔이 부족해요');
   S.yen-=d.cost;S.fin.exp+=d.cost;S.objs.push({k:ghost,x,y,lv:1,price:d.price||0,uses:0,earn:0});anims['o'+(S.objs.length-1)]={t:0};OCC=occ();groundDirty=true;
   for(let i=0;i<10;i++)parts.push({k:'steam',x:x+d.fp/2+(Math.random()-0.5)*d.fp,y:y+d.fp/2+(Math.random()-0.5)*d.fp,h:0,vx:0,l:1,L:1,s:2});if(ghost=='path'){}else if(!ev.shift){ghost=null;buildCards()}save();return}
- const o=OCC[x+','+y];if(o){if(mode=='del'){remove(o);return}clearTimeout(infoT);infoT=setTimeout(()=>{if(!moving)showInfo(o)},330)}else $('info').style.display='none'}
+ const o=pickObj(sx,sy);if(o&&!DEF[o.k].isPath){if(mode=='del'){remove(o);return}clearTimeout(infoT);infoT=setTimeout(()=>{if(!moving)showInfo(o)},230)}else hideInfo()}
 function unlock(s){const k=s.px+','+s.py;if(S.yen<s.price)return toast(`구역 확장에 ¥${fmt(s.price)} 필요해요`);S.yen-=s.price;S.fin.exp+=s.price;S.plots[k]=1;BUS.emit('unlock',k);anims['p'+k]={t:0};toast('🎉 새 구역이 열렸어요!');
  for(let i=0;i<40;i++)parts.push({k:'petal',x:s.px*PS+Math.random()*PS,y:s.py*PS+Math.random()*PS,h:20+Math.random()*30,l:3,L:3,ph:Math.random()*6});save()}
 const ev={shift:false};
 function initInput(){
- cv.addEventListener('pointerdown',e=>{if(ghost&&DEF[ghost].fp==1&&(DEF[ghost].isPath||DEF[ghost].erase)&&e.button!=2){const[a,b]=toTile(e.clientX,e.clientY);paint={x0:a|0,y0:b|0,x1:a|0,y1:b|0,area:e.shiftKey};return}ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});clearTimeout(lp);if(e.pointerType!='mouse'&&!moving&&!ghost){const sx=e.clientX,sy=e.clientY;lp=setTimeout(()=>{if(drag&&!drag.m&&ptrs.size==1){const[a,b]=toTile(sx,sy);const o=OCC[Math.floor(a)+','+Math.floor(b)];if(o){drag.lp=true;startMove(o)}}},550)}ev.shift=e.shiftKey;if(ptrs.size==1)drag={x:e.clientX,y:e.clientY,cx:cam.x,cy:cam.y,m:false};else{const p=[...ptrs.values()];pinch={d:Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y),z:cam.z};drag=null}});
- cv.addEventListener('pointermove',e=>{const[a,b]=toTile(e.clientX,e.clientY);if(paint){paint.x1=a|0;paint.y1=b|0;paint.area=paint.area||e.shiftKey;paintCursor=[e.clientX,e.clientY]}hoverT=[Math.floor(a-(ghost?DEF[ghost].fp/2-0.5:0)),Math.floor(b-(ghost?DEF[ghost].fp/2-0.5:0))];if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ cv.addEventListener('pointerdown',e=>{if(ghost&&DEF[ghost].fp==1&&(DEF[ghost].isPath||DEF[ghost].erase)&&e.button!=2){const[a,b]=toTile(e.clientX,e.clientY);paint={x0:a|0,y0:b|0,x1:a|0,y1:b|0,area:e.shiftKey};return}ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});clearTimeout(lp);if(e.pointerType!='mouse'&&!moving&&!ghost){const sx=e.clientX,sy=e.clientY;lp=setTimeout(()=>{if(drag&&!drag.m&&ptrs.size==1){const o=pickObj(sx,sy);if(o&&!DEF[o.k].isPath){drag.lp=true;startMove(o)}}},550)}ev.shift=e.shiftKey;if(ptrs.size==1)drag={x:e.clientX,y:e.clientY,cx:cam.x,cy:cam.y,m:false};else{const p=[...ptrs.values()];pinch={d:Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y),z:cam.z};drag=null}});
+ cv.addEventListener('pointermove',e=>{if(e.pointerType=='mouse'&&!ptrs.size){const h=ghost||moving?null:pickObj(e.clientX,e.clientY);window.HOVER=h&&!DEF[h.k].isPath?h:null;cv.style.cursor=window.HOVER?'pointer':''}const[a,b]=toTile(e.clientX,e.clientY);if(paint){paint.x1=a|0;paint.y1=b|0;paint.area=paint.area||e.shiftKey;paintCursor=[e.clientX,e.clientY]}hoverT=[Math.floor(a-(ghost?DEF[ghost].fp/2-0.5:0)),Math.floor(b-(ghost?DEF[ghost].fp/2-0.5:0))];if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(pinch&&ptrs.size==2){const p=[...ptrs.values()];zoomAt((p[0].x+p[1].x)/2,(p[0].y+p[1].y)/2,pinch.z*Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y)/pinch.d);cam.tz=cam.z}
   else if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>6){drag.m=true;clearTimeout(lp)}if(drag.m){cam.x=drag.cx+dx;cam.y=drag.cy+dy}}});
  cv.addEventListener('pointerup',e=>{clearTimeout(lp);if(paint){applyPaint();paint=null;return}if(drag&&drag.lp){ptrs.delete(e.pointerId);drag=null;return}
-  if(drag&&!drag.m&&!moving&&!ghost&&mode!='del'){const now=performance.now();const[a,b]=toTile(e.clientX,e.clientY);const o=OCC[Math.floor(a)+','+Math.floor(b)];
+  if(drag&&!drag.m&&!moving&&!ghost&&mode!='del'){const now=performance.now();const o=pickObj(e.clientX,e.clientY);
    if(o&&lastTap.o===o&&now-lastTap.t<400){lastTap={};ptrs.delete(e.pointerId);drag=null;startMove(o);return}lastTap={o,t:now}}
   if(drag&&!drag.m&&ptrs.size==1){if(ghost){const[a,b]=toTile(e.clientX,e.clientY);hoverT=[Math.floor(a-(DEF[ghost].fp/2-0.5)),Math.floor(b-(DEF[ghost].fp/2-0.5))];placeAt()}else onTap(e.clientX,e.clientY)}ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;drag=null});
  cv.addEventListener('pointercancel',e=>{ptrs.delete(e.pointerId);drag=null;pinch=null});
  cv.addEventListener('wheel',e=>{e.preventDefault();zoomTarget=[e.clientX,e.clientY];cam.tz=Math.max(zmin(),Math.min(8,cam.tz*(e.deltaY<0?1.15:1/1.15)))},{passive:false});
  cv.addEventListener('contextmenu',e=>{e.preventDefault();if(moving)return cancelMove();ghost=null;buildCards()});
- const objAt=(sx,sy)=>{const[a,b]=toTile(sx,sy);return OCC[Math.floor(a)+','+Math.floor(b)]};
+ const objAt=(sx,sy)=>{const o=pickObj(sx,sy);return o&&!DEF[o.k].isPath?o:null};
  cv.addEventListener('dblclick',e=>{if(moving||ghost&&!moving)return;const o=objAt(e.clientX,e.clientY);if(o)startMove(o)});
  $('mvCancel').onclick=cancelMove;
  addEventListener('keydown',e=>{if(e.key=='Escape'){$('toast').style.display='none';if(moving){cancelMove();return}ghost=null;mode=null;$('tDel').classList.remove('on');$('info').style.display='none';$('modal').style.display='none';buildCards()}});
