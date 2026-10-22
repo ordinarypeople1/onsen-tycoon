@@ -229,7 +229,7 @@ function spawnRate(){const h=hour();const f=h<6?0.05:h<9?0.5:h<12?0.7:h<15?0.6:h
 function spawn(){const gi=gateInfo();if(!gi)return;const[mx,my]=gi.m,[ox,oy]=gi.o;const vip=Math.random()<0.1*stars();const c=(k)=>[mx+0.5+ox*k,my+0.5+oy*k];const s0=c(5);
  guests.push({x:s0[0]+(Math.random()-0.5)*0.3,y:s0[1],tx:s0[0],ty:s0[1],path:[c(3),c(1),c(0)],st:'walk',spr:'cw'+(1+(Math.random()*4|0)),cb:'cb'+(1+(Math.random()*4|0)),
   need:{fatigue:50+Math.random()*45,hunger:20+Math.random()*60,thirst:20+Math.random()*60,fun:20+Math.random()*50},
-  budget:Math.round((2500+Math.random()*5000)*(vip?2.2:1)),happy:60,t:0,target:null,life:0,dir:1,bob:Math.random()*6,fade:0,vip});BUS.emit('spawn',guests[guests.length-1])}
+  budget:Math.round((2500+Math.random()*5000)*(vip?2.2:1)*(1+0.22*Math.max(0,stars()-1))),happy:60,t:0,target:null,life:0,dir:1,bob:Math.random()*6,fade:0,vip});BUS.emit('spawn',guests[guests.length-1])}
 function pickTarget(g){
  const h=hour();
  if((h>=20||h<5)&&g.budget>2000){const r=S.objs.filter(o=>DEF[o.k].stay&&(o.users||0)<capOf(o));if(r.length)return pickBy(g,r,'fatigue')}
@@ -245,6 +245,7 @@ const ctr=o=>{const f=DEF[o.k].fp;return[o.x+f/2,o.y+f/2]};
 const dist=(g,o)=>{const[a,b]=ctr(o);return Math.hypot(a-g.x,b-g.y)};
 function think(g,t){if(!t)return;(window.__thinks=window.__thinks||{})[t]=(window.__thinks[t]||0)+1;bubbles=bubbles.filter(b=>b.g!==g);if(bubbles.length>=4)return;bubbles.push({g,t,l:3.2})}
 function walkable(x,y){if(!tileOpen(x,y))return false;const o=OCC[x+','+y];return !o||!!DEF[o.k].walk||!!DEF[o.k].isPath||DEF[o.k].fp==1&&!!DEF[o.k].isPath}
+function fairPrice(o){return DEF[o.k].price*(1+o.lv*0.12)}
 function doorTile(o){const f=DEF[o.k].fp;const c=[[o.x+(f>>1),o.y+f],[o.x+f,o.y+(f>>1)],[o.x+(f>>1),o.y-1],[o.x-1,o.y+(f>>1)]];for(let i=0;i<f;i++)c.push([o.x+i,o.y+f],[o.x+f,o.y+i],[o.x-1,o.y+i],[o.x+i,o.y-1]);return c.find(([x,y])=>walkable(x,y))}
 function door(o){const d=doorTile(o)||[o.x,o.y+DEF[o.k].fp];return[d[0]+0.5,d[1]+0.5]}
 function findPath(sx,sy,ex,ey){sx|=0;sy|=0;ex|=0;ey|=0;if(sx==ex&&sy==ey)return[];
@@ -285,8 +286,9 @@ function decide(g){
 function arrive(g){g.ax=g.x;g.ay=g.y;const o=g.target,d=DEF[o.k];g.target=null;o.users=o.users||0;
  if(!S.objs.includes(o)){decide(g);return}
  const cap=capOf(o);if(o.users>=cap){if(!g.waited){g.waited=1;if(Math.random()<0.5)think(g,'자리가 날 때까지 기다릴게요');g.st='wait';g.t=5;g.target=o;return}g.waited=0;think(g,'자리가 없네…');g.happy-=3;(g.used=g.used||[]).push(o);return}
- const fair=d.price*(1+o.lv*0.12)*(0.8+g.happy/150);
- if(o.price>g.budget||o.price>fair*1.45){think(g,THOUGHT.pricey[Math.random()*3|0]);g.happy-=10;(g.used=g.used||[]).push(o);return}
+ const fair=fairPrice(o)*(0.8+g.happy/150);
+ if(o.price>fair*1.45){think(g,THOUGHT.pricey[Math.random()*3|0]);g.happy-=9;o.rej=(o.rej||0)+1;(g.used=g.used||[]).push(o);return}
+ if(o.price>g.budget){think(g,'다음에 또 올게요');leave(g);return}
  g.budget-=o.price;S.yen+=o.price;S.fin.inc+=o.price;o.earn=(o.earn||0)+o.price;o.uses=(o.uses||0)+1;o.hu=(o.hu||0)+1;S.served++;BUS.emit('pay',o,g,o.price);
  const[sx,sy]=toScreenT(...ctr(o));floats.push({x:ctr(o)[0],y:ctr(o)[1],t:'+¥'+fmt(o.price),l:1.6});
  o.users++;g.cur=o;g.st='use';g.t=d.stay?Math.max(30,((30-hour()+24)%24+7)*60/120):d.dur*(1+o.lv*0.1);
@@ -490,11 +492,11 @@ function hud(){const lt=light();$('yen').textContent=fmt(S.yen);const n=S.fin.hi
 function showInfo(o){if(o.k=='gate'){const el=$('info');el.style.display='block';el.innerHTML=`<h3>⛩️ 대문</h3><div style="color:#7a5a3a;margin-bottom:6px">손님이 드나드는 유일한 입구예요. 철거할 수 없고, 열린 땅 가장자리로 이동만 할 수 있어요.</div><button class="b" id="iMove">이동</button><button class="b g" id="iCl">닫기</button>`;$('iMove').onclick=()=>startMove(o);$('iCl').onclick=()=>el.style.display='none';return}const d=DEF[o.k];const el=$('info');el.style.display='block';const up=Math.round(d.cost*Math.pow(1.7,o.lv));
  const users=guests.filter(g=>g.cur===o).length;
  el.innerHTML=`<h3>${d.n} <small>Lv.${o.lv}</small></h3><div style="color:#7a5a3a;margin-bottom:6px">${d.desc}</div>`+
- (d.price?`<div class="row"><span>이용 요금</span><b>¥${fmt(o.price)}</b></div><div style="display:flex;gap:4px;margin:4px 0"><button class="b g" data-p="-0.1">−10%</button><button class="b g" data-p="0.1">+10%</button><button class="b g" data-p="0">기본</button></div>
+ (d.price?`<div class="row"><span>이용 요금</span><b>¥${fmt(o.price)}</b></div>${(()=>{const fr=fairPrice(o),r=o.price/fr;const [c,t]=r<0.9?["#6fbf73","저렴 · 손님 만족 ↑"]:r<1.15?["#8fc7e8","적정가"]:r<1.4?["#e8b85a","조금 비쌈 · 만족 ↓"]:["#e07a6a","너무 비쌈 · 손님이 거절해요"];const pos=Math.max(0,Math.min(100,(r-0.6)/1.0*100));return `<div class="pfb"><div class="pbar"><i style="left:${pos}%;background:${c}"></i></div><small style="color:${c}">${t}</small><small style="opacity:.7"> · 추천 ¥${fmt(Math.round(fr*1.1/10)*10)}${o.rej?` · 거절 ${o.rej}회`:""}</small></div>`})()}<div style="display:flex;gap:4px;margin:4px 0"><button class="b g" data-p="-0.1">−10%</button><button class="b g" data-p="0.1">+10%</button><button class="b g" data-p="0">기본</button><button class="b g" data-p="rec">추천가</button></div>
   <div class="row"><span>이용 중</span><b>${users}/${capOf(o)}</b></div><div class="row"><span>누적 이용</span><b>${o.uses||0}회</b></div><div class="row"><span>누적 매출</span><b>¥${fmt(o.earn||0)}</b></div><div class="row"><span>직원 급여</span><b>¥${fmt(d.wage*(1+0.5*(o.lv-1)))}/시</b></div>
   <div style="font-size:12px;color:#7a5a3a;margin-top:4px">적정가 약 ¥${fmt(d.price*(1+o.lv*0.12))} · 너무 비싸면 손님이 돌아가요</div>`:`<div class="row"><span>아름다움</span><b>+${d.beauty}</b></div>`)+
  `<div style="margin-top:6px">${o.lv<5&&d.price?`<button class="b" id="iUp">업그레이드 ¥${fmt(up)}</button>`:''}<button class="b g" id="iMove">이동</button><button class="b g" id="iDel">철거</button><button class="b g" id="iCl">닫기</button></div>`;
- el.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const p=+b.dataset.p;o.price=p==0?d.price:Math.max(50,Math.round(o.price*(1+p)/10)*10);showInfo(o)});
+ el.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{if(b.dataset.p=='rec'){o.price=Math.round(fairPrice(o)*1.1/10)*10;o.rej=0;showInfo(o);return}const p=+b.dataset.p;o.price=p==0?d.price:Math.max(50,Math.round(o.price*(1+p)/10)*10);showInfo(o)});
  if($('iUp'))$('iUp').onclick=()=>{if(S.yen<up)return toast('엔이 부족해요');S.yen-=up;S.fin.exp+=up;o.lv++;anims['o'+S.objs.indexOf(o)]={t:0};upFx(o);BUS.emit('upgrade',o);toast(`${d.n} Lv.${o.lv}!${o.lv==3||o.lv==5?' 외관이 바뀌었어요 ✨':''}`);showInfo(o);save()};
  $('iDel').onclick=()=>remove(o);$('iMove').onclick=()=>startMove(o);$('iCl').onclick=()=>el.style.display='none';BUS.emit('info',o,el);}
 function remove(o){if(window.READONLY)return;if(o.k=='gate')return toast('대문은 철거할 수 없어요. 이동만 가능해요');if(S.objs.length<=1)return;S.yen+=Math.floor(DEF[o.k].cost*0.4);guests.forEach(g=>{if(g.cur===o)finish(g);if(g.target===o)g.target=null});S.objs.splice(S.objs.indexOf(o),1);OCC=occ();groundDirty=true;$('info').style.display='none';save()}

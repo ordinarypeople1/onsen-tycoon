@@ -117,3 +117,5 @@ body.visit #build,body.visit #bOpen,body.visit #tDel,body.visit #quest,body.visi
  #info{top:88px;bottom:auto;left:auto;right:8px;width:min(250px,64vw);max-height:calc(58vh - 110px);overflow:auto;z-index:6;font-size:12px}
  #toast{max-width:86vw;white-space:normal;text-align:center}
 }
+
+.pfb{margin:2px 0 4px}.pbar{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,#6fbf73,#8fc7e8 35%,#e8b85a 65%,#e07a6a);opacity:.85;margin:4px 0}.pbar i{position:absolute;top:-3px;width:4px;height:12px;border-radius:2px;border:1px solid #fff;transform:translateX(-50%);transition:left .35s cubic-bezier(.2,.9,.3,1.2)}

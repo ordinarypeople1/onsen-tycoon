@@ -11,9 +11,9 @@ const {chromium}=require('playwright');
   for(let h=0;h<HOURS;h++){for(let i=0;i<300;i++)D.step(0.1);
    if(BOT=='smart'){claim();
     for(const k of want){const n=S.objs.filter(o=>o.k==k).length;const cap=DEF[k].tab=='deco'?4+h/10:1+Math.floor(h/40);if(n<cap&&S.yen>DEF[k].cost*1.5){place(k);break}}
-    upg();for(const pk of ['2,1','1,0','0,1','1,2','2,2','0,0','2,0','0,2']){if(S.plots[pk])continue;const[a,b2]=pk.split(',').map(Number);const pr=D.plotPrice(a,b2);if(S.yen>pr*1.4&&S.objs.length>30*Object.keys(S.plots).length){S.plots[pk]=1;S.yen-=pr;D.emit('unlock',pk);D.occ()}break}}
+    upg();if(h%6==0)for(const o of S.objs){const d=DEF[o.k];if(!d.price)continue;const fr=d.price*(1+o.lv*0.12);if((o.rej||0)>3){o.price=Math.max(50,Math.round(o.price*0.9/10)*10);o.rej=0}else if(o.price<fr*1.1)o.price=Math.round(fr*1.1/10)*10}for(const pk of ['2,1','1,0','0,1','1,2','2,2','0,0','2,0','0,2']){if(S.plots[pk])continue;const[a,b2]=pk.split(',').map(Number);const pr=D.plotPrice(a,b2);if(S.yen>pr*1.4&&S.objs.length>30*Object.keys(S.plots).length){S.plots[pk]=1;S.yen-=pr;D.emit('unlock',pk);D.occ()}break}}
    const s=D.stars();if(!starAt[s])starAt[s]=h;minYen=Math.min(minYen,S.yen);
    if(h%10==0)log.push([h,D.maxG(),Math.round(S.yen),D.guests().length,S.served,s,Math.round(S.rep),S.objs.filter(o=>!DEF[o.k].isPath).length]);
    if(h%5==0)await new Promise(r=>setTimeout(r,0))}
-  return{th:Object.entries(window.__thinks||{}).sort((a,b)=>b[1]-a[1]).slice(0,10),starAt,minYen,log,served:S.served,yen:S.yen,reviews:QX.M().reviews.slice(0,5).map(r=>r.s)}},{HOURS,BOT});
+  return{th:Object.entries(window.__thinks||{}).sort((a,b)=>b[1]-a[1]).slice(0,10),starAt,minYen,log,served:S.served,yen:S.yen,reviews:QX.M().reviews.slice(0,5).map(r=>r.s),ravg:QX.M().reviews.reduce((a,r)=>a+r.s,0)/QX.M().reviews.length}},{HOURS,BOT});
  console.log(JSON.stringify(res));console.log('ERR',JSON.stringify(errs.slice(0,5)));await b.close()})();
