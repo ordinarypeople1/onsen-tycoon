@@ -79,7 +79,7 @@ const SHELL=(()=>{
  addEventListener('keydown',e=>{if(inTitle){const t=top();if(e.key=='Escape'&&t){close(t.id);e.stopImmediatePropagation()}else if(e.key=='Enter'&&!t){start()}return}
   if(e.key=='Escape'){const t=top();if(t&&t.id!='ovPause'){close(t.id);e.stopImmediatePropagation();return}
    if(AMB.zen)return;if(document.getElementById('ovPause')){resume();e.stopImmediatePropagation();return}
-   if(!ghost&&!moving&&!mode&&$('modal').style.display!='block'&&$('info').style.display!='block'){pause();e.stopImmediatePropagation()}}
+   const vis=id=>getComputedStyle($(id)).display!='none';if(!ghost&&!moving&&!mode&&!vis('modal')&&!vis('info')){pause();e.stopImmediatePropagation()}}
   else if(e.key=='p'||e.key=='P'){document.getElementById('ovPause')?resume():pause()}},true);
  document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
  // 상단 일시정지 버튼

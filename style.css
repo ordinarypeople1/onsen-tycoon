@@ -111,3 +111,9 @@ body.titling #zenHint{display:none}
 .cp{display:flex;gap:6px;align-items:flex-start}.cp input,.cp textarea,#shI{flex:1;width:100%;box-sizing:border-box;font:500 11px monospace;border:1.5px solid #a07a50;border-radius:6px;padding:6px;background:#fffaf0;color:#4a3220;resize:none}
 #visitBar{position:fixed;top:56px;left:50%;transform:translateX(-50%);z-index:40;display:flex;gap:10px;align-items:center;padding:6px 8px 6px 14px;font:600 13px Pretendard,sans-serif}
 body.visit #build,body.visit #bOpen,body.visit #tDel,body.visit #quest,body.visit #bPause{display:none!important}
+@media (max-width:700px){
+ #quest{top:88px;bottom:auto;width:168px;font-size:11px;padding:5px 7px;z-index:3}
+ #quest .qf{font-size:11px}
+ #info{top:88px;bottom:auto;left:auto;right:8px;width:min(250px,64vw);max-height:calc(58vh - 110px);overflow:auto;z-index:6;font-size:12px}
+ #toast{max-width:86vw;white-space:normal;text-align:center}
+}

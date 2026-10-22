@@ -65,7 +65,7 @@ const AMB=(()=>{
  const flies=[],butts=[],birds=[],fx=[];
  function updCreatures(dt,t,lt){
   const open=Object.keys(S.plots).map(k=>k.split(',').map(Number));const rp=()=>{const p=open[(R()*open.length)|0];return[p[0]*PS+R()*PS,p[1]*PS+R()*PS]};
-  const want=Math.round(Math.max(0,lt.night-0.3)*(window.GFX_LOW?14:40));while(flies.length<want){const[x,y]=rp();flies.push({x,y,h:3+R()*12,vx:0,vy:0,p:R()*6,l:0})}if(flies.length>want&&R()<dt*3)flies.pop();
+  const want=Math.round(Math.max(0,lt.night-0.5)*2*(window.GFX_LOW?14:36));while(flies.length<want){const[x,y]=rp();flies.push({x,y,h:3+R()*12,vx:0,vy:0,p:R()*6,l:0})}if(flies.length>want&&R()<dt*3)flies.pop();
   for(const f of flies){f.vx+=(R()-0.5)*dt*1.2;f.vy+=(R()-0.5)*dt*1.2;f.vx*=0.97;f.vy*=0.97;f.x+=f.vx*dt;f.y+=f.vy*dt;f.h=Math.max(2,Math.min(18,f.h+(R()-0.5)*dt*10));f.l+=dt}
   const sea=season();const bw=lt.sun>0.35&&sea!=3?Math.min(7,2+S.objs.filter(o=>DEF[o.k].tree||DEF[o.k].pond).length):0;
   while(butts.length<bw){const[x,y]=rp();butts.push({x,y,h:6+R()*8,a:R()*6,c:['#f6e7a8','#f0b6c8','#ffffff','#bcd8f2'][(R()*4)|0],p:R()*6})}if(butts.length>bw)butts.pop();
@@ -103,7 +103,7 @@ const AMB=(()=>{
  });
  BUS.on('screen',(t,lt)=>{const z=cam.z;
   // 반딧불
-  if(flies.length){cx.globalCompositeOperation='lighter';for(const f of flies){const[a,b]=iso(f.x,f.y);const[X,Y]=toScreen(a,b-f.h);const pu=(Math.sin(f.l*2.5+f.p)+1)/2;if(pu<0.15)continue;const r=(3+pu*4)*z;cx.globalAlpha=pu*Math.min(1,f.l);cx.drawImage(B_FF,X-r,Y-r,r*2,r*2);cx.fillStyle='#f6ffd0';cx.fillRect(X-0.6*z,Y-0.6*z,1.2*z,1.2*z)}cx.globalAlpha=1}
+  if(flies.length){cx.globalCompositeOperation='lighter';for(const f of flies){const[a,b]=iso(f.x,f.y);const[X,Y]=toScreen(a,b-f.h);const pu=(Math.sin(f.l*2.5+f.p)+1)/2;if(pu<0.15)continue;const r=(2+pu*2.5)*Math.min(z,4);cx.globalAlpha=pu*Math.min(1,f.l);cx.drawImage(B_FF,X-r,Y-r,r*2,r*2);cx.fillStyle='#f6ffd0';cx.fillRect(X-0.6*z,Y-0.6*z,1.2*z,1.2*z)}cx.globalAlpha=1}
   // 석등 일렁임
   if(lt.night>0.3){cx.globalCompositeOperation='lighter';for(const o of S.objs){if(o.k!='lantern')continue;const G=objGeom(o);const[X,Y]=toScreen(G.X,G.Y-G.H*0.55);const fl=0.6+0.4*Math.sin(t/90+o.x*3)*Math.sin(t/233+o.y);const r=(9+fl*4)*z;cx.globalAlpha=0.25*fl*lt.night;cx.drawImage(B_WARM,X-r,Y-r,r*2,r*2)}cx.globalAlpha=1}
   cx.globalCompositeOperation='source-over';
@@ -113,7 +113,7 @@ const AMB=(()=>{
  // ---- 탭 반응 ----
  function tap(fx_,fy_,sx,sy){let best=null,bd=1e9;for(const g of guests){if(g.hide||g.dead)continue;const[X,Y]=toScreenT(g.x,g.y);const d=Math.hypot(X-sx,(Y-7*cam.z)-sy);if(d<bd){bd=d;best=g}}
   if(best&&bd<9*cam.z+6){best.hop=0.5;fx.push({k:'heart',g:best,l:1.2,L:1.2});if(best.inBath)fx.push({k:'ring',x:best.x,y:best.y,l:1,L:1},{k:'drop',x:best.x,y:best.y,n:8,l:0.7,L:0.7});
-   const L=best.inBath?['아~ 좋다','뜨끈뜨끈','최고야…','♨ 행복']:['안녕하세요!','여기 좋네요','유자 냄새~','오늘 날씨 좋다'];think(best,L[(R()*L.length)|0]);window.SND&&SND.squeak&&SND.squeak();return true}
+   const L=best.inBath?['아~ 좋다','뜨끈뜨끈','최고야…','♨ 행복']:['안녕하세요!','여기 좋네요','유자 냄새~','오늘 날씨 좋다'];think(best,L[(R()*L.length)|0]);window.SND&&SND.squeak&&SND.squeak();return !best.inBath}
   const o=OCC[(fx_|0)+','+(fy_|0)];if(o&&!DEF[o.k].isPath){const c=ctr(o);o.sway=Math.min(0.4,(o.sway||0)+0.3);fx.push({k:'spark',x:c[0],y:c[1],h:DEF[o.k].tree?20:10,l:0.8,L:0.8});
    if(DEF[o.k].pond){const d=pondData(o);const[X,Y]=iso(fx_,fy_);d.rip.push({x:X,y:Y,l:1.6},{x:X+2,y:Y+1,l:1.2})}}
   return false}
