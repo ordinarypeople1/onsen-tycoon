@@ -14,7 +14,7 @@ const SHELL=(()=>{
  let autoLow=localStorage.onsenAutoLow==='1';
  let fT=0,fN=0,fps=60,probe=0;const fpsEl=el('<div id="fps"></div>');document.body.appendChild(fpsEl);
  BUS.on('frame',dt=>{fT+=dt;fN++;if(fT>=1){fps=fN/fT;fT=0;fN=0;fpsEl.textContent=Math.round(fps)+' FPS';
-   if(SET.gfx=='auto'&&!autoLow&&!document.hidden){probe=fps<42?probe+1:0;if(probe>=5){autoLow=true;localStorage.onsenAutoLow='1';applyGfx();toast('기기 성능에 맞춰 그래픽 품질을 낮췄어요 (설정에서 변경)')}}}
+   if(SET.gfx=='auto'&&!autoLow&&!document.hidden){probe=fps<42?probe+1:0;if(probe>=5&&!(window.WSCALE<1)){window.WSCALE=0.75;probe=0;try{resize()}catch(e){}}else if(probe>=5){autoLow=true;localStorage.onsenAutoLow='1';applyGfx();toast('기기 성능에 맞춰 그래픽 품질을 낮췄어요 (설정에서 변경)')}}}
   fpsEl.style.display=SET.fps?'block':'none'});
  // ---- 오버레이 공통 ----
  function overlay(id,html,cls=''){close(id);const o=el(`<div class="ovl ${cls}" id="${id}"><div class="menu panel">${html}</div></div>`);document.body.appendChild(o);requestAnimationFrame(()=>o.classList.add('on'));return o}

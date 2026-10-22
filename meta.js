@@ -59,14 +59,18 @@ const QX=(()=>{
   el.innerHTML=`<h3>⭐ 손님 리뷰 <small>평균 ${avg.toFixed(1)} / 5 (최근 ${m.reviews.length}개)</small></h3>`+(m.reviews.map(r=>`<div class="row"><span><b>${r.n}</b> <span class="stars">${'★'.repeat(r.s)}<span style="color:#cdbb9c">${'★'.repeat(5-r.s)}</span></span><br><small>${r.t}</small></span><small>Day ${r.d}</small></div>`).join('')||'<div>아직 리뷰가 없어요</div>')+`<div style="text-align:right"><button class="b g" onclick="this.closest('.panel').style.display='none'">닫기</button></div>`;el.style.display='block'}
  // ----- 연출 -----
  let coinT=0;
- function flyCoin(sx,sy){const yb=$('yen').getBoundingClientRect();const c=document.createElement('div');c.className='flycoin';c.textContent='¥';c.style.left=sx+'px';c.style.top=sy+'px';document.body.appendChild(c);
-  requestAnimationFrame(()=>{c.style.left=(yb.left+6)+'px';c.style.top=(yb.top+4)+'px';c.style.transform='scale(0.6)';c.style.opacity='0.4'});setTimeout(()=>{c.remove();const y=$('yen').parentNode;y.classList.remove('bump');void y.offsetWidth;y.classList.add('bump')},650)}
+ function flyCoin(sx,sy){const yb=$('yen').getBoundingClientRect();const c=document.createElement('div');c.className='flycoin';c.textContent='¥';c.style.left='0px';c.style.top='0px';document.body.appendChild(c);
+  const ex=yb.left+6,ey=yb.top+4,mx=(sx+ex)/2+(Math.random()-0.5)*120,my=Math.min(sy,ey)-60-Math.random()*60,K=[];
+  for(let i=0;i<=12;i++){const t=i/12,u=1-t,x=u*u*sx+2*u*t*mx+t*t*ex,y=u*u*sy+2*u*t*my+t*t*ey;K.push({transform:`translate(${x}px,${y}px) scale(${1.15-0.55*t}) rotateY(${t*540}deg)`,opacity:t<0.1?t*10:1-0.4*t*t})}
+  const an=c.animate?c.animate(K,{duration:620+Math.random()*160,easing:'cubic-bezier(.45,.05,.55,.95)',fill:'forwards'}):null;
+  const done=()=>{c.remove();const y=$('yen').parentNode;y.classList.remove('bump');void y.offsetWidth;y.classList.add('bump')};if(an)an.onfinish=done;else setTimeout(done,650)}
+ function lvPop(o){try{const[sx,sy]=toScreenT(...ctr(o));const e=document.createElement('div');e.className='lvpop'+(o.lv==3||o.lv==5?' big':'');e.innerHTML=`<b>Lv.${o.lv}</b>${o.lv==3||o.lv==5?'<small>새 외관!</small>':''}`;e.style.left=sx+'px';e.style.top=(sy-30)+'px';document.body.appendChild(e);setTimeout(()=>e.remove(),1600)}catch(_){}}
  function burst(){for(let i=0;i<14;i++){const r=$('quest').getBoundingClientRect();flyCoin(r.left+r.width/2+(Math.random()-0.5)*80,r.top+r.height/2+(Math.random()-0.5)*30)}}
  function flash(){const f=document.createElement('div');f.className='flash';document.body.appendChild(f);setTimeout(()=>f.remove(),500)}
  // ----- 이벤트 -----
  BUS.on('pay',(o,g,p)=>{st().earned+=p;if(g.vip)st().vip++;const now=performance.now();if(now-coinT>180){coinT=now;const[sx,sy]=toScreenT(...ctr(o));if(sx>0&&sy>0&&sx<innerWidth&&sy<innerHeight){flyCoin(sx,sy-20);SND.coin()}}});
  BUS.on('build',o=>{const d=DEF[o.k];st().built++;if((d.tab=='deco'||d.tab=='theme')&&!d.isPath&&!d.price)st().decor++;const _sd=setsDone();for(const k of _sd)if(!(M().sets||(M().sets=[])).includes(k)){M().sets.push(k);toast('🎐 '+SETS[k][0]+' 세트 완성! 평판 점수 +15');SND.quest&&SND.quest()}M().col.i[o.k]=Math.max(M().col.i[o.k]||0,1);SND.build()});
- BUS.on('upgrade',o=>{st().upgrades++;M().col.i[o.k]=Math.max(M().col.i[o.k]||0,o.lv);SND.upgrade();if(o.lv==3||o.lv==5)flash()});
+ BUS.on('upgrade',o=>{st().upgrades++;M().col.i[o.k]=Math.max(M().col.i[o.k]||0,o.lv);SND.upgrade();lvPop(o);if(o.lv==3||o.lv==5)flash()});
  BUS.on('unlock',()=>{st().unlock++;SND.unlock()});
  BUS.on('paint',(k,n)=>{st().paint+=n;M().col.i[k]=Math.max(M().col.i[k]||0,1)});
  BUS.on('spawn',g=>{const m=M();m.col.g[g.vip?'vip':g.spr]=1;
