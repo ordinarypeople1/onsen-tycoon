@@ -138,8 +138,8 @@ function buildGround(){
  const pathMap={};S.objs.forEach(o=>{if(DEF[o.k].isPath)pathMap[o.x+','+o.y]=o.k});
  const near=new Set();for(const o of S.objs){if(DEF[o.k].fp>=2)for(let x=o.x-1;x<=o.x+DEF[o.k].fp;x++)for(let y=o.y-1;y<=o.y+DEF[o.k].fp;y++)near.add(x+','+y)}
  // 절벽 옆면
- g.fillStyle='#8a6a48';g.beginPath();g.moveTo(ox-N*TW/2,N*TH/2);g.lineTo(ox,N*TH);g.lineTo(ox+N*TW/2,N*TH/2);g.lineTo(ox+N*TW/2,N*TH/2+14);g.lineTo(ox,N*TH+14);g.lineTo(ox-N*TW/2,N*TH/2+14);g.fill();
- g.fillStyle='#6d5238';g.beginPath();g.moveTo(ox,N*TH);g.lineTo(ox+N*TW/2,N*TH/2);g.lineTo(ox+N*TW/2,N*TH/2+14);g.lineTo(ox,N*TH+14);g.fill();
+ if(0){g.fillStyle='#8a6a48';g.beginPath();g.moveTo(ox-N*TW/2,N*TH/2);g.lineTo(ox,N*TH);g.lineTo(ox+N*TW/2,N*TH/2);g.lineTo(ox+N*TW/2,N*TH/2+14);g.lineTo(ox,N*TH+14);g.lineTo(ox-N*TW/2,N*TH/2+14);g.fill();
+ g.fillStyle='#6d5238';g.beginPath();g.moveTo(ox,N*TH);g.lineTo(ox+N*TW/2,N*TH/2);g.lineTo(ox+N*TW/2,N*TH/2+14);g.lineTo(ox,N*TH+14);g.fill()}
  g.fillStyle='#5f8f45';g.fillRect(0,0,0,0);
  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
   const r=rng(x*928371+y*1237+7);const[ix,iy]=iso(x,y);const X=ox+ix,Y=iy;
@@ -376,6 +376,7 @@ function render(t){
  const lt=light(),sv=sunVec(),z=cam.z;
  cx.setTransform(DPR,0,0,DPR,0,0);cx.imageSmoothingEnabled=false;
  const sg=cx.createLinearGradient(0,0,0,VH);const sk=lt.sky;sg.addColorStop(0,`rgb(${sk})`);sg.addColorStop(1,`rgb(${sk.map(v=>Math.min(255,v+25))})`);cx.fillStyle=sg;cx.fillRect(0,0,VW,VH);
+ drawBackdrop(lt);
  // 원경 숲
  cx.setTransform(DPR*z,0,0,DPR*z,DPR*cam.x,DPR*cam.y);
  if(groundDirty)buildGround();
@@ -487,7 +488,17 @@ function nightLights(t,lt,z){const k0=Math.min(1,(lt.night-0.18)/0.5),k=k0*k0*(3
     glow(X,Y-5*z,3*z,`rgba(255,236,190,${0.85*on*fl})`);glow(X,Y-5*z,10*z,`rgba(255,190,110,${0.3*on*fl})`);cx.save();cx.translate(X,Y);cx.scale(1,0.45);glow(0,0,16*z,`rgba(255,170,90,${0.2*on*fl})`);cx.restore()}}}
  cx.globalAlpha=1;BUS.emit('nightlight',t,lt,k,z)}
 function glow(X,Y,r,c){const[rgb,a]=parseC(c);const pa=cx.globalAlpha;cx.globalAlpha=pa*a;cx.drawImage(blob(rgb),X-r,Y-r,r*2,r*2);cx.globalAlpha=pa;return;const g=cx.createRadialGradient(X,Y,0,X,Y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=g;cx.fillRect(X-r,Y-r,r*2,r*2)}
-let FOREST=null;function drawForest(lt){if(!FOREST){const x0=-60*TW/2,y0=-160,W=(N+12)*TW,H=(N+8)*TH/2+200;const c=mk(W*2,H*2),g=c.getContext('2d');g.scale(2,2);g.translate(-x0,-y0);const _cx=cx;cx=g;drawForest_();cx=_cx;FOREST={c,x0,y0,W,H}}cx.drawImage(FOREST.c,FOREST.x0,FOREST.y0,FOREST.W,FOREST.H)}
+let FOREST=null;// ===== 원경: 계곡·숲·강 회화 배경 (화면 공간 1장, 줌/이동 시차, 시간대·계절 색조) =====
+const BG=new Image();BG.src='assets/bg/valley.jpg';const SEA_T=['rgba(255,190,210,0.10)',null,'rgba(230,120,40,0.16)','rgba(235,242,255,0.38)'];
+function drawBackdrop(lt){if(!BG.complete||!BG.naturalWidth)return;const iw=BG.naturalWidth,ih=BG.naturalHeight;
+ const [mx,my]=iso(N/2,N/2);const sx=mx*cam.z+cam.x,sy=my*cam.z+cam.y;const zk=1+Math.log2(Math.max(0.3,cam.z/zmin()))*0.05;
+ const sc=Math.max(VW/iw,VH/ih)*1.25*zk,w=iw*sc,h=ih*sc;const px=(sx-VW/2)*0.18,py=(sy-VH/2)*0.18;
+ cx.imageSmoothingEnabled=true;cx.drawImage(BG,VW/2-w/2+px,VH*0.46-h/2+py,w,h);cx.imageSmoothingEnabled=false;
+ const se=SEA_T[season()];if(se){cx.fillStyle=se;cx.fillRect(0,0,VW,VH)}
+ cx.globalCompositeOperation='multiply';cx.fillStyle=`rgba(${lt.sky},0.32)`;cx.fillRect(0,0,VW,VH);cx.globalCompositeOperation='source-over';
+ if(lt.night>0.05){cx.fillStyle=`rgba(12,18,40,${Math.min(0.55,lt.night*0.55)})`;cx.fillRect(0,0,VW,VH)}
+ const mg=cx.createLinearGradient(0,VH*0.15,0,VH*0.6);mg.addColorStop(0,'rgba(240,244,246,0)');mg.addColorStop(0.5,`rgba(235,240,244,${0.10+0.08*Math.sin(performance.now()/9000)})`);mg.addColorStop(1,'rgba(240,244,246,0)');cx.fillStyle=mg;cx.fillRect(0,0,VW,VH)}
+function drawForest(lt){if(!FOREST){const x0=-60*TW/2,y0=-160,W=(N+12)*TW,H=(N+8)*TH/2+200;const c=mk(W*2,H*2),g=c.getContext('2d');g.scale(2,2);g.translate(-x0,-y0);const _cx=cx;cx=g;drawForest_();cx=_cx;FOREST={c,x0,y0,W,H}}cx.drawImage(FOREST.c,FOREST.x0,FOREST.y0,FOREST.W,FOREST.H)}
 function drawForest_(){const r=rng(42);for(let i=0;i<160;i++){const side=i%2;const k=r()*N;const x=side?-1.5-r()*3:k,y=side?k:-1.5-r()*3;const[X,Y]=iso(x,y);
   cx.fillStyle=`rgb(${60+r()*20|0},${104+r()*25|0},${70+r()*15|0})`;const h=18+r()*18;cx.beginPath();cx.moveTo(X,Y-h);cx.lineTo(X+9,Y);cx.lineTo(X-9,Y);cx.fill();
   cx.fillStyle='rgba(255,255,255,0.08)';cx.beginPath();cx.moveTo(X,Y-h);cx.lineTo(X-9,Y);cx.lineTo(X-3,Y);cx.fill()}}
@@ -547,7 +558,7 @@ function drawPlots(t,lt){const P=N/PS;window._signs=[];
   let fog=open?0:1;if(an)fog=1-easeOut(Math.min(1,an.t));if(fog<=0)continue;
   const x0=px*PS,y0=py*PS;const c=[iso(x0,y0),iso(x0+PS,y0),iso(x0+PS,y0+PS),iso(x0,y0+PS)];
   cx.beginPath();cx.moveTo(...c[0]);c.slice(1).forEach(p=>cx.lineTo(...p));cx.closePath();
-  cx.save();cx.clip();cx.fillStyle=`rgba(200,214,206,${0.42*fog})`;cx.fill();cx.fillStyle=`rgba(70,90,90,${0.12*fog})`;cx.fill();
+  cx.save();cx.clip();cx.fillStyle=`rgba(200,214,206,${0.2*fog})`;cx.fill();cx.fillStyle=`rgba(40,60,55,${0.22*fog})`;cx.fill();
   // 안개 덩어리
   const r=rng(px*7+py*13+3);for(let i=0;i<14;i++){const fx=x0+r()*PS,fy=y0+r()*PS;const[X,Y]=iso(fx,fy);const s=10+r()*10;if(window.GFX_LOW&&i%2)continue;const pa=cx.globalAlpha;cx.globalAlpha=pa*0.22*fog;cx.drawImage(blob('255,255,255'),X+Math.sin(t/4000+i)*6-s,Y-s,s*2,s*2);cx.globalAlpha=pa}cx.restore();
   if(!open&&plotAdj(px,py)){ // 로프 울타리
