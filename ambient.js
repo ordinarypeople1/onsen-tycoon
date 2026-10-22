@@ -23,37 +23,62 @@ const AMB=(()=>{
   for(let i=0;i<4;i++)d.koi.push({r:0.25+r()*0.5,sp:(0.12+r()*0.18)*(r()<0.5?1:-1),ph:r()*6.28,c:KC[i%4],w:r()*6});
   for(let i=0;i<4;i++){const a=r()*6.28,rr=0.35+r()*0.5;d.pads.push({a,rr,s:0.8+r()*0.5,fl:i==1})}
   d.rip=[];PD.set(o,d);return d}
+ const PWC={};
+ function pondWater(ctx,rx,ry,ph,lt){ // 깊이 그라디언트 + 하늘 반사 + 커스틱 (프레임 캐시용)
+  const sk=lt.sky,su=lt.sun,n=lt.night;const mix=(a,b,k)=>a.map((v,i)=>Math.round(v+(b[i]-v)*k));
+  const shal=mix([92,150,140],sk,0.25),deep=mix([22,58,66],[14,22,48],n*0.6);
+  const g=ctx.createRadialGradient(0,ry*0.25,0,0,0,rx);g.addColorStop(0,`rgb(${deep})`);g.addColorStop(0.72,`rgb(${mix(deep,shal,0.55)})`);g.addColorStop(1,`rgb(${shal})`);
+  ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,6.283);ctx.fill();ctx.save();ctx.clip();
+  // 바닥 자갈 (깊이로 흐림)
+  ctx.globalAlpha=0.18*(1-n*0.6);ctx.fillStyle='#b9b08f';for(let i=0;i<26;i++){const a=i*2.39996,r=Math.sqrt((i+0.5)/26)*0.85;ctx.beginPath();ctx.ellipse(Math.cos(a)*rx*r,Math.sin(a)*ry*r+1,1.4,0.7,0,0,6.283);ctx.fill()}
+  // 하늘 반사 (뒤쪽 가장자리일수록 강하게)
+  const rg=ctx.createLinearGradient(0,-ry,0,ry*0.4);rg.addColorStop(0,`rgba(${sk},${0.42-0.18*n})`);rg.addColorStop(1,`rgba(${sk},0)`);ctx.globalAlpha=1;ctx.fillStyle=rg;ctx.fillRect(-rx,-ry,rx*2,ry*2);
+  // 커스틱
+  ctx.globalCompositeOperation='screen';ctx.strokeStyle=`rgba(220,255,240,${0.06+0.12*su})`;ctx.lineWidth=0.55;ctx.beginPath();
+  for(let i=0;i<6;i++){const yy=-ry+(i+0.5)/6*ry*2;ctx.moveTo(-rx,yy);for(let xx=-rx;xx<=rx;xx+=2.5)ctx.lineTo(xx,yy+Math.sin(xx/3.3+ph+i*1.7)*0.8+Math.sin(xx/7-ph*0.7+i)*0.6)}ctx.stroke();
+  // 하이라이트 (해 쪽)
+  ctx.fillStyle=`rgba(255,250,230,${0.12*su})`;ctx.beginPath();ctx.ellipse(-rx*0.35,-ry*0.45,rx*0.35,ry*0.12,-0.1,0,6.283);ctx.fill();
+  ctx.globalCompositeOperation='source-over';
+  // 앞쪽 테두리 안쪽 그늘 (돌 아래 깊이)
+  const sg=ctx.createLinearGradient(0,-ry,0,-ry*0.4);sg.addColorStop(0,'rgba(10,25,25,0.45)');sg.addColorStop(1,'rgba(10,25,25,0)');ctx.fillStyle=sg;ctx.fillRect(-rx,-ry,rx*2,ry);
+  ctx.restore()}
  function drawPond(o,t,lt,ghostA){const d=pondData(o);const[cX,cY]=iso(o.x+1.5,o.y+1.5);const rx=3*TW*0.4,ry=rx/2;
   cx.save();cx.globalAlpha=ghostA||1;
-  // 바닥 그림자 + 물
   cx.fillStyle='rgba(30,40,30,0.25)';cx.beginPath();cx.ellipse(cX,cY+1.5,rx+3,ry+2.5,0,0,6.283);cx.fill();
-  const wg=cx.createLinearGradient(0,cY-ry,0,cY+ry);wg.addColorStop(0,'#3d6f70');wg.addColorStop(1,'#2a5257');cx.fillStyle=wg;cx.beginPath();cx.ellipse(cX,cY,rx,ry,0,0,6.283);cx.fill();
+  // 캐시된 물 프레임
+  const sc=cx.getTransform().a,FR=24,per=4800,fi=Math.floor((t%per)/per*FR);const lk=sc.toFixed(2)+'|'+Math.round(lt.sun*12)+'|'+Math.round(lt.night*12)+'|'+lt.sky.map(v=>v>>3).join(',');
+  let C=PWC.c;if(!C||C.lk!==lk){C=PWC.c={lk,fr:[]}}let im=C.fr[fi];
+  if(!im){im=document.createElement('canvas');im.width=Math.ceil((rx*2+2)*sc);im.height=Math.ceil((ry*2+2)*sc);const g=im.getContext('2d');g.setTransform(sc,0,0,sc,(rx+1)*sc,(ry+1)*sc);pondWater(g,rx,ry,fi/FR*6.283,lt);C.fr[fi]=im}
+  cx.drawImage(im,cX-rx-1,cY-ry-1,rx*2+2,ry*2+2);
   cx.save();cx.beginPath();cx.ellipse(cX,cY,rx-1,ry-0.5,0,0,6.283);cx.clip();
-  // 안쪽 그늘
-  cx.fillStyle='rgba(20,35,35,0.35)';cx.beginPath();cx.ellipse(cX,cY-ry*0.55,rx,ry*0.6,0,0,6.283);cx.fill();
-  // 잉어
+  // 잉어 + 그림자
   for(const k of d.koi){const a=t/1000*k.sp+k.ph;const px=cX+Math.cos(a)*rx*k.r*1.3,py=cY+Math.sin(a)*ry*k.r*1.3;const hd=a+(k.sp>0?1.571:-1.571);
-   const ux=Math.cos(hd),uy=Math.sin(hd)*0.5,wig=Math.sin(t/180+k.w)*0.35;
-   cx.globalAlpha=0.85;for(let s=0;s<4;s++){const bx=px-ux*s*1.7+Math.sin(wig*s)*0.6*-uy,by=py-uy*s*1.7;cx.fillStyle=s==1?k.c[1]:k.c[0];cx.beginPath();cx.ellipse(bx,by,s==3?0.8:1.5-s*0.2,s==3?0.8:1.1-s*0.15,hd,0,6.283);cx.fill()}
+   const ux=Math.cos(hd),uy=Math.sin(hd)*0.5,wig=Math.sin(t/180+k.w)*0.35;const dep=0.5+0.5*Math.sin(t/2600+k.w);
+   cx.globalAlpha=0.22;cx.fillStyle='#0c1c1c';cx.beginPath();cx.ellipse(px-ux*3+1.2,py-uy*3+1.4,4.2,1.5,hd,0,6.283);cx.fill();
+   cx.globalAlpha=0.6+0.3*dep;for(let s=0;s<4;s++){const bx=px-ux*s*1.7+Math.sin(wig*s)*0.6*-uy,by=py-uy*s*1.7;cx.fillStyle=s==1?k.c[1]:k.c[0];cx.beginPath();cx.ellipse(bx,by,s==3?0.8:1.5-s*0.2,s==3?0.8:1.1-s*0.15,hd,0,6.283);cx.fill()}
    const tx=px-ux*7.2,ty=py-uy*7.2;cx.fillStyle=k.c[0];cx.beginPath();cx.moveTo(tx+ux*1.5,ty+uy*1.5);cx.lineTo(tx-uy*2+Math.sin(t/150+k.w),ty+ux*1.2);cx.lineTo(tx+uy*2+Math.sin(t/150+k.w),ty-ux*1.2);cx.fill();
-   if(R()<0.002){d.rip.push({x:px,y:py,l:1.6})}}
-  cx.globalAlpha=1;
-  // 하늘 반사·물결선
-  cx.fillStyle=`rgba(${lt.sky},0.14)`;cx.fillRect(cX-rx,cY-ry,rx*2,ry*2);
-  cx.globalCompositeOperation='screen';cx.strokeStyle=`rgba(255,255,255,${0.08+0.08*lt.sun})`;cx.lineWidth=0.5;cx.beginPath();
-  for(let i=0;i<5;i++){const yy=cY-ry+((t/120+i*ry*0.45)%(ry*2.2));cx.moveTo(cX-rx,yy);for(let xx=-rx;xx<=rx;xx+=4)cx.lineTo(cX+xx,yy+Math.sin(xx/5+t/500+i)*0.6)}cx.stroke();
-  cx.globalCompositeOperation='source-over';
+   if(R()<0.003){d.rip.push({x:px,y:py,l:1.6})}}
+  cx.globalAlpha=1;cx.lineWidth=0.5;
   for(const p of d.rip){p.l-=1/60;const k=1.6-p.l;cx.strokeStyle=`rgba(230,250,250,${Math.max(0,p.l/1.6)*0.6})`;cx.beginPath();cx.ellipse(p.x,p.y,1+k*5,0.5+k*2.5,0,0,6.283);cx.stroke()}d.rip=d.rip.filter(p=>p.l>0);
   cx.restore();
-  // 연잎
-  for(const p of d.pads){const a=p.a+Math.sin(t/4000+p.a)*0.05;const px=cX+Math.cos(a)*rx*p.rr,py=cY+Math.sin(a)*ry*p.rr;cx.fillStyle='#4f7d3a';cx.beginPath();cx.ellipse(px,py,2.6*p.s,1.3*p.s,0,0.5,6.0);cx.lineTo(px,py);cx.fill();cx.fillStyle='#6d9a4c';cx.beginPath();cx.ellipse(px-0.4,py-0.3,1.6*p.s,0.7*p.s,0,0.5,6.0);cx.lineTo(px,py);cx.fill();
+  // 연잎 (그림자 + 잎맥)
+  for(const p of d.pads){const a=p.a+Math.sin(t/4000+p.a)*0.05;const px=cX+Math.cos(a)*rx*p.rr,py=cY+Math.sin(a)*ry*p.rr;
+   cx.fillStyle='rgba(10,30,25,0.3)';cx.beginPath();cx.ellipse(px+0.6,py+0.8,2.6*p.s,1.3*p.s,0,0,6.283);cx.fill();
+   cx.fillStyle='#3f6e33';cx.beginPath();cx.ellipse(px,py,2.6*p.s,1.3*p.s,0,0.5,6.0);cx.lineTo(px,py);cx.fill();cx.fillStyle='#6d9a4c';cx.beginPath();cx.ellipse(px-0.4,py-0.3,1.6*p.s,0.7*p.s,0,0.5,6.0);cx.lineTo(px,py);cx.fill();
+   cx.fillStyle='rgba(200,230,150,0.5)';cx.fillRect(px-1.6*p.s,py-0.1,1.4*p.s,0.35);
    if(p.fl){cx.fillStyle='#f3c2cf';cx.beginPath();cx.ellipse(px+0.5,py-1,1.3,0.9,0,0,6.283);cx.fill();cx.fillStyle='#fff3f5';cx.fillRect(px+0.1,py-1.8,0.8,0.8)}}
-  // 돌 테두리 (뒤→앞 순서)
+  // 돌 테두리 + 이끼 (뒤→앞)
   const st=d.stones.slice().sort((a,b)=>Math.sin(a.a)-Math.sin(b.a));const SC=[['#8f8a80','#b4ad9f'],['#7d7a72','#a39e92'],['#9a9384','#c2baa8']];
-  for(const s of st){const px=cX+Math.cos(s.a)*(rx+0.5),py=cY+Math.sin(s.a)*(ry+0.3);const w=3.2*s.s,h=2.2*s.s;cx.fillStyle='rgba(30,30,25,0.25)';cx.beginPath();cx.ellipse(px+0.5,py+0.9,w,h*0.7,0,0,6.283);cx.fill();
+  for(const s of st){const px=cX+Math.cos(s.a)*(rx+0.5),py=cY+Math.sin(s.a)*(ry+0.3);const w=3.2*s.s,h=2.2*s.s;const front=Math.sin(s.a)>0;
+   cx.fillStyle='rgba(30,30,25,0.25)';cx.beginPath();cx.ellipse(px+0.5,py+0.9,w,h*0.7,0,0,6.283);cx.fill();
    cx.fillStyle=SC[s.c][0];cx.beginPath();cx.ellipse(px,py,w,h,0,0,6.283);cx.fill();cx.fillStyle=SC[s.c][1];cx.beginPath();cx.ellipse(px-0.5,py-0.7,w*0.65,h*0.5,0,0,6.283);cx.fill();
-   if(s.c==1){cx.fillStyle='rgba(110,140,70,0.7)';cx.fillRect(px-w*0.6,py-h*0.6,w*0.5,0.9)}}
+   if(front){cx.fillStyle='rgba(40,60,50,0.35)';cx.beginPath();cx.ellipse(px,py-h*0.55,w*0.8,h*0.25,0,3.3,6.1);cx.fill()} // 물에 닿는 젖은 면
+   if(s.c!=2){cx.fillStyle=s.c==1?'rgba(104,140,64,0.85)':'rgba(124,156,76,0.7)';cx.beginPath();cx.ellipse(px-w*0.25,py-h*0.55,w*0.45,h*0.28,0,0,6.283);cx.fill();cx.fillStyle='rgba(170,196,100,0.6)';cx.fillRect(px-w*0.4,py-h*0.75,1,0.6)}}
   cx.restore()}
+ // 밤: 연못 수중등 + 가장자리 반사
+ BUS.on('nightlight',(t,lt,k,z)=>{for(const o of S.objs){if(!DEF[o.k].pond)continue;const[X0,Y0]=iso(o.x+1.5,o.y+1.5);const X=X0*z+cam.x,Y=Y0*z+cam.y;const rx=3*TW*0.4*z,ry=rx/2;if(X<-rx||X>VW+rx||Y<-ry||Y>VH+ry)continue;const fl=0.93+0.05*Math.sin(t/210+o.x);
+  cx.save();cx.translate(X,Y);cx.scale(1,0.5);glow(0,0,rx*0.95,`rgba(90,210,200,${0.2*k*fl})`);glow(-rx*0.3,rx*0.15,rx*0.4,`rgba(255,210,140,${0.14*k*fl})`);cx.restore();
+  for(let i=0;i<3;i++){const a=Math.PI*(0.25+0.25*i);glow(X+Math.cos(a)*rx,Y+Math.sin(a)*ry,3*z,`rgba(255,226,170,${0.55*k*fl})`)}}});
  // ---- 탕 물결/커스틱 ----
  BUS.on('water',(o,cX,cY,rx,ry,t,lt)=>{
   cx.globalCompositeOperation='screen';cx.strokeStyle=`rgba(255,255,255,${0.05+0.07*lt.sun})`;cx.lineWidth=0.6;cx.beginPath();

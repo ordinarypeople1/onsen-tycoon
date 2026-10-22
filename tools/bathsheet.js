@@ -2,7 +2,7 @@
 const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1500,height:900}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
 await p.goto('http://localhost:8765/index.html?notitle');await p.waitForFunction(()=>window.__ready);
-for(const lv of [1,3,5]){
+for(const lv of [1,2,3,4,5]){
  await p.evaluate(lv=>{const D=__dbg,S=D.S;S.objs=S.objs.filter(o=>o.k=='gate'||D.DEF[o.k].isPath);D.guests().length=0;D.occ();
   const pos={rock:[18,17],milky:[24,17],hinoki:[19,24],sauna:[25,24]};
   for(const k in pos){const[x,y]=pos[k];S.objs.push({k,x,y,lv,price:D.DEF[k].price,uses:0,earn:0,users:0})}D.occ();
