@@ -27,6 +27,7 @@ const SND=(()=>{let ac=null,master=null,amb=null,bgmOn=false,muted=localStorage.
  api.coin=()=>{if(!ac)return;tone(1318,'square',0.06,0.03);tone(1975,'square',0.12,0.025,0.05)};
  api.build=()=>{if(!ac)return;tone(110,'sine',0.25,0.15);tone(70,'triangle',0.3,0.1,0.02);for(let i=0;i<4;i++)tone(1500+i*300,'sine',0.15,0.02,0.08+i*0.04)};
  api.upgrade=()=>{if(!ac)return;[523,659,784,1046,1318].forEach((f,i)=>tone(f,'triangle',0.35,0.05,i*0.07))};
+ api.boom=()=>{if(!ac)return;const t=ac.currentTime,src=ac.createBufferSource();src.buffer=api._nb||(api._nb=noiseBuf(1));const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.setValueAtTime(900,t);lp.frequency.exponentialRampToValueAtTime(120,t+0.6);const g=ac.createGain();src.connect(lp);lp.connect(g);g.connect(sfx);env(g,t,0.01,0.8,0.25);src.start(t);src.stop(t+0.9);tone(60,'sine',0.5,0.12)};
  api.hammer=()=>{if(!ac)return;tone(196,'square',0.05,0.05);tone(98,'triangle',0.09,0.08,0.005)};
  api.tok=()=>{if(!ac)return;tone(520,'triangle',0.09,0.12,0,ambB);tone(260,'sine',0.14,0.08,0.005,ambB);tone(780,'triangle',0.05,0.04,0.25,ambB)};
  api.squeak=()=>{if(!ac)return;tone(1400,'sine',0.08,0.04);tone(1900,'sine',0.07,0.03,0.06)};
