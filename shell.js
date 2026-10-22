@@ -73,7 +73,7 @@ const SHELL=(()=>{
    <div class="ver">v3.0 · Esc 일시정지 · Z 감상 모드</div></div></div>`);
   document.body.appendChild(o);requestAnimationFrame(()=>o.classList.add('on'));
   o.querySelectorAll('[data-a]').forEach(b=>b.onclick=e=>{e.stopPropagation();SND.init();const a=b.dataset.a;if(a=='cont')start();else if(a=='slots')slots(true);else if(a=='set')settings();else if(a=='cred')credits();else if(a=='zen'){start();AMB.setZen(true)}})}
- function start(){const o=document.getElementById('title');if(o){o.classList.remove('on');o.id='';setTimeout(()=>o.remove(),700)}inTitle=false;paused=false;document.body.classList.remove('titling');AMB.setZen(false)}
+ function start(){const o=document.getElementById('title');if(o){o.classList.remove('on');o.id='';setTimeout(()=>o.remove(),700)}inTitle=false;paused=false;document.body.classList.remove('titling');AMB.setZen(false);const zh=document.getElementById('zHome');zh&&zh.click()}
  function refreshTexts(){const o=document.getElementById('title');if(o){o.remove();showTitle()}}
  // ---- 입력 ----
  addEventListener('keydown',e=>{if(inTitle){const t=top();if(e.key=='Escape'&&t){close(t.id);e.stopImmediatePropagation()}else if(e.key=='Enter'&&!t){start()}return}
