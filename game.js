@@ -426,8 +426,28 @@ let FOREST=null;function drawForest(lt){if(!FOREST){const x0=-60*TW/2,y0=-160,W=
 function drawForest_(){const r=rng(42);for(let i=0;i<160;i++){const side=i%2;const k=r()*N;const x=side?-1.5-r()*3:k,y=side?k:-1.5-r()*3;const[X,Y]=iso(x,y);
   cx.fillStyle=`rgb(${60+r()*20|0},${104+r()*25|0},${70+r()*15|0})`;const h=18+r()*18;cx.beginPath();cx.moveTo(X,Y-h);cx.lineTo(X+9,Y);cx.lineTo(X-9,Y);cx.fill();
   cx.fillStyle='rgba(255,255,255,0.08)';cx.beginPath();cx.moveTo(X,Y-h);cx.lineTo(X-9,Y);cx.lineTo(X-3,Y);cx.fill()}}
-function drawWater_(o,G,t,lt){const d=DEF[o.k],f=d.fp;const[cX,cY]=iso(o.x+f/2,o.y+f/2);const rx=f*TW*0.25,ry=f*TH*0.25;
- cx.save();cx.beginPath();cx.ellipse(cX,cY-1,rx,ry,0,0,6.283);cx.clip();
+const WGEO={milky:{ins:0.7,lift:12}};
+function wgeo(o){const d=DEF[o.k],f=d.fp,w=WGEO[o.k];const[cX,cY0]=iso(o.x+f/2,o.y+f/2);if(w){const k=f/2-w.ins;return{d,f,cX,cY:cY0-w.lift,rx:k*TW,ry:k*TH,dia:1}}return{d,f,cX,cY:cY0,rx:f*TW*0.25,ry:f*TH*0.25,dia:0}}
+function wpath(W){cx.beginPath();if(W.dia){cx.moveTo(W.cX,W.cY-W.ry);cx.lineTo(W.cX+W.rx,W.cY);cx.lineTo(W.cX,W.cY+W.ry);cx.lineTo(W.cX-W.rx,W.cY);cx.closePath()}else cx.ellipse(W.cX,W.cY-1,W.rx,W.ry,0,0,6.283)}
+function drawMilky(W,t,lt){const{cX,cY,rx,ry}=W;const sk=lt.sky,n=lt.night,su=lt.sun;
+ const mix=(a,b,k)=>a.map((v,i)=>Math.round(v*(1-k)+b[i]*k));const base=mix([224,220,206],sk,0.15),deep=mix([112,170,172],sk,0.15);
+ const g=cx.createLinearGradient(cX,cY-ry,cX,cY+ry);g.addColorStop(0,`rgba(${deep},0.85)`);g.addColorStop(0.5,`rgba(${base},0.8)`);g.addColorStop(1,`rgba(${mix(base,[255,255,255],0.35)},0.82)`);cx.fillStyle=g;cx.fill();
+ // 은은하게 흐르는 우윳빛 구름
+ const B=blob('255,253,245');const PH=t/(ry*2.4*90)*6.283;for(let i=0;i<7;i++){const a=PH*(i%3==0?1:0)+Math.sin(PH+i)*0.35+i*0.9,r=0.55+0.3*Math.sin(i*2.1);const X=cX+Math.cos(a*(i%2?1:-1)+i)*rx*0.45*r,Y=cY+Math.sin(a*1.3+i*1.7)*ry*0.45*r;cx.globalAlpha=0.32+0.15*Math.sin(PH+i);cx.drawImage(B,X-rx*0.32,Y-ry*0.32,rx*0.64,ry*0.64)}
+ cx.globalAlpha=1;
+ // 하늘빛 반사 (새벽·저녁·밤에도 물이 빛을 머금도록)
+ {const sl=mix(sk,n>0.5?[170,190,255]:[255,214,176],0.5),k=0.28*(1-su*0.75);const rg=cx.createLinearGradient(cX-rx*0.3,cY-ry,cX+rx*0.3,cY+ry);rg.addColorStop(0,`rgba(${sl},${k})`);rg.addColorStop(0.5,`rgba(${sl},${k*0.25})`);rg.addColorStop(1,`rgba(${sl},${k*0.6})`);cx.globalCompositeOperation='screen';cx.fillStyle=rg;cx.fillRect(cX-rx,cY-ry,rx*2,ry*2)}
+ // 비스듬한 물비늘 띠 (등각 축 방향)
+ cx.globalCompositeOperation='screen';for(let i=0;i<5;i++){const u=((PH/6.283+i/5)%1)*2-1;const X=cX+u*rx,Y=cY-u*ry*0.0;cx.strokeStyle=`rgba(255,250,235,${(0.10+0.10*su)*(1-Math.abs(u))})`;cx.lineWidth=1.2;cx.beginPath();cx.moveTo(X-rx*0.5,Y-ry*0.5+u*ry*0.5);cx.lineTo(X+rx*0.5,Y+ry*0.5+u*ry*0.5);cx.stroke()}
+ // 반짝임
+ for(let i=0;i<9;i++){const q=(PH*(1+i%2)+i*2.3)%6.283,v=Math.max(0,Math.sin(q*2))**6;if(v<0.05)continue;const a=i*1.7,rr=0.25+0.5*((i*0.37)%1);cx.fillStyle=`rgba(255,255,245,${v*(0.5+0.4*su)})`;cx.fillRect(cX+Math.cos(a)*rx*rr*0.7-1,cY+Math.sin(a)*ry*rr*0.7,2.2,0.7)}
+ cx.globalCompositeOperation='source-over';
+ // 안쪽 벽 그림자 (뒤쪽 두 변)
+ cx.strokeStyle=`rgba(80,70,60,${0.28-0.1*n})`;cx.lineWidth=2.2;cx.beginPath();cx.moveTo(cX-rx,cY);cx.lineTo(cX,cY-ry);cx.lineTo(cX+rx,cY);cx.stroke();
+ cx.strokeStyle='rgba(255,255,255,0.35)';cx.lineWidth=0.7;cx.beginPath();cx.moveTo(cX-rx+3,cY+1);cx.lineTo(cX,cY-ry+2.2);cx.lineTo(cX+rx-3,cY+1);cx.stroke();
+}
+function drawWater_(o,G,t,lt){const W=wgeo(o);const{d,f,cX,cY,rx,ry}=W;
+ cx.save();wpath(W);cx.clip();if(W.dia)drawMilky(W,t,lt);
  // 반짝이는 하이라이트 띠
  cx.globalCompositeOperation='screen';for(let i=0;i<4;i++){const y=cY-ry+((t/90+i*ry*0.6)%(ry*2.4));cx.fillStyle=`rgba(255,255,255,${0.10+0.08*lt.sun})`;cx.fillRect(cX-rx,y,rx*2,0.6)}
  // 하늘 반사
@@ -437,13 +457,13 @@ function drawWater_(o,G,t,lt){const d=DEF[o.k],f=d.fp;const[cX,cY]=iso(o.x+f/2,o
  if(lt.night>0.4){cx.fillStyle=`rgba(255,200,120,${0.12*lt.night})`;cx.fillRect(cX-rx,cY-ry,rx*2,ry*2)}
  cx.globalCompositeOperation='source-over';cx.restore()}
 const SUNT={};function sunTex(left,sun,ar){const k=left+'|'+sun+'|'+ar.toFixed(2);if(SUNT.k===k)return SUNT.c;const H=180,W=Math.round(H*ar),c=SUNT.c||document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');const gr=g.createRadialGradient(left?W*0.1:W*0.9,-H*0.2,0,left?W*0.1:W*0.9,-H*0.2,H*1.3);gr.addColorStop(0,`rgba(255,236,190,${0.32*sun})`);gr.addColorStop(1,'rgba(255,236,190,0)');g.fillStyle=gr;g.fillRect(0,0,W,H);SUNT.k=k;SUNT.c=c;return c}
-const WC={};function drawWater(o,G,t,lt){const d=DEF[o.k],f=d.fp;const[cX,cY]=iso(o.x+f/2,o.y+f/2);const rx=f*TW*0.25,ry=f*TH*0.25;
- if(window.GFX_LOW||window.__nowc){cx.save();drawWater_(o,G,t,lt);cx.beginPath();cx.ellipse(cX,cY-1,rx,ry,0,0,6.283);cx.clip();BUS.emit('water',o,cX,cY,rx,ry,t,lt);cx.restore();return}
+const WC={};function drawWater(o,G,t,lt){const W=wgeo(o);const{d,f,cX,cY,rx,ry}=W;
+ if(window.GFX_LOW||window.__nowc){cx.save();drawWater_(o,G,t,lt);wpath(W);cx.clip();BUS.emit('water',o,cX,cY,rx,ry,t,lt);cx.restore();return}
  const m=cx.getTransform(),sc=m.a;const per=ry*2.4*90,FR=32,fi=Math.floor((t%per)/per*FR);const lk=o.k+'|'+sc.toFixed(2)+'|'+Math.round(lt.sun*12)+'|'+Math.round(lt.night*12)+'|'+lt.sky.map(v=>v>>3).join(',');
  let c=WC[o.k];if(!c||c.lk!==lk){c=WC[o.k]={lk,fr:[]}}
  let im=c.fr[fi];if(!im){const pw=Math.ceil((rx*2+4)*sc),ph=Math.ceil((ry*2+4)*sc);im=document.createElement('canvas');im.width=pw;im.height=ph;const ocx=cx;cx=im.getContext('2d');cx.setTransform(sc,0,0,sc,(rx+2)*sc,(ry+3)*sc);
-  const fo={...o,x:-f/2,y:-f/2};const sI=iso;try{const tt=fi/FR*per+Math.floor(t/per)*0;drawWater_(fo,G,tt,lt)}finally{cx=ocx}c.fr[fi]=im}
- cx.drawImage(im,cX-rx-2,cY-ry-3,rx*2+4,ry*2+4);cx.save();cx.beginPath();cx.ellipse(cX,cY-1,rx,ry,0,0,6.283);cx.clip();BUS.emit('water',o,cX,cY,rx,ry,t,lt);cx.restore()}
+  const fo={...o,x:-f/2,y:-f/2};const _l=(WGEO[o.k]||{}).lift||0;cx.translate(0,_l);const sI=iso;try{const tt=fi/FR*per+Math.floor(t/per)*0;drawWater_(fo,G,tt,lt)}finally{cx=ocx}c.fr[fi]=im}
+ cx.drawImage(im,cX-rx-2,cY-ry-3,rx*2+4,ry*2+4);cx.save();wpath(W);cx.clip();BUS.emit('water',o,cX,cY,rx,ry,t,lt);cx.restore()}
 function drawGuest(g,t,lt,sv){const[X,Y]=iso(g.x,g.y);if(g.vip||g.reg){cx.save();cx.globalCompositeOperation='lighter';cx.globalAlpha=g.vip?0.35:0.28;cx.drawImage(blob(g.vip?'255,215,90':'140,200,255'),X-12,Y-18,24,24);cx.globalAlpha=1;cx.restore()}
  if(g.inBath){const v=VAR[g.cb];if(!v)return;const W=17,h=W*v.base.height/v.base.width,bob=Math.sin(t/600+g.bob)*0.4-(g.hz||0)*0.5,ch=h*0.8;
   cx.drawImage(v.base,0,0,v.base.width,v.base.height*0.8,X-W/2,Y-ch+2+bob,W,ch);
