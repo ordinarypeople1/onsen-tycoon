@@ -45,3 +45,5 @@ canvas{display:block;position:fixed;left:0;top:0}#tc{pointer-events:none}
  #tools{bottom:calc(42vh + 6px)}#tools.low{bottom:8px}.tool{width:46px;height:46px;font-size:18px}.zoom input{width:80px}
  #info{top:auto;bottom:calc(42vh + 62px);width:240px}
 }
+
+#moveBar{position:fixed;top:64px;left:50%;transform:translateX(-50%);display:none;z-index:8}#moveBar button{font-family:inherit;background:#c0703a;color:#fff;border:0;border-radius:5px;padding:4px 10px;cursor:pointer}
