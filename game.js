@@ -298,7 +298,7 @@ function decide(g){
  const o=pickTarget(g);if(!o){if(NEEDK.every(k=>g.need[k]<35)||Math.random()<0.4){leave(g);return}
   for(let i=0;i<8;i++){const x=(Math.random()*N)|0,y=(Math.random()*N)|0;if(walkable(x,y)&&goTo(g,x,y))return}leave(g);return}
  const pp=pathToObj(g,o);if(pp)g.path=pp;if(!pp){if(!g.blocked)g.blocked=new Set();if(!g.blocked.size){think(g,'길이 막혔어요…');g.happy-=4}g.blocked.add(o);g.path=[];return}g.target=o;}
-function arrive(g){g.ax=g.x;g.ay=g.y;const o=g.target,d=DEF[o.k];g.target=null;o.users=o.users||0;
+function arrive(g){g.ax=g.x;g.ay=g.y;const o=g.target;if(!o||!DEF[o.k]){g.target=null;g.st='walk';if(_pb-->0)decide(g);return}const d=DEF[o.k];g.target=null;o.users=o.users||0;
  if(!S.objs.includes(o)){decide(g);return}
  const cap=capOf(o);if(o.users>=cap){if(!g.waited){g.waited=1;if(Math.random()<0.5)think(g,'자리가 날 때까지 기다릴게요');g.st='wait';g.t=5;g.target=o;return}g.waited=0;think(g,'자리가 없네…');g.happy-=3;(g.used=g.used||[]).push(o);return}
  const fair=fairPrice(o)*(0.8+g.happy/150);
@@ -352,7 +352,7 @@ function emit(dt){if(parts.length>(window.GFX_LOW?140:600))return;if(window.GFX_
  if(season()==3&&Math.random()<dt*6){const r=rng(Date.now()|0);parts.push({k:'snow',x:Math.random()*N,y:Math.random()*N,h:60,l:8,L:8,ph:Math.random()*6})}
 }
 function updParts(dt){for(const o of S.objs)if(o.sway)o.sway=Math.max(0,o.sway-dt*0.35);for(const p of parts){p.l-=dt;if(p.k=='spark'){p.h+=p.vh*dt;p.vh*=0.96;continue}if(p.k=='dust'){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=0.92;p.vy*=0.92;continue}if(p.k=='steam'){p.h+=dt*9;p.x+=(p.vx+(window.WIND||0)*0.12)*dt;p.y-=(window.WIND||0)*0.06*dt;p.s+=dt*2.5}else{if(p.h>0){p.h-=dt*(p.k=='snow'?6:8);p.ph+=dt*2;p.x+=Math.sin(p.ph)*dt*0.25+dt*0.12}else{p.h=0;p.l=Math.min(p.l,1.5)}}}
- parts=parts.filter(p=>p.l>0);floats.forEach(f=>f.l-=dt);floats=floats.filter(f=>f.l>0);bubbles.forEach(b=>b.l-=dt);bubbles=bubbles.filter(b=>b.l>0&&!b.g.dead&&!b.g.hide);
+ parts=parts.filter(p=>p.l>0);if(parts.length>900)parts.splice(0,parts.length-900);floats.forEach(f=>f.l-=dt);floats=floats.filter(f=>f.l>0);bubbles.forEach(b=>b.l-=dt);bubbles=bubbles.filter(b=>b.l>0&&!b.g.dead&&!b.g.hide);
  for(const k in anims){anims[k].t+=dt;if(anims[k].t>1.6)delete anims[k]}}
 // ===== 렌더 =====
 let ghost=null,hoverT=null,mode=null;
@@ -697,7 +697,7 @@ function checkReach(){const gi=gateInfo();const w=$('warn');if(!gi){w.style.disp
  while(q.length){const[x,y]=q.shift();for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const k=(x+dx)+','+(y+dy);if(seen.has(k)||!walkable(x+dx,y+dy))continue;seen.add(k);q.push([x+dx,y+dy])}}
  const bad=S.objs.filter(o=>DEF[o.k].price&&o!==moving).filter(o=>{const t=[];for(const[x,y]of tilesOf(o))for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]])t.push((x+dx)+','+(y+dy));return !t.some(k=>seen.has(k))});
  if(bad.length){w.textContent='⚠️ 대문에서 갈 수 없는 시설: '+[...new Set(bad.map(o=>DEF[o.k].n))].join(', ');w.style.display='block'}else w.style.display='none'}
-let _ferr=0,_pb=8;function frame(now){_pb=8;try{frame_(now)}catch(e){if(_ferr++<5)console.error('frame error',e)}requestAnimationFrame(frame)}
+let _ferr=0,_pb=8;function frame(now){_pb=8;try{frame_(now)}catch(e){if(_ferr++<5)console.error('frame error',e);if(window.DIAG&&_ferr<50)DIAG.log('frame',e.message,{stack:(e.stack||'').slice(0,600)})}requestAnimationFrame(frame)}
 function frame_(now){warnAcc+=1;if(warnAcc%90==1)checkReach();const dt=Math.min(0.1,(now-last)/1000||0);last=now;
  if(!paused&&!window.READONLY)for(let i=0;i<speed;i++)step(dt);else if(window.READONLY&&!paused)step(dt);
  if(Math.abs(cam.tz-cam.z)>0.001){const z=cam.z+(cam.tz-cam.z)*Math.min(1,dt*10);const p=zoomTarget||[VW/2,VH/2];zoomAt(p[0],p[1],z)}

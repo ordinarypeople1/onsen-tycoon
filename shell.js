@@ -26,7 +26,9 @@ const SHELL=(()=>{
    <h3>${T('gfx')}</h3><div class="seg" data-k="gfx">${['auto','high','low'].map(g=>`<button data-g="${g}" class="${SET.gfx==g?'on':''}">${T(g)}</button>`).join('')}</div>
    <h3>${T('lang')}</h3><div class="seg" data-k="lang"><button data-l="ko" class="${SET.lang=='ko'?'on':''}">한국어</button><button data-l="en" class="${SET.lang=='en'?'on':''}">English (menus)</button></div>
    <label class="row chk"><span>${T('fps')}</span><input type="checkbox" ${SET.fps?'checked':''} id="sFps"></label>
+   <h3>진단</h3><div class="btns"><button class="mb sm" id="sDiag">오류 로그 복사</button></div>
    <div class="btns"><button class="mb" data-x>${T('close')}</button></div>`);
+  o.querySelector('#sDiag').onclick=async()=>{const t=window.DIAG?DIAG.text():'';try{await navigator.clipboard.writeText(t);toast('오류 로그를 복사했어요. 그대로 붙여넣어 보내주세요')}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('오류 로그를 복사했어요')}catch(_){prompt('아래 내용을 복사하세요',t.slice(0,5000))}ta.remove()}};
   o.querySelectorAll('input[data-v]').forEach(i=>i.oninput=()=>{v[i.dataset.v]=+i.value;saveSet();SND.applyVol&&SND.applyVol()});
   o.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{SET.gfx=b.dataset.g;if(SET.gfx!='auto'){autoLow=false;localStorage.onsenAutoLow='0'}saveSet();applyGfx();settings()});
   o.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{SET.lang=b.dataset.l;saveSet();settings();refreshTexts()});
