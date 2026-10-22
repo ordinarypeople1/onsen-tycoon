@@ -34,4 +34,4 @@ const SAVE={adapter:new LocalAdapter(),codec:SaveCodec,LocalAdapter,SupabaseAdap
  _t:0,mirror(obj){if(this.adapter.name=='local')return;clearTimeout(this._t);this._t=setTimeout(()=>this.adapter.save(+localStorage.onsenSlot||1,obj).catch(e=>console.warn('remote save',e)),30000)}};
 window.SAVE=SAVE;
 // 방문 링크: #visit=YUZU1....
-(()=>{const m=location.hash.match(/visit=([^&]+)/);if(m)window.VISIT_PROMISE=SaveCodec.decode(decodeURIComponent(m[1]))})();
+(()=>{const m=location.hash.match(/visit=([^&]+)/);if(m)window.VISIT_PROMISE=SaveCodec.decode(decodeURIComponent(m[1]));else if(/showcase/.test(location.hash)){window.SHOWCASE=1;window.VISIT_PROMISE=fetch('assets/showcase.json').then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(d=>{d.t=Date.now();return d})}})();

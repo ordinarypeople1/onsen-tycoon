@@ -130,7 +130,7 @@ const AMB=(()=>{
   const pts=S.objs.filter(o=>DEF[o.k].bath||DEF[o.k].stay||DEF[o.k].tab=='food').sort((a,b)=>(DEF[b.k].bath?1:0)-(DEF[a.k].bath?1:0)||(a.x+a.y)-(b.x+b.y));
   let tx_,ty_;if(pts.length){const seg=16,i=Math.floor(zT/seg),f=(zT%seg)/seg;const A=pts[(i*3)%pts.length],c=ctr(A);const dr=(f-0.5)*2.2;tx_=c[0]+dr*0.6;ty_=c[1]-dr*0.6+Math.sin(zT/11)*0.4}
   else{const P=Object.keys(S.plots).map(k=>k.split(',').map(Number));tx_=P[0][0]*PS+PS/2;ty_=P[0][1]*PS+PS/2}
-  const zz=(VW>820?3.6:2.8)+Math.sin(zT/23)*0.35;
+  const zz=((VW>820?3.6:2.8)+Math.sin(zT/23)*0.35)*Math.max(1,VW/1280);
   const[wx,wy]=iso(tx_,ty_);const k=Math.min(1,dt*(zT<3?1.6:0.45));cam.z+=(zz-cam.z)*Math.min(1,dt*0.4);cam.tz=cam.z;const gx=VW/2-wx*cam.z,gy=VH/2-wy*cam.z;cam.x+=(gx-cam.x)*k;cam.y+=(gy-cam.y)*k}
  function setZen(on,quiet){zen=on;zT=0;document.body.classList.toggle('zen',on);if(on&&!quiet){zHint=document.createElement('div');zHint.id='zenHint';zHint.textContent='감상 모드 · 아무 곳이나 누르거나 Esc로 나가기';document.body.appendChild(zHint);setTimeout(()=>zHint&&zHint.classList.add('fade'),2500);window.SND&&SND.init&&SND.init()}else{zHint&&zHint.remove();zHint=null}}
  addEventListener('keydown',e=>{if(window.SHELL&&SHELL.inTitle)return;if(e.key=='Escape'&&zen){setZen(false);e.stopPropagation()}else if((e.key=='z'||e.key=='Z')&&!e.ctrlKey&&document.activeElement.tagName!='INPUT')setZen(!zen)},true);
