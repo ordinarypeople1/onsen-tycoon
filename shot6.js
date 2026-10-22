@@ -1,0 +1,11 @@
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1440,height:900}});const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()=='error')errs.push(m.text())});
+ await p.goto('http://localhost:8765/index.html');await p.waitForFunction(()=>window.__ready);
+ await p.evaluate(()=>{const D=__dbg,S=D.S;S.yen=1e6;const add=(k,x,y)=>{if(D.canPlace(k,x,y)){S.objs.push({k,x,y,lv:1,price:D.DEF[k].price||0,uses:0,earn:0,users:0});D.occ()}};add('pond',27,17);add('sakura',30,18);add('maple',26,21);add('pine',17,18);add('lantern',27,21);add('ramen',18,22);add('milk',29,25);for(let i=0;i<400;i++)D.step(0.1)});
+ const at=async(min,name,z)=>{await p.evaluate(([m,z])=>{__dbg.S.min=Math.floor(__dbg.S.min/1440)*1440+m;if(z)__dbg.cam.tz=z},[min,z]);await p.waitForTimeout(1500);await p.screenshot({path:name})};
+ await at(10*60+30,'shot_amb_day.png');
+ await p.evaluate(()=>{__dbg.focusXY&&__dbg.focusXY(28.5,18.5,5)});await at(10*60+30,'shot_amb_pond.png');
+ await at(21*60+30,'shot_amb_night.png');
+ await p.keyboard.press('z');await at(16*60+40,'shot_amb_zen.png');await p.waitForTimeout(4000);await p.screenshot({path:'shot_amb_zen2.png'});
+ const fps=await p.evaluate(()=>new Promise(r=>{let n=0,t0=performance.now();const f=()=>{n++;if(performance.now()-t0<2000)requestAnimationFrame(f);else r(n/2)};requestAnimationFrame(f)}));
+ console.log('fps',fps,'ERR',JSON.stringify(errs.slice(0,5)));await b.close()})();

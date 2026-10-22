@@ -17,9 +17,9 @@ const DEF={
  yuzu:{n:'유자차 매점',tab:'shop',img:'yuzu',fp:2,sc:1,cost:2500,price:350,cap:3,dur:8,eff:{thirst:-60,fun:8},wage:25,star:1,appeal:6,desc:'따끈한 유자차 한 잔'},
  gift:{n:'기념품 가게',tab:'shop',img:'gift',fp:2,sc:1,cost:6000,price:1500,cap:3,dur:12,eff:{fun:-0,joy:30},wage:50,star:2,appeal:7,fun:1,light:[[0.2,-0.4]],desc:'카피바라 인형이 인기'},
  room:{n:'객실 별채',tab:'shop',img:'room',fp:3,sc:1,cost:12000,price:6000,cap:4,dur:0,eff:{fatigue:-100},wage:90,star:2,appeal:10,stay:1,light:[[-0.2,-0.3],[0.25,-0.3],[0,-0.55]],desc:'밤에 묵어가는 손님용 객실'},
- sakura:{n:'벚꽃나무',tab:'deco',img:'sakura',fp:1,sc:2.3,cost:1200,beauty:8,star:1,emit:'petal',desc:'꽃잎이 흩날려요'},
- maple:{n:'단풍나무',tab:'deco',img:'maple',fp:1,sc:2.3,cost:1200,beauty:8,star:1,emit:'leaf',desc:'붉은 잎이 떨어져요'},
- pine:{n:'눈 내린 소나무',tab:'deco',img:'pine',fp:1,sc:2.0,cost:2000,beauty:10,star:2,emit:'snow',desc:'주변에 눈이 내려요'},
+ sakura:{tree:1,n:'벚꽃나무',tab:'deco',img:'sakura',fp:1,sc:2.3,cost:1200,beauty:8,star:1,emit:'petal',desc:'꽃잎이 흩날려요'},
+ maple:{tree:1,n:'단풍나무',tab:'deco',img:'maple',fp:1,sc:2.3,cost:1200,beauty:8,star:1,emit:'leaf',desc:'붉은 잎이 떨어져요'},
+ pine:{tree:1,n:'눈 내린 소나무',tab:'deco',img:'pine',fp:1,sc:2.0,cost:2000,beauty:10,star:2,emit:'snow',desc:'주변에 눈이 내려요'},
  lantern:{n:'석등롱',tab:'deco',img:'lantern',fp:1,sc:1.25,cost:600,beauty:5,star:1,light:[[0,-0.55]],desc:'밤이면 은은히 빛나요'},
  rocks:{n:'정원석',tab:'deco',img:'rocks',fp:1,sc:1.4,cost:400,beauty:4,star:1,desc:'이끼 낀 정원석'},
  gate:{n:'대문',img:'gate',fp:1,cost:0,star:9,walk:1,gate:1,light:[[-0.33,-0.42],[0.22,-0.3]],desc:'손님이 드나드는 유일한 입구'},
@@ -27,6 +27,7 @@ const DEF={
  path_wood:{n:'나무 데크길',tab:'deco',img:null,ic:'🪵',fp:1,cost:80,beauty:2,star:1,isPath:1,desc:'따뜻한 나무 데크'},
  path_gravel:{n:'자갈길',tab:'deco',img:null,ic:'⚪',fp:1,cost:30,beauty:1,star:1,isPath:1,desc:'사각사각 자갈길'},
  path_tatami:{n:'다다미 회랑',tab:'deco',img:null,ic:'🟩',fp:1,cost:150,beauty:3,star:2,isPath:1,desc:'료칸 느낌의 회랑'},
+ pond:{n:'비단잉어 연못',tab:'deco',img:null,ic:'🐟',fp:3,cost:3000,beauty:14,star:1,flat:1,pond:1,desc:'잉어가 헤엄치고 연잎이 떠 있어요'},
  path_erase:{n:'길 지우기',tab:'deco',img:null,ic:'🧽',fp:1,cost:0,star:1,erase:1,desc:'드래그해서 길 제거 (50% 환불)'},
 };
 const TABS=[['bath','♨️','탕'],['food','🍜','음식'],['shop','🏮','상점'],['deco','🌸','장식']];
@@ -117,13 +118,16 @@ function buildGround(){
   const key=x+','+y,pk=pathMap[key],cob=!pk&&near.has(key);
   const tmp=tileTex(pk||(cob?1:0),(x*7+y*13)%12,(x+y)%2);g.drawImage(tmp,X-TW/2,Y,TW,TH);
   if(!pk){g.beginPath();g.moveTo(X,Y+0.25);g.lineTo(X+TW/2-0.5,Y+TH/2);g.lineTo(X,Y+TH-0.25);g.lineTo(X-TW/2+0.5,Y+TH/2);g.closePath();
-  g.lineWidth=0.5;g.strokeStyle=cob?'rgba(90,78,62,0.45)':'rgba(48,84,36,0.42)';g.stroke()}
+  if(cob){g.lineWidth=0.5;g.strokeStyle='rgba(90,78,62,0.35)';g.stroke()}}
   else{ // 오토타일: 다른 종류와 맞닿은 변에만 테두리
    const T=[X,Y],R=[X+TW/2,Y+TH/2],B=[X,Y+TH],L=[X-TW/2,Y+TH/2];const ed={path:'#7d7466',path_wood:'#5a3c22',path_gravel:'#9a9286',path_tatami:'#4f5a2a'}[pk];
    const sides=[[[0,-1],L,T],[[1,0],T,R],[[0,1],R,B],[[-1,0],B,L]];g.lineWidth=1.1;g.strokeStyle=ed;
    for(const[[dx,dy],a,b]of sides){if(pathMap[(x+dx)+','+(y+dy)]===pk)continue;g.beginPath();g.moveTo(...a);g.lineTo(...b);g.stroke();
     g.save();g.globalAlpha=0.25;g.strokeStyle='#000';g.lineWidth=0.6;g.beginPath();g.moveTo(a[0],a[1]+0.8);g.lineTo(b[0],b[1]+0.8);g.stroke();g.restore()}}
  }
+ {const r=rng(777);g.save();g.beginPath();g.moveTo(ox,0);g.lineTo(ox+N*TW/2,N*TH/2);g.lineTo(ox,N*TH);g.lineTo(ox-N*TW/2,N*TH/2);g.clip();
+  for(let i=0;i<70;i++){const[ix,iy]=iso(r()*N,r()*N);const R=30+r()*70;const dk=r()<0.5;const gr=g.createRadialGradient(ox+ix,iy,0,ox+ix,iy,R);gr.addColorStop(0,dk?'rgba(40,70,40,0.13)':'rgba(230,220,150,0.10)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.save();g.translate(ox+ix,iy);g.scale(1,0.5);g.translate(-ox-ix,-iy);g.fillRect(ox+ix-R,iy-R,R*2,R*2);g.restore()}g.restore()}
+ BUS.emit('groundCache',g,ox);
  groundDirty=false;
 }
 const TEX={};
@@ -137,8 +141,8 @@ function tileTex(cob,vr,par){const key=cob+'_'+vr+'_'+par;const ty=typeof cob=='
    else if(ty=='path_tatami'){const bx=(px+py*2)%32<2||(px-py*2+256)%64<2;c=bx?[70,78,40]:[196+((px*3+py)%5)-n*8,198-n*8,132-n*6];if(!bx&&(px+py*2)%3==0)c=[c[0]-10,c[1]-10,c[2]-8]}
    else if(cob){const sx=Math.floor((px+py*2)/7),sy=Math.floor((px-py*2+140)/7);const seam=((px+py*2)%7==0)||((px-py*2+140)%7==0);
      const v=((sx*7+sy*13+x*3+y*5)%5)*6;c=seam?[150,140,124]:[196+v-n*10,186+v-n*10,166+v-n*8];}
-   else{const v=n<0.08?22:n<0.2?-12:0;const fl=n>0.995;c=fl?[255,240,246]:[118+v+par*4,170+v,92+v*0.6];
-     if(n>0.985&&!fl)c=[150,196,108];}
+   else{const v=n<0.08?22:n<0.2?-12:0;const fl=n>0.995;c=fl?[250,238,226]:[114+v*0.7+par*3,156+v*0.8,90+v*0.5];
+     if(n>0.985&&!fl)c=[140,176,104];}
    const i=(py*TW*2+px)*4;id.data[i]=c[0];id.data[i+1]=c[1];id.data[i+2]=c[2];id.data[i+3]=255;}
   const tmp=mk(TW*2,TH*2);tmp.getContext('2d').putImageData(id,0,0);return TEX[key]=tmp}
 // ===== 오브젝트 =====
@@ -189,6 +193,7 @@ const THOUGHT={
  none:{fatigue:'쉴 곳이 없네…',hunger:'뭐 먹을 데 없나…',thirst:'목말라요…',fun:'좀 심심하다'},
  want:{fatigue:'온천 하고 싶다',hunger:'배고파요',thirst:'우유 마시고 싶다',fun:'구경하고 싶어요'}};
 function entrance(){const s=START_PLOT;return[s[0]*PS+PS/2,s[1]*PS+PS]}
+function wageNow(h){const nt=(h%24)>=23||(h%24)<6;return Math.round(S.objs.reduce((s,o)=>{const d=DEF[o.k];if(!d.wage)return s;const w=d.wage*(1+0.5*(o.lv-1));return s+(nt&&!d.stay&&!d.night?w*0.3:w)},0)+S.objs.filter(o=>!DEF[o.k].isPath&&!DEF[o.k].wage).length*4)}
 function capTotal(){return S.objs.reduce((a,o)=>{const d=DEF[o.k];return a+(d.cap&&!d.stay?d.cap+o.lv-1:0)},0)}
 function maxGuests(){return Math.min(12+stars()*8,Math.round(capTotal()*1.5)+4)}
 function spawnRate(){const h=hour();const f=h<6?0.05:h<9?0.5:h<12?0.7:h<15?0.6:h<17?0.8:h<21?1.15:h<23?0.5:0.15;return f*(0.12+stars()*0.06)}
@@ -276,7 +281,7 @@ function emit(dt){
   if(d.emit&&Math.random()<dt*2.2){parts.push({k:d.emit,x:o.x+0.5+(Math.random()-0.5)*4,y:o.y+0.5+(Math.random()-0.5)*4,h:30+Math.random()*25,vx:0,l:6,L:6,ph:Math.random()*6})}}
  if(season()==3&&Math.random()<dt*6){const r=rng(Date.now()|0);parts.push({k:'snow',x:Math.random()*N,y:Math.random()*N,h:60,l:8,L:8,ph:Math.random()*6})}
 }
-function updParts(dt){for(const o of S.objs)if(o.sway)o.sway=Math.max(0,o.sway-dt*0.35);for(const p of parts){p.l-=dt;if(p.k=='spark'){p.h+=p.vh*dt;p.vh*=0.96;continue}if(p.k=='dust'){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=0.92;p.vy*=0.92;continue}if(p.k=='steam'){p.h+=dt*9;p.x+=p.vx*dt;p.s+=dt*2.5}else{if(p.h>0){p.h-=dt*(p.k=='snow'?6:8);p.ph+=dt*2;p.x+=Math.sin(p.ph)*dt*0.25+dt*0.12}else{p.h=0;p.l=Math.min(p.l,1.5)}}}
+function updParts(dt){for(const o of S.objs)if(o.sway)o.sway=Math.max(0,o.sway-dt*0.35);for(const p of parts){p.l-=dt;if(p.k=='spark'){p.h+=p.vh*dt;p.vh*=0.96;continue}if(p.k=='dust'){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=0.92;p.vy*=0.92;continue}if(p.k=='steam'){p.h+=dt*9;p.x+=(p.vx+(window.WIND||0)*0.12)*dt;p.y-=(window.WIND||0)*0.06*dt;p.s+=dt*2.5}else{if(p.h>0){p.h-=dt*(p.k=='snow'?6:8);p.ph+=dt*2;p.x+=Math.sin(p.ph)*dt*0.25+dt*0.12}else{p.h=0;p.l=Math.min(p.l,1.5)}}}
  parts=parts.filter(p=>p.l>0);floats.forEach(f=>f.l-=dt);floats=floats.filter(f=>f.l>0);bubbles.forEach(b=>b.l-=dt);bubbles=bubbles.filter(b=>b.l>0&&!b.g.dead&&!b.g.hide);
  for(const k in anims){anims[k].t+=dt;if(anims[k].t>1.6)delete anims[k]}}
 // ===== 렌더 =====
@@ -304,10 +309,11 @@ function render(t){
  drawPlots(t,lt);
  // 건설 모드 그리드 + 열린 구역 테두리
  drawGrid();
+ BUS.emit('ground',t,lt);
  if(paint){const{t}=paintPlan();const er=DEF[ghost].erase;cx.fillStyle=er?'rgba(240,110,100,0.5)':'rgba(140,230,140,0.5)';for(const[x,y]of t){const[X,Y]=iso(x,y);cx.beginPath();cx.moveTo(X,Y);cx.lineTo(X+16,Y+8);cx.lineTo(X,Y+16);cx.lineTo(X-16,Y+8);cx.fill()}}
  // 그림자 + 오브젝트 + 손님 정렬
  const list=[];
- for(const o of S.objs){if(!!DEF[o.k].isPath||o===moving)continue;const t=tilesOf(o),l=t[t.length-1];
+ for(const o of S.objs){if(!!DEF[o.k].isPath||DEF[o.k].flat||o===moving)continue;const t=tilesOf(o),l=t[t.length-1];
   if(o.k=='gate'){list.push({x0:t[0][0],y0:t[0][1],x1:t[0][0]+1,y1:t[0][1]+1,o,part:'back'});list.push({x0:l[0],y0:l[1],x1:l[0]+1,y1:l[1]+1,o,part:'front'});continue}
   list.push({x0:o.x,y0:o.y,x1:l[0]+1,y1:l[1]+1,o})}
  for(const g of guests)if(!g.hide&&!g.inBath)list.push({x0:g.x-0.15,y0:g.y-0.15,x1:g.x+0.15,y1:g.y+0.15,g});
@@ -324,7 +330,7 @@ function render(t){
  for(const it of list){
   if(it.part){const o=it.o,G=objGeom(o);drawSprite(skey(o)+'_'+it.part,o,G.X,G.Y,G.W,lt,sv,1)}
   else if(it.o){const o=it.o,d=DEF[o.k],G=objGeom(o);const an=anims['o'+S.objs.indexOf(o)];const pop=an?Math.min(1,an.t*3):1;
-   const Wp=G.W*(0.7+0.3*easeOut(pop));const fade=hidden.has(o)&&!d.bath&&d.fp>1;drawSprite(skey(o),o,G.X,G.Y,Wp,lt,sv,pop*(fade?0.5:1));
+   const Wp=G.W*(0.7+0.3*easeOut(pop));const fade=hidden.has(o)&&!d.bath&&d.fp>1;const sw_=d.tree?(Math.sin(t/1100+o.x*1.7+o.y)*0.018+(window.WIND||0)*0.025+(o.sway||0)*Math.sin(t/110)*0.25):0;if(sw_){cx.save();cx.translate(G.X,G.Y);cx.transform(1,0,-sw_,1,0,0);cx.translate(-G.X,-G.Y)}drawSprite(skey(o),o,G.X,G.Y,Wp,lt,sv,pop*(fade?0.5:1));if(sw_)cx.restore();
    if(d.bath){drawWater(o,G,t,lt);guests.filter(g=>g.inBath&&g.cur===o).sort((a,b)=>a.x+a.y-b.x-b.y).forEach(g=>drawGuest(g,t,lt,sv));const ov=skey(o)+'_over';if(VAR[ov]&&guests.some(g=>g.inBath&&g.cur===o))drawSprite(ov,o,G.X,G.Y,Wp,lt,sv,pop)}
    if(o.lv>1){for(let i=0;i<o.lv-1;i++){cx.fillStyle='#f6cf5a';cx.fillRect(G.X-8+i*4,G.Y+1,3,3)}}}
   else drawGuest(it.g,t,lt,sv);}
@@ -337,7 +343,7 @@ function render(t){
   else if(p.k=='spark'){cx.globalAlpha=Math.min(1,p.l);const tw=(Math.sin(t/60+p.x*9)+1)/2;cx.fillStyle=tw>0.5?'#fff6c0':'#ffd65a';cx.fillRect(X-1,Y-p.h-1,2,2);if(tw>0.6){cx.fillRect(X-3,Y-p.h-0.4,6,0.8);cx.fillRect(X-0.4,Y-p.h-3,0.8,6)}}
   else if(p.k=='dust'){cx.globalAlpha=0.5*p.l;cx.fillStyle='#e8dcc0';cx.beginPath();cx.arc(X,Y,2+(0.9-p.l)*4,0,6.283);cx.fill()}
   else{cx.globalAlpha=Math.min(1,p.l);cx.fillStyle=p.k=='petal'?'#ffc6d9':p.k=='leaf'?(p.ph%2<1?'#e8643a':'#f0a03a'):'#ffffff';const w=p.k=='snow'?1:Math.abs(Math.sin(p.ph))*1.5+0.6;cx.fillRect(X,Y-p.h,w,1)}}
- cx.globalAlpha=1;
+ cx.globalAlpha=1;BUS.emit('over',t,lt,sv);
  // 빛줄기 (낮) – 김 사이로
  if(lt.sun>0.2){cx.save();cx.globalCompositeOperation='screen';for(const o of S.objs){if(!DEF[o.k].bath)continue;const G=objGeom(o);
    for(let i=0;i<3;i++){const ox=G.X-G.W*0.35+i*G.W*0.3+Math.sin(t/3000+i)*4;const a=(0.07+0.04*Math.sin(t/1700+i*2))*lt.sun;
@@ -359,6 +365,7 @@ function render(t){
     glow(X,Y,14*z,`rgba(255,214,140,${0.55*k*fl})`);glow(X,Y,4*z,`rgba(255,240,200,${0.8*k})`);
     const[gx,gy]=toScreen(G.X+lx*G.W,G.Y+2);cx.save();cx.translate(gx,gy);cx.scale(1,0.5);glow(0,0,30*z,`rgba(255,180,100,${0.22*k*fl})`);cx.restore()}}}
  cx.globalCompositeOperation='source-over';
+ BUS.emit('screen',t,lt);cx.globalCompositeOperation='source-over';cx.globalAlpha=1;
  drawText(t,lt);
 }
 function drawGrid(){const P=N/PS;
@@ -383,14 +390,15 @@ function drawWater(o,G,t,lt){const d=DEF[o.k],f=d.fp;const[cX,cY]=iso(o.x+f/2,o.
  // 스펙큘러
  const r=rng(Math.floor(t/220)+o.x*31);for(let i=0;i<10;i++){const a=r()*6.28,rr=Math.sqrt(r());cx.fillStyle=`rgba(255,255,240,${0.5+0.5*lt.sun})`;cx.fillRect(cX+Math.cos(a)*rx*rr,cY+Math.sin(a)*ry*rr,1,0.6)}
  if(lt.night>0.4){cx.fillStyle=`rgba(255,200,120,${0.12*lt.night})`;cx.fillRect(cX-rx,cY-ry,rx*2,ry*2)}
+ cx.globalCompositeOperation='source-over';BUS.emit('water',o,cX,cY,rx,ry,t,lt);
  cx.restore();}
 function drawGuest(g,t,lt,sv){const[X,Y]=iso(g.x,g.y);if(g.vip||g.reg){cx.save();cx.globalCompositeOperation='lighter';const gr=cx.createRadialGradient(X,Y-6,0,X,Y-6,12);gr.addColorStop(0,g.vip?'rgba(255,215,90,0.35)':'rgba(140,200,255,0.28)');gr.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=gr;cx.fillRect(X-12,Y-18,24,24);cx.restore()}
- if(g.inBath){const v=VAR[g.cb];if(!v)return;const W=17,h=W*v.base.height/v.base.width,bob=Math.sin(t/600+g.bob)*0.4,ch=h*0.8;
+ if(g.inBath){const v=VAR[g.cb];if(!v)return;const W=17,h=W*v.base.height/v.base.width,bob=Math.sin(t/600+g.bob)*0.4-(g.hz||0)*0.5,ch=h*0.8;
   cx.drawImage(v.base,0,0,v.base.width,v.base.height*0.8,X-W/2,Y-ch+2+bob,W,ch);
   cx.fillStyle='rgba(180,240,240,0.55)';cx.beginPath();cx.ellipse(X,Y+2+bob,W*0.55,1.6,0,0,6.283);cx.fill();
   if(g.slot%3==1){const yx=X+W*0.7,yy=Y+2+Math.sin(t/700+g.bob)*0.6;cx.fillStyle='#f6c431';cx.beginPath();cx.arc(yx,yy,1.6,0,6.283);cx.fill();cx.fillStyle='#fff3a0';cx.fillRect(yx-0.8,yy-1,0.8,0.6)}
   return}
- const v=VAR[g.spr];if(!v)return;const W=14,h=W*v.base.height/v.base.width;const moving=Math.hypot(g.tx-g.x,g.ty-g.y)>0.05;const bob=(moving?Math.abs(Math.sin(t/120+g.bob))*1.2:0)+(g.z||0);
+ const v=VAR[g.spr];if(!v)return;const W=14,h=W*v.base.height/v.base.width;const moving=Math.hypot(g.tx-g.x,g.ty-g.y)>0.05;const bob=(moving?Math.abs(Math.sin(t/120+g.bob))*1.2:0)+(g.z||0)+(g.hz||0);
  cx.globalAlpha=g.fade;ao(X,Y,5,2.2,0.35);
  if(lt.sun>0.1){cx.save();cx.globalAlpha=0.25*lt.sun*g.fade;cx.translate(X,Y);cx.transform(1,0,-sv.kx,sv.ky,0,0);cx.drawImage(v.sil,-W/2,-h,W,h);cx.restore()}
  cx.globalAlpha=g.fade;cx.save();cx.translate(X,Y-bob);cx.scale(g.dir,1);cx.drawImage(v.base,-W/2,-h,W,h);if(lt.sun>0.15){cx.globalAlpha=0.45*lt.sun*g.fade;cx.drawImage(sv.left?v.rimL:v.rimR,-W/2,-h,W,h)}cx.restore();cx.globalAlpha=1}
@@ -441,14 +449,14 @@ function showInfo(o){if(o.k=='gate'){const el=$('info');el.style.display='block'
  const users=guests.filter(g=>g.cur===o).length;
  el.innerHTML=`<h3>${d.n} <small>Lv.${o.lv}</small></h3><div style="color:#7a5a3a;margin-bottom:6px">${d.desc}</div>`+
  (d.price?`<div class="row"><span>이용 요금</span><b>¥${fmt(o.price)}</b></div><div style="display:flex;gap:4px;margin:4px 0"><button class="b g" data-p="-0.1">−10%</button><button class="b g" data-p="0.1">+10%</button><button class="b g" data-p="0">기본</button></div>
-  <div class="row"><span>이용 중</span><b>${users}/${d.cap+o.lv-1}</b></div><div class="row"><span>누적 이용</span><b>${o.uses||0}회</b></div><div class="row"><span>누적 매출</span><b>¥${fmt(o.earn||0)}</b></div><div class="row"><span>직원 급여</span><b>¥${fmt(d.wage*o.lv)}/시</b></div>
+  <div class="row"><span>이용 중</span><b>${users}/${d.cap+o.lv-1}</b></div><div class="row"><span>누적 이용</span><b>${o.uses||0}회</b></div><div class="row"><span>누적 매출</span><b>¥${fmt(o.earn||0)}</b></div><div class="row"><span>직원 급여</span><b>¥${fmt(d.wage*(1+0.5*(o.lv-1)))}/시</b></div>
   <div style="font-size:12px;color:#7a5a3a;margin-top:4px">적정가 약 ¥${fmt(d.price*(1+o.lv*0.12))} · 너무 비싸면 손님이 돌아가요</div>`:`<div class="row"><span>아름다움</span><b>+${d.beauty}</b></div>`)+
  `<div style="margin-top:6px">${o.lv<5&&d.price?`<button class="b" id="iUp">업그레이드 ¥${fmt(up)}</button>`:''}<button class="b g" id="iMove">이동</button><button class="b g" id="iDel">철거</button><button class="b g" id="iCl">닫기</button></div>`;
  el.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const p=+b.dataset.p;o.price=p==0?d.price:Math.max(50,Math.round(o.price*(1+p)/10)*10);showInfo(o)});
  if($('iUp'))$('iUp').onclick=()=>{if(S.yen<up)return toast('엔이 부족해요');S.yen-=up;S.fin.exp+=up;o.lv++;anims['o'+S.objs.indexOf(o)]={t:0};upFx(o);BUS.emit('upgrade',o);toast(`${d.n} Lv.${o.lv}!${o.lv==3||o.lv==5?' 외관이 바뀌었어요 ✨':''}`);showInfo(o);save()};
  $('iDel').onclick=()=>remove(o);$('iMove').onclick=()=>startMove(o);$('iCl').onclick=()=>el.style.display='none';}
 function remove(o){if(o.k=='gate')return toast('대문은 철거할 수 없어요. 이동만 가능해요');if(S.objs.length<=1)return;S.yen+=Math.floor(DEF[o.k].cost*0.4);guests.forEach(g=>{if(g.cur===o)finish(g);if(g.target===o)g.target=null});S.objs.splice(S.objs.indexOf(o),1);OCC=occ();groundDirty=true;$('info').style.display='none';save()}
-function modalFin(){const m=$('modal');const wages=S.objs.reduce((s,o)=>s+(DEF[o.k].wage||0)*o.lv,0),up=S.objs.filter(o=>!DEF[o.k].isPath).length*8;
+function modalFin(){const m=$('modal');const up=S.objs.filter(o=>!DEF[o.k].isPath&&!DEF[o.k].wage).length*4,wages=wageNow(12)-up;
  const rows=S.objs.filter(o=>DEF[o.k].price).sort((a,b)=>(b.earn||0)-(a.earn||0)).slice(0,8).map(o=>`<div class="row"><span>${DEF[o.k].n} Lv.${o.lv}</span><b>¥${fmt(o.earn||0)}</b></div>`).join('');
  m.innerHTML=`<h3>📊 재정</h3><div class="row"><span>보유 자금</span><b>¥${fmt(S.yen)}</b></div><div class="row"><span>평균 순이익</span><b>¥${fmt(avgNet())}/시</b></div><div class="row"><span>오늘 수입</span><b>¥${fmt(S.fin.inc)}</b></div><div class="row"><span>오늘 지출</span><b>¥${fmt(S.fin.exp)}</b></div>
  <div class="row"><span>직원 급여</span><b>¥${fmt(wages)}/시</b></div><div class="row"><span>시설 유지비</span><b>¥${fmt(up)}/시</b></div><h3 style="margin-top:10px">시설별 매출</h3>${rows}<div style="text-align:right"><button class="b" onclick="this.closest('.panel').style.display='none'">닫기</button></div>`;m.style.display='block'}
@@ -461,6 +469,7 @@ function modalGuest(){const m=$('modal');const n=guests.length||1;const avg=k=>g
 const ptrs=new Map();let drag=null,pinch=null,lp=null,lastTap={};
 function onTap(sx,sy){const[fx,fy]=toTile(sx,sy);const x=Math.floor(fx),y=Math.floor(fy);
  for(const s of window._signs||[]){const[X,Y]=toScreen(s.X,s.Y);if(Math.abs(sx-X)<16*cam.z/1.5+10&&Math.abs(sy-Y)<10*cam.z/1.5+8){unlock(s);return}}
+ if(!ghost&&!moving&&window.AMB&&AMB.tap(fx,fy,sx,sy))return;
  if(ghost){if(!canPlace(ghost,x,y))return toast(tileOpen(x,y)?'여기엔 지을 수 없어요':'잠긴 구역이에요. 표지판을 눌러 열어주세요');const d=DEF[ghost];if(S.yen<d.cost)return toast('엔이 부족해요');
   S.yen-=d.cost;S.fin.exp+=d.cost;S.objs.push({k:ghost,x,y,lv:1,price:d.price||0,uses:0,earn:0});anims['o'+(S.objs.length-1)]={t:0};OCC=occ();groundDirty=true;
   for(let i=0;i<10;i++)parts.push({k:'steam',x:x+d.fp/2+(Math.random()-0.5)*d.fp,y:y+d.fp/2+(Math.random()-0.5)*d.fp,h:0,vx:0,l:1,L:1,s:2});if(ghost=='path'){}else if(!ev.shift){ghost=null;buildCards()}save();return}
@@ -514,7 +523,7 @@ let last=0,acc=0,hourAcc=0,saveAcc=0;
 function step(dt){
  const gm=dt*2; // 실시간 1초 = 게임 2분
  const prevH=Math.floor(S.min/60);S.min+=gm;const nowH=Math.floor(S.min/60);
- if(nowH!=prevH){const wages=S.objs.reduce((s,o)=>s+(DEF[o.k].wage||0)*o.lv,0)+S.objs.filter(o=>!DEF[o.k].isPath).length*8;const pay=Math.min(wages,Math.max(0,S.yen)),unpaid=wages-pay;S.yen-=pay;if(unpaid>0){S.rep=Math.max(0,S.rep-1.5);if(!S._wt||S.min-S._wt>600){S._wt=S.min;toast('⚠️ 자금 부족! 직원 급여를 다 못 줘서 평판이 떨어지고 있어요')}}BUS.emit('hour',nowH);if(nowH%24==0)BUS.emit('day',Math.floor(nowH/24)+1);S.fin.exp+=wages;
+ if(nowH!=prevH){const wages=wageNow(nowH);const pay=Math.min(wages,Math.max(0,S.yen)),unpaid=wages-pay;S.yen-=pay;if(unpaid>0){S.rep=Math.max(0,S.rep-1.5);if(!S._wt||S.min-S._wt>600){S._wt=S.min;toast('⚠️ 자금 부족! 직원 급여를 다 못 줘서 평판이 떨어지고 있어요')}}BUS.emit('hour',nowH);if(nowH%24==0)BUS.emit('day',Math.floor(nowH/24)+1);S.fin.exp+=pay;
   S.fin.hist.push((S.fin._h||0)-wages);S.fin._h=0;if(S.fin.hist.length>48)S.fin.hist.shift();if(nowH%24==0){S.fin.inc=0;S.fin.exp=0}}
  const before=S.yen;
  if(Math.random()<dt*spawnRate()*3&&guests.length<maxGuests())spawn();
@@ -533,7 +542,7 @@ function frame(now){warnAcc+=1;if(warnAcc%90==1)checkReach();const dt=Math.min(0
  if(homeAnim){homeAnim.t+=dt/0.9;const k=easeOut(Math.min(1,homeAnim.t));const f=homeAnim.to.k?DEF[homeAnim.to.k].fp:1;const save_=cam.z;
   const z=lerp(homeAnim.from.z,VW>820?5.2:3.6,k);cam.z=z;cam.tz=z;const[wx,wy]=iso(homeAnim.to.x+f/2,homeAnim.to.y+f/2);const tx_=VW*(VW>820?0.42:0.5)-wx*z,ty_=VH*(VW>820?0.5:0.33)-wy*z;
   cam.x=lerp(homeAnim.from.x,tx_,k);cam.y=lerp(homeAnim.from.y,ty_,k);if(homeAnim.t>=1)homeAnim=null}
- render(now);hud();saveAcc+=dt;if(saveAcc>5){saveAcc=0;save()}
+ BUS.emit('frame',dt,now);render(now);hud();saveAcc+=dt;if(saveAcc>5){saveAcc=0;save()}
  requestAnimationFrame(frame)}
 async function boot(){resize();addEventListener('resize',resize);load();S.objs.forEach(o=>o.users=0);migrateLayout();migrate();OCC=occ();ensureGate();OCC=occ();
  await Promise.all([loadImgs(),document.fonts.load('700 14px Pretendard'),document.fonts.ready]);
@@ -550,4 +559,4 @@ async function boot(){resize();addEventListener('resize',resize);load();S.objs.f
 const _drawSprite=drawSprite;
 boot();
 // 테스트 훅
-window.__dbg={maxG:()=>maxGuests(),reachOK(){const gi=gateInfo();if(!gi)return true;const seen=new Set([gi.m.join(',')]),q=[gi.m];while(q.length){const[x,y]=q.shift();for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const k=(x+dx)+','+(y+dy);if(seen.has(k)||!walkable(x+dx,y+dy))continue;seen.add(k);q.push([x+dx,y+dy])}}return S.objs.filter(o=>DEF[o.k].price).every(o=>tilesOf(o).some(([x,y])=>[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>seen.has((x+dx)+','+(y+dy)))))},step:dt=>step(dt),stars:()=>stars(),DEF,canPlace,emit:(...a)=>BUS.emit(...a),plotPrice,occ:()=>{OCC=occ();groundDirty=true},ensureGate(){ensureGate()},gate:()=>gateObj(),checkReach,clearGhost(){ghost=null;buildCards()},upFx(o){upFx(o)},setPaint(k,x0,y0,x1,y1,area){ghost=k;paint={x0,y0,x1,y1,area};applyPaint();paint=null},free(k,x0,y0){for(let r=1;r<8;r++)for(let dx=-r;dx<=r;dx++)for(let dy=-r;dy<=r;dy++)if(canPlace(k,x0+dx,y0+dy))return[x0+dx,y0+dy]},scr:(x,y)=>toScreenT(x,y),mig(){migrate();OCC=occ();groundDirty=true},get moving(){return moving},refresh(){OCC=occ();groundDirty=true},get S(){return S},setHour(h){S.min=Math.floor(S.min/1440)*1440+h*60},spawn,guests:()=>guests,focus,cam};
+window.__dbg={focusXY:(x,y,z)=>focus(x,y,z),cam,maxG:()=>maxGuests(),reachOK(){const gi=gateInfo();if(!gi)return true;const seen=new Set([gi.m.join(',')]),q=[gi.m];while(q.length){const[x,y]=q.shift();for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const k=(x+dx)+','+(y+dy);if(seen.has(k)||!walkable(x+dx,y+dy))continue;seen.add(k);q.push([x+dx,y+dy])}}return S.objs.filter(o=>DEF[o.k].price).every(o=>tilesOf(o).some(([x,y])=>[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>seen.has((x+dx)+','+(y+dy)))))},step:dt=>step(dt),stars:()=>stars(),DEF,canPlace,emit:(...a)=>BUS.emit(...a),plotPrice,occ:()=>{OCC=occ();groundDirty=true},ensureGate(){ensureGate()},gate:()=>gateObj(),checkReach,clearGhost(){ghost=null;buildCards()},upFx(o){upFx(o)},setPaint(k,x0,y0,x1,y1,area){ghost=k;paint={x0,y0,x1,y1,area};applyPaint();paint=null},free(k,x0,y0){for(let r=1;r<8;r++)for(let dx=-r;dx<=r;dx++)for(let dy=-r;dy<=r;dy++)if(canPlace(k,x0+dx,y0+dy))return[x0+dx,y0+dy]},scr:(x,y)=>toScreenT(x,y),mig(){migrate();OCC=occ();groundDirty=true},get moving(){return moving},refresh(){OCC=occ();groundDirty=true},get S(){return S},setHour(h){S.min=Math.floor(S.min/1440)*1440+h*60},spawn,guests:()=>guests,focus,cam};

@@ -24,6 +24,7 @@ const SND=(()=>{let ac=null,master=null,amb=null,bgmOn=false,muted=localStorage.
  api.coin=()=>{if(!ac)return;tone(1318,'square',0.06,0.03);tone(1975,'square',0.12,0.025,0.05)};
  api.build=()=>{if(!ac)return;tone(110,'sine',0.25,0.15);tone(70,'triangle',0.3,0.1,0.02);for(let i=0;i<4;i++)tone(1500+i*300,'sine',0.15,0.02,0.08+i*0.04)};
  api.upgrade=()=>{if(!ac)return;[523,659,784,1046,1318].forEach((f,i)=>tone(f,'triangle',0.35,0.05,i*0.07))};
+ api.squeak=()=>{if(!ac)return;tone(1400,'sine',0.08,0.04);tone(1900,'sine',0.07,0.03,0.06)};
  api.click=()=>{if(!ac)return;tone(880,'sine',0.04,0.03)};
  api.quest=()=>{if(!ac)return;[784,988,1175,1568].forEach((f,i)=>{tone(f,'sine',1.2,0.05,i*0.09);tone(f*2,'sine',0.5,0.01,i*0.09)})};
  api.unlock=()=>{if(!ac)return;[392,523,659,784,1046].forEach((f,i)=>tone(f,'triangle',0.6,0.06,i*0.1))};
