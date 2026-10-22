@@ -558,7 +558,7 @@ function step(dt){
  emit(dt);updParts(dt);
  const earned=Math.max(0,S.yen-before);S.fin._h=(S.fin._h||0)+earned;
 }
-let warnAcc=0;
+let warnAcc=0,frameN=0;
 function checkReach(){const gi=gateInfo();const w=$('warn');if(!gi){w.style.display='none';return}const seen=new Set([gi.m.join(',')]),q=[gi.m];
  while(q.length){const[x,y]=q.shift();for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const k=(x+dx)+','+(y+dy);if(seen.has(k)||!walkable(x+dx,y+dy))continue;seen.add(k);q.push([x+dx,y+dy])}}
  const bad=S.objs.filter(o=>DEF[o.k].price&&o!==moving).filter(o=>{const t=[];for(const[x,y]of tilesOf(o))for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]])t.push((x+dx)+','+(y+dy));return !t.some(k=>seen.has(k))});
@@ -569,7 +569,7 @@ function frame(now){warnAcc+=1;if(warnAcc%90==1)checkReach();const dt=Math.min(0
  if(homeAnim){homeAnim.t+=dt/0.9;const k=easeOut(Math.min(1,homeAnim.t));const f=homeAnim.to.k?DEF[homeAnim.to.k].fp:1;const save_=cam.z;
   const z=lerp(homeAnim.from.z,VW>820?5.2:3.6,k);cam.z=z;cam.tz=z;const[wx,wy]=iso(homeAnim.to.x+f/2,homeAnim.to.y+f/2);const tx_=VW*(VW>820?0.42:0.5)-wx*z,ty_=VH*(VW>820?0.5:0.33)-wy*z;
   cam.x=lerp(homeAnim.from.x,tx_,k);cam.y=lerp(homeAnim.from.y,ty_,k);if(homeAnim.t>=1)homeAnim=null}
- BUS.emit('frame',dt,now);render(now);hud();saveAcc+=dt;if(saveAcc>5){saveAcc=0;save()}
+ BUS.emit('frame',dt,now);if(!window.GFX_LOW||(frameN++&1)==0){render(now);hud()}saveAcc+=dt;if(saveAcc>5){saveAcc=0;save()}
  requestAnimationFrame(frame)}
 async function boot(){resize();addEventListener('resize',resize);if(window.VISIT_PROMISE){try{window.VISIT_SAVE=await window.VISIT_PROMISE}catch(e){window.VISIT_SAVE=null;setTimeout(()=>toast('방문 링크가 올바르지 않아요'),1200)}}load();S.objs.forEach(o=>o.users=0);migrateLayout();migrate();OCC=occ();ensureGate();OCC=occ();
  await Promise.all([loadImgs(),document.fonts.load('700 14px Pretendard'),document.fonts.ready]);

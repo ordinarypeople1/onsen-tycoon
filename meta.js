@@ -44,10 +44,10 @@ const QX=(()=>{
   el.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{const r=milesReady().find(x=>x.id==b.dataset.m);if(!r)return;m.ms.push(r.id);reward(r.rw,'마일스톤');modalQuest()})}
  // ----- 도감 -----
  const GKINDS=[['cw1','파란 유카타'],['cw2','분홍 유카타'],['cw3','초록 유카타'],['cw4','베이지 유카타'],['vip','VIP 손님']];
- function modalBook(){const m=M(),el=$('modal');const cell=(img,name,got,sub,filter)=>`<div class="bk ${got?'':'no'}">${img?`<img src="assets/${img}.png" style="${filter?'filter:'+filter:''}">`:'<div class="ph">?</div>'}<b>${got?name:'???'}</b><small>${got?sub||'':''}</small></div>`;
+ function modalBook(){const m=M(),el=$('modal');const cell=(img,name,got,sub,filter,ic)=>`<div class="bk ${got?'':'no'}">${img?`<img src="assets/${img}.png" style="${filter?'filter:'+filter:''}">`:`<div class="ph">${ic||'?'}</div>`}<b>${got?name:'???'}</b><small>${got?sub||'':''}</small></div>`;
   const items=Object.entries(DEF).filter(([k,d])=>d.tab&&!d.erase);const gotI=items.filter(([k])=>m.col.i[k]).length;
   el.innerHTML=`<h3>📖 도감</h3><b>손님 (${GKINDS.filter(([k])=>m.col.g[k]).length+REGS.filter(([n])=>m.regs[n]).length}/${GKINDS.length+REGS.length})</b><div class="bkg">${GKINDS.map(([k,n])=>cell(k=='vip'?'cw1':k,n,m.col.g[k],'',k=='vip'?'sepia(1) saturate(3) hue-rotate(-10deg)':'')).join('')}${REGS.map(([n,img,d])=>cell(img,'단골 '+n,m.regs[n],m.regs[n]?`${d} · ${m.regs[n].v}회 방문`:'')).join('')}</div>
-  <b style="display:block;margin-top:8px">시설·장식 (${gotI}/${items.length})</b><div class="bkg">${items.map(([k,d])=>{const lv=m.col.i[k]||0;const img=d.img?(TIERED.includes(d.img)?d.img+'_lv'+(lv>=5?5:lv>=3?3:1):d.img):null;return cell(img,d.n,lv,d.price?`최고 Lv.${lv}`:'',d.filter)}).join('')}</div>
+  <b style="display:block;margin-top:8px">시설·장식 (${gotI}/${items.length})</b><div class="bkg">${items.map(([k,d])=>{const lv=m.col.i[k]||0;const bi=d.img=='milk'?'yuzu':d.img;const img=bi?(TIERED.includes(bi)?bi+'_lv'+(lv>=5?5:lv>=3?3:1):bi):null;return cell(img,d.n,lv,d.price?`최고 Lv.${lv}`:'',d.filter,d.ic)}).join('')}</div>
   <div style="text-align:right"><button class="b g" onclick="this.closest('.panel').style.display='none'">닫기</button></div>`;el.style.display='block'}
  // ----- 리뷰 -----
  const RV={5:['최고의 온천이에요! 또 올게요','물이 정말 좋고 직원도 친절해요','여기서 평생 살고 싶어요'],4:['편안하게 쉬다 갑니다','분위기가 참 좋아요','다음엔 친구랑 올래요'],3:['나쁘지 않았어요','무난한 온천이에요','조금 더 볼거리가 있으면 좋겠어요'],2:['좀 비싸요…','기다리는 시간이 길었어요','먹을 곳이 부족해요'],1:['다신 안 올래요','실망했어요','시설이 너무 부족해요']};

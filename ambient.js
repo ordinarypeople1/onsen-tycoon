@@ -117,8 +117,13 @@ const AMB=(()=>{
   const o=OCC[(fx_|0)+','+(fy_|0)];if(o&&!DEF[o.k].isPath){const c=ctr(o);o.sway=Math.min(0.4,(o.sway||0)+0.3);fx.push({k:'spark',x:c[0],y:c[1],h:DEF[o.k].tree?20:10,l:0.8,L:0.8});
    if(DEF[o.k].pond){const d=pondData(o);const[X,Y]=iso(fx_,fy_);d.rip.push({x:X,y:Y,l:1.6},{x:X+2,y:Y+1,l:1.2})}}
   return false}
+ // ---- 호버 ----
+ let hov=null;addEventListener('pointermove',e=>{if(e.pointerType!='mouse')return;let best=null,bd=1e9;for(const g of guests){if(g.hide||g.dead)continue;const[X,Y]=toScreenT(g.x,g.y);const d=Math.hypot(X-e.clientX,(Y-7*cam.z)-e.clientY);if(d<bd){bd=d;best=g}}hov=best&&bd<9*cam.z+6?best:null;const c=document.getElementById('c');if(c)c.style.cursor=hov&&!ghost?'pointer':''});
+ BUS.on('over',(t)=>{if(!hov||hov.dead||ghost)return;const[X,Y]=iso(hov.x,hov.y);cx.strokeStyle=`rgba(255,246,200,${0.55+0.25*Math.sin(t/200)})`;cx.lineWidth=0.8;cx.beginPath();cx.ellipse(X,Y+(hov.inBath?2:0),7,3.2,0,0,6.283);cx.stroke()});
+ // ---- 계절 전역 낙하물 (뷰포트 위쪽에서) ----
+ function seasonal(dt){const sea=season();const k=sea==0?'petal':sea==2?'leaf':null;if(!k||window.GFX_LOW||parts.length>500)return;if(R()<dt*1.6){const[fx,fy]=toTile(R()*VW,R()*VH*0.6);parts.push({k,x:fx-1,y:fy-1,h:50+R()*20,vx:0,l:7,L:7,ph:R()*6})}}
  // ---- 바람 & 갱신 ----
- BUS.on('frame',(dt,t)=>{windT+=dt;const target=Math.sin(windT/23)*0.6+Math.sin(windT/7.3)*0.25;wind+=(target-wind)*Math.min(1,dt*0.5);window.WIND=wind;updCreatures(dt,t,light());zenStep(dt,t);shT-=dt;if(shT<=0){shT=9+R()*6;const sh=S.objs.find(o=>o.k=='shishi');if(sh){window.SND&&SND.tok&&SND.tok();const c=ctr(sh);fx.push({k:'drop',x:c[0],y:c[1],n:6,l:0.6,L:0.6});sh.sway=0.3}}});let shT=5;
+ BUS.on('frame',(dt,t)=>{windT+=dt;const target=Math.sin(windT/23)*0.6+Math.sin(windT/7.3)*0.25;wind+=(target-wind)*Math.min(1,dt*0.5);window.WIND=wind;updCreatures(dt,t,light());seasonal(dt);zenStep(dt,t);shT-=dt;if(shT<=0){shT=9+R()*6;const sh=S.objs.find(o=>o.k=='shishi');if(sh){window.SND&&SND.tok&&SND.tok();const c=ctr(sh);fx.push({k:'drop',x:c[0],y:c[1],n:6,l:0.6,L:0.6});sh.sway=0.3}}});let shT=5;
  // ---- 감상 모드 ----
  let zen=false,zT=0,zHint=null;
  function zenStep(dt,t){if(!zen)return;zT+=dt;const P=Object.keys(S.plots).map(k=>k.split(',').map(Number));let cx_=0,cy_=0;for(const[a,b]of P){cx_+=a*PS+PS/2;cy_+=b*PS+PS/2}cx_/=P.length;cy_/=P.length;
