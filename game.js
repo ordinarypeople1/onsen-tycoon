@@ -197,8 +197,9 @@ function endMove(){if(moving)delete moving._from;moving=null;ghost=null;OCC=occ(
 function canPlace(k,x,y){if(k=='gate')return !!gateSpot(x,y);const f=DEF[k].fp;for(let i=0;i<f;i++)for(let j=0;j<f;j++){const o=OCC[(x+i)+','+(y+j)];if(!tileOpen(x+i,y+j)||(o&&!(DEF[o.k].isPath&&!DEF[k].isPath)))return false}return true}
 function clearPaths(k,x,y){const f=DEF[k].fp;S.objs=S.objs.filter(o=>!(DEF[o.k].isPath&&o.x>=x&&o.x<x+f&&o.y>=y&&o.y<y+f))}
 function starScore(){let s=S.rep*0.5,b=0;for(const o of S.objs){const d=DEF[o.k];s+=(d.appeal||0)*(1+0.35*(o.lv-1))*0.4;b+=(d.beauty||0)*bMul(d)}s+=Math.sqrt(b)*3+Object.keys(S.plots).length*4+setsDone().length*15;return s}
-const STAR_REQ=[0,0,[55,500,1],[105,1700,2],[190,5000,3],[320,12000,4]]; // [점수, 누적손님, 구역수]
-function stars(){const s=starScore(),pl=Object.keys(S.plots).length;let r=1;for(let i=2;i<=5;i++){const[q,sv,p]=STAR_REQ[i];if(s>=q&&S.served>=sv&&pl>=p)r=i;else break}return r}
+const STAR_REQ=[0,0,[55,500,1],[105,1700,2],[190,5000,3],[320,9000,4]]; // [점수, 누적손님, 구역수]
+let _stC={k:''};function stars(){const ck=Math.floor(S.min/10)+'|'+S.objs.length+'|'+S.served+'|'+Object.keys(S.plots).length;if(_stC.k===ck)return _stC.v;_stC.k=ck;return _stC.v=stars_()}
+function stars_(){const s=starScore(),pl=Object.keys(S.plots).length;let r=1;for(let i=2;i<=5;i++){const[q,sv,p]=STAR_REQ[i];if(s>=q&&S.served>=sv&&pl>=p)r=i;else break}return r}
 function nextStarInfo(){const r=stars();if(r>=5)return null;const[q,sv,p]=STAR_REQ[r+1];return{r:r+1,score:[Math.floor(starScore()),q],served:[S.served,sv],plots:[Object.keys(S.plots).length,p]}}
 function beautyAt(x,y){let b=0;for(const o of S.objs){const d=DEF[o.k];if(!d.beauty)continue;const dd=Math.hypot(o.x-x,o.y-y);if(dd<4)b+=d.beauty*bMul(d)*(1-dd/4)}return b}
 // ===== 시간/조명 =====
