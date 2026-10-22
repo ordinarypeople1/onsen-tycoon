@@ -250,7 +250,7 @@ function door(o){const d=doorTile(o)||[o.x,o.y+DEF[o.k].fp];return[d[0]+0.5,d[1]
 function findPath(sx,sy,ex,ey){sx|=0;sy|=0;ex|=0;ey|=0;if(sx==ex&&sy==ey)return[];
  const K=(x,y)=>y*N+x,open=[[0,sx,sy]],g={},from={};g[K(sx,sy)]=0;let it=0;
  while(open.length&&it++<9000){let bi=0;for(let i=1;i<open.length;i++)if(open[i][0]<open[bi][0])bi=i;const[,x,y]=open.splice(bi,1)[0];
-  if(x==ex&&y==ey){const p=[];let k=K(x,y);while(k!=K(sx,sy)){p.unshift([k%N+0.5,Math.floor(k/N)+0.5]);k=from[k]}return p}
+  if(x==ex&&y==ey){const p=[];let k=K(x,y);let gd=0;while(k!=K(sx,sy)){if(k==null||gd++>N*N)return null;p.unshift([k%N+0.5,Math.floor(k/N)+0.5]);k=from[k]}return p}
   for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(!(nx==ex&&ny==ey)&&!walkable(nx,ny))continue;
    const o=OCC[nx+','+ny];const c=g[K(x,y)]+(o&&!!DEF[o.k].isPath?0.6:1);if(g[K(nx,ny)]==null||c<g[K(nx,ny)]){g[K(nx,ny)]=c;from[K(nx,ny)]=K(x,y);open.push([c+Math.abs(ex-nx)+Math.abs(ey-ny),nx,ny])}}}
  return null}
@@ -258,8 +258,8 @@ function findPath(sx,sy,ex,ey){sx|=0;sy|=0;ex|=0;ey|=0;if(sx==ex&&sy==ey)return[
 function heapPush(h,v){h.push(v);let i=h.length-1;while(i>0){const p=(i-1)>>1;if(h[p][0]<=h[i][0])break;[h[p],h[i]]=[h[i],h[p]];i=p}}
 function heapPop(h){const top=h[0],last=h.pop();if(h.length){h[0]=last;let i=0;for(;;){const l=i*2+1,r=l+1;let m=i;if(l<h.length&&h[l][0]<h[m][0])m=l;if(r<h.length&&h[r][0]<h[m][0])m=r;if(m==i)break;[h[m],h[i]]=[h[i],h[m]];i=m}}return top}
 function pathToObj(g,o){const goal=new Set();for(const[x,y]of tilesOf(o))for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const k=(x+dx)+','+(y+dy);if(walkable(x+dx,y+dy))goal.add((y+dy)*N+(x+dx))}
- if(!goal.size)return null;const sx=g.x|0,sy=g.y|0,s0=sy*N+sx;const dist=new Float32Array(N*N).fill(1e9),from=new Int32Array(N*N).fill(-1);dist[s0]=0;const h=[[0,s0]];
- while(h.length){const[d,k]=heapPop(h);if(d>dist[k])continue;if(goal.has(k)){const p=[];let c=k;while(c!=s0){p.unshift([c%N+0.5,Math.floor(c/N)+0.5]);c=from[c]}return p}
+ if(!goal.size)return null;const sx=g.x|0,sy=g.y|0,s0=sy*N+sx;if(sx<0||sy<0||sx>=N||sy>=N)return null;const dist=new Float32Array(N*N).fill(1e9),from=new Int32Array(N*N).fill(-1);dist[s0]=0;const h=[[0,s0]];
+ while(h.length){const[d,k]=heapPop(h);if(d>dist[k])continue;if(goal.has(k)){const p=[];let c=k;let gd=0;while(c!=s0){if(c<0||gd++>N*N)return null;p.unshift([c%N+0.5,Math.floor(c/N)+0.5]);c=from[c]}return p}
   const x=k%N,y=(k/N)|0;for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=N||ny>=N||!walkable(nx,ny))continue;const oc=OCC[nx+','+ny];const nk=ny*N+nx,nd=d+(oc&&DEF[oc.k].isPath?0.6:1);if(nd<dist[nk]){dist[nk]=nd;from[nk]=k;heapPush(h,[nd,nk])}}}
  return null}
 function goTo(g,x,y){const p=findPath(g.x,g.y,x,y);if(!p){g.path=[];return false}g.path=p;return true}
