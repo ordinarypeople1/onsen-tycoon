@@ -128,7 +128,7 @@ const AMB=(()=>{
  let zen=false,zT=0,zHint=null;
  function zenStep(dt,t){if(!zen)return;zT+=dt;
   const pts=S.objs.filter(o=>DEF[o.k].bath||DEF[o.k].stay||DEF[o.k].tab=='food').sort((a,b)=>(DEF[b.k].bath?1:0)-(DEF[a.k].bath?1:0)||(a.x+a.y)-(b.x+b.y));
-  let tx_,ty_;if(pts.length){const seg=16,i=Math.floor(zT/seg),f=(zT%seg)/seg;const A=pts[(i*3)%pts.length],c=ctr(A);const dr=(f-0.5)*2.2;tx_=c[0]+dr*0.6;ty_=c[1]-dr*0.6+Math.sin(zT/11)*0.4}
+  let tx_,ty_;if(pts.length){const seg=16,i=Math.floor(zT/seg),f=(zT%seg)/seg;const A=pts[(i*3)%pts.length],c0=ctr(A);const all=S.objs.filter(o=>!DEF[o.k].isPath&&o.k!='gate');let mx=0,my=0;for(const o of all){const q=ctr(o);mx+=q[0];my+=q[1]}mx/=all.length||1;my/=all.length||1;const c=[c0[0]*0.6+mx*0.4,c0[1]*0.6+my*0.4];const dr=(f-0.5)*2.2;tx_=c[0]+dr*0.6;ty_=c[1]-dr*0.6+Math.sin(zT/11)*0.4}
   else{const P=Object.keys(S.plots).map(k=>k.split(',').map(Number));tx_=P[0][0]*PS+PS/2;ty_=P[0][1]*PS+PS/2}
   const zz=((VW>820?3.6:2.8)+Math.sin(zT/23)*0.35)*Math.max(1,VW/1280);
   const[wx,wy]=iso(tx_,ty_);const k=Math.min(1,dt*(zT<3?1.6:0.45));cam.z+=(zz-cam.z)*Math.min(1,dt*0.4);cam.tz=cam.z;const gx=VW/2-wx*cam.z,gy=VH/2-wy*cam.z;cam.x+=(gx-cam.x)*k;cam.y+=(gy-cam.y)*k}
