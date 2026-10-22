@@ -10,6 +10,15 @@ const DEF={
  hinoki:{n:'히노키 욕조',tab:'bath',img:'hinoki',fp:2,sc:1,cost:3500,price:450,cap:2,dur:22,eff:{fatigue:-50,fun:8},wage:35,star:1,bath:1,water:'#9fd6e6',appeal:7,desc:'편백나무 향 가득한 욕조'},
  sauna:{n:'사우나',tab:'bath',inside:1,img:'sauna',fp:2,sc:1,cost:7000,price:700,cap:3,dur:20,eff:{fatigue:-40,fun:25},wage:55,star:2,appeal:8,light:[[0.1,-0.45]],desc:'땀 빼고 나면 개운!'},
  milky:{n:'유백 대욕장',tab:'bath',img:'milky',fp:4,sc:1,cost:15000,price:1100,cap:6,dur:30,eff:{fatigue:-85,fun:15},wage:110,star:3,bath:1,water:'#f1ede0',appeal:16,desc:'우윳빛 온천수의 대욕장'},
+ cave:{n:'동굴탕',tab:'bath',img:'cave',fp:4,sc:1,cost:15000,price:1100,cap:5,dur:30,eff:{fatigue:-80,fun:18},wage:90,star:3,bath:1,water:'#7fdcd6',appeal:16,light:[[0,-0.5]],desc:'바위 동굴 속 신비로운 온천'},
+ foot:{n:'족욕탕',tab:'bath',img:'foot',fp:2,sc:1,cost:2500,price:250,cap:4,dur:12,eff:{fatigue:-30,fun:10},wage:20,star:1,bath:1,water:'#a6dde8',appeal:5,desc:'발만 담가도 노곤노곤'},
+ fall:{n:'폭포탕',tab:'bath',img:'fall',fp:4,sc:1,cost:22000,price:1400,cap:6,dur:30,eff:{fatigue:-85,fun:25},wage:110,star:4,bath:1,water:'#86e0e6',appeal:20,desc:'쏟아지는 폭포 아래 노천탕'},
+ fam:{n:'가족탕',tab:'bath',inside:1,img:'fam',fp:2,sc:1,cost:12000,price:1600,cap:4,dur:26,eff:{fatigue:-60,fun:20},wage:70,star:3,appeal:10,light:[[0.1,-0.5]],desc:'가족끼리 오붓한 전세 욕탕'},
+ wine:{n:'와인탕',tab:'bath',img:'wine',fp:2,sc:1,cost:18000,price:1500,cap:3,dur:24,eff:{fatigue:-60,fun:30},wage:90,star:4,bath:1,water:'#8a1f3a',appeal:14,desc:'포도향 가득 레드 와인탕'},
+ dango:{n:'당고 노점',tab:'food',img:'dango',fp:1,sc:1,cost:2000,price:300,cap:2,dur:8,eff:{hunger:-30,fun:10},wage:15,star:1,appeal:4,light:[[0.2,-0.4]],desc:'달콤한 미타라시 당고'},
+ sake:{n:'사케 바',tab:'food',img:'sake',fp:2,sc:1,cost:9000,price:1000,cap:3,dur:16,eff:{hunger:-20,fun:40},wage:60,star:2,appeal:8,light:[[0.15,-0.5],[-0.2,-0.4]],night:1,desc:'온천 후 한 잔의 사케'},
+ tea:{n:'찻집',tab:'food',img:'tea',fp:2,sc:1,cost:6000,price:600,cap:3,dur:18,eff:{hunger:-25,fun:20},wage:40,star:2,appeal:9,light:[[0.1,-0.45]],desc:'말차와 화과자가 있는 찻집'},
+ ice:{n:'빙수 가게',tab:'food',img:'ice',fp:1,sc:1,cost:3500,price:450,cap:2,dur:10,eff:{hunger:-25,fun:18},wage:25,star:2,appeal:6,desc:'목욕 후 시원한 빙수'},
  ramen:{n:'라멘집',tab:'food',img:'ramen',fp:2,sc:1,cost:4000,price:900,cap:3,dur:15,eff:{hunger:-70,fun:5},wage:45,star:1,appeal:6,light:[[0.15,-0.55],[0.28,-0.3]],desc:'유자 시오 라멘이 명물'},
  teishoku:{n:'정식당',tab:'food',img:'teishoku',fp:2,sc:1,cost:9000,price:1600,cap:4,dur:20,eff:{hunger:-90,fun:10},wage:80,star:2,appeal:8,light:[[0.3,-0.35]],desc:'오늘의 유자 연어 정식'},
  izakaya:{n:'이자카야',tab:'food',img:'izakaya',fp:2,sc:1,cost:16000,price:2200,cap:5,dur:25,eff:{hunger:-50,thirst:-50,fun:40},wage:120,star:3,appeal:10,night:1,light:[[-0.1,-0.6],[0.1,-0.6],[0.3,-0.6]],desc:'밤에 북적이는 선술집'},
@@ -97,9 +106,9 @@ function save(){if(window.READONLY||!S)return;S.t=Date.now();try{localStorage[SK
 const fmt=n=>Math.floor(n).toLocaleString('ko-KR');
 function avgNet(){const h=S.fin.hist;if(!h.length)return 0;const a=h.slice(-24);return a.reduce((s,x)=>s+x,0)/a.length}
 // ===== 에셋 =====
-const TIERED=['rock','hinoki','sauna','milky','ramen','teishoku','izakaya','yuzu','gift','room'];
+const TIERED=['rock','hinoki','sauna','milky','ramen','teishoku','izakaya','yuzu','gift','room','cave','foot','fall','fam','wine','dango','sake','tea','ice'];
 const IMG={},VAR=new Proxy({},{get(t,k){if(typeof k!='string'||t[k]||!k.includes('~m'))return t[k];const src=t[k.replace('~m','')];if(!src)return undefined;return t[k]={base:src.base,sil:src.sil,rimL:src.rimR,rimR:src.rimL,m:1}}}); // 좌우반전은 그릴 때 변환으로 처리(캔버스 추가 생성 없음)
-const NAMES=[...TIERED.flatMap(n=>[1,2,3,4,5].flatMap(l=>[n+'_lv'+l])),'rock','hinoki','sauna','milky','ramen','teishoku','izakaya','yuzu','gift','room','sakura','maple','pine','lantern','torii','bamboo','sandgarden','bridge','waterwheel','wisteria','rocks','shishi','nodate','pagoda','bamboofence','cafe','lamppost','olive','lounger','cedar','mushroom','fern','birdhouse','snowman','hydrangea','tsukimi','kadomatsu','cb1','cb2','cb3','cb4','cw1','cw2','cw3','cw4','gate'];
+const NAMES=[...TIERED.flatMap(n=>[1,2,3,4,5].flatMap(l=>[n+'_lv'+l])),'rock','hinoki','sauna','milky','ramen','teishoku','izakaya','yuzu','gift','room','cave','foot','fall','fam','wine','dango','sake','tea','ice','sakura','maple','pine','lantern','torii','bamboo','sandgarden','bridge','waterwheel','wisteria','rocks','shishi','nodate','pagoda','bamboofence','cafe','lamppost','olive','lounger','cedar','mushroom','fern','birdhouse','snowman','hydrangea','tsukimi','kadomatsu','cb1','cb2','cb3','cb4','cw1','cw2','cw3','cw4','gate'];
 function loadImgs(){return Promise.all(NAMES.map(n=>new Promise(r=>{const i=new Image();i.onload=()=>{IMG[n]=i;r()};i.onerror=r;i.src='assets/'+n+'.png'})))}
 // 멀티 레이어 스프라이트: 마스크 경로 순서대로 픽셀을 잘라 레이어로 분리 (나머지 = ground)
 const roofY=(x,W,H)=>H*(0.294+0.144*x/W);

@@ -20,8 +20,9 @@ while q:
     if 0<=ny<H and 0<=nx<W and cand[ny,nx] and not mask[ny,nx]:mask[ny,nx]=1;q.append((ny,nx))
 # 테두리와 이어지지 않은 내부 배경(울타리 사이로 보이는 배경)도 제거: 배경색에 가까운 큰 덩어리
 from scipy import ndimage
+import os
 lab,nl=ndimage.label(d<55)
-if nl:
+if nl and not os.environ.get('NOINT'):
   sz=ndimage.sum(np.ones_like(d),lab,range(1,nl+1))
   for i,z in enumerate(sz):
     if z>H*W*0.0015: mask|=lab==(i+1)
