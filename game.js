@@ -20,6 +20,12 @@ const DEF={
  sakura:{tree:1,n:'벚꽃나무',tab:'deco',img:'sakura',fp:1,sc:2.3,cost:1200,beauty:8,star:1,emit:'petal',desc:'꽃잎이 흩날려요'},
  maple:{tree:1,n:'단풍나무',tab:'deco',img:'maple',fp:1,sc:2.3,cost:1200,beauty:8,star:1,emit:'leaf',desc:'붉은 잎이 떨어져요'},
  pine:{tree:1,n:'눈 내린 소나무',tab:'deco',img:'pine',fp:1,sc:2.0,cost:2000,beauty:10,star:2,emit:'snow',desc:'주변에 눈이 내려요'},
+ torii:{n:'토리이',tab:'deco',img:'torii',fp:1,sc:1.6,cost:2200,beauty:9,star:1,desc:'붉은 토리이, 신성한 입구'},
+ bamboo:{n:'대나무 숲 석등',tab:'deco',img:'bamboo',fp:1,sc:1.7,cost:1800,beauty:8,star:1,light:[[0,-0.45]],desc:'바람에 사각이는 대숲'},
+ sandgarden:{n:'모래 정원',tab:'deco',img:'sandgarden',fp:2,sc:1,cost:4000,beauty:15,star:2,desc:'갈퀴로 다듬은 고요한 가레산스이'},
+ bridge:{n:'붉은 아치 다리',tab:'deco',img:'bridge',fp:2,sc:1,cost:5000,beauty:16,star:2,desc:'작은 개울 위 다이코바시'},
+ waterwheel:{n:'물레방아',tab:'deco',img:'waterwheel',fp:2,sc:1,cost:6000,beauty:18,star:3,desc:'졸졸 물소리와 함께 도는 물레방아'},
+ wisteria:{n:'등나무 정자',tab:'deco',img:'wisteria',fp:2,sc:1.05,cost:4500,beauty:16,star:2,desc:'보랏빛 등꽃 아래 돌벤치'},
  lantern:{n:'석등롱',tab:'deco',img:'lantern',fp:1,sc:1.25,cost:600,beauty:5,star:1,light:[[0,-0.55]],desc:'밤이면 은은히 빛나요'},
  rocks:{n:'정원석',tab:'deco',img:'rocks',fp:1,sc:1.4,cost:400,beauty:4,star:1,desc:'이끼 낀 정원석'},
  shishi:{set:'trad',n:'시시오도시',tab:'theme',img:'shishi',fp:1,sc:1.3,cost:1800,beauty:9,star:1,sound:'shishi',desc:'딱! 대나무 소리가 정원에 울려요'},
@@ -93,7 +99,7 @@ function avgNet(){const h=S.fin.hist;if(!h.length)return 0;const a=h.slice(-24);
 // ===== 에셋 =====
 const TIERED=['rock','hinoki','sauna','milky','ramen','teishoku','izakaya','yuzu','gift','room'];
 const IMG={},VAR=new Proxy({},{get(t,k){if(typeof k!='string'||t[k]||!k.includes('~m'))return t[k];const src=t[k.replace('~m','')];if(!src)return undefined;return t[k]={base:src.base,sil:src.sil,rimL:src.rimR,rimR:src.rimL,m:1}}}); // 좌우반전은 그릴 때 변환으로 처리(캔버스 추가 생성 없음)
-const NAMES=[...TIERED.flatMap(n=>[1,2,3,4,5].flatMap(l=>[n+'_lv'+l])),'rock','hinoki','sauna','milky','ramen','teishoku','izakaya','yuzu','gift','room','sakura','maple','pine','lantern','rocks','shishi','nodate','pagoda','bamboofence','cafe','lamppost','olive','lounger','cedar','mushroom','fern','birdhouse','snowman','hydrangea','tsukimi','kadomatsu','cb1','cb2','cb3','cb4','cw1','cw2','cw3','cw4','gate'];
+const NAMES=[...TIERED.flatMap(n=>[1,2,3,4,5].flatMap(l=>[n+'_lv'+l])),'rock','hinoki','sauna','milky','ramen','teishoku','izakaya','yuzu','gift','room','sakura','maple','pine','lantern','torii','bamboo','sandgarden','bridge','waterwheel','wisteria','rocks','shishi','nodate','pagoda','bamboofence','cafe','lamppost','olive','lounger','cedar','mushroom','fern','birdhouse','snowman','hydrangea','tsukimi','kadomatsu','cb1','cb2','cb3','cb4','cw1','cw2','cw3','cw4','gate'];
 function loadImgs(){return Promise.all(NAMES.map(n=>new Promise(r=>{const i=new Image();i.onload=()=>{IMG[n]=i;r()};i.onerror=r;i.src='assets/'+n+'.png'})))}
 // 멀티 레이어 스프라이트: 마스크 경로 순서대로 픽셀을 잘라 레이어로 분리 (나머지 = ground)
 const roofY=(x,W,H)=>H*(0.294+0.144*x/W);
