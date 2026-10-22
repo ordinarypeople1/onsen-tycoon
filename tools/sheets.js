@@ -20,4 +20,9 @@ for(const h of[10,21]){await setup(h=>{const D=__dbg,S=D.S;S.objs=S.objs.filter(
 // 업그레이드 연출 프레임
 await setup(()=>{const D=__dbg,S=D.S;S.objs=S.objs.filter(o=>o.k=='gate');S.objs.push({k:'izakaya',x:20,y:20,lv:2,rot:0,price:2200,uses:0,earn:0});D.occ();D.setHour(14);D.focusXY(21,21,5);const o=S.objs[S.objs.length-1];o.lv++;o.build={t:0}});
 for(const ms of[500,1200,1950,2600]){await p.waitForTimeout(ms==500?500:ms-[500,1200,1950,2600][[500,1200,1950,2600].indexOf(ms)-1]);await p.screenshot({path:O+`upseq_${ms}.png`})}
+// 연못 테두리 가림: 연못 뒤(북쪽)에 선 손님
+await setup(()=>{const D=__dbg,S=D.S;S.objs=S.objs.filter(o=>o.k=='gate');D.guests().length=0;S.objs.push({k:'pond',x:20,y:20,lv:1,rot:0,price:0,uses:0,earn:0});D.occ();D.setHour(11);for(let i=0;i<3;i++){D.spawn();const g=D.guests()[D.guests().length-1];g.x=20.5+i;g.y=19.6;g.tx=g.x;g.ty=g.y;g.path=[];g.st='wait';g.t=1e9}D.focusXY(21.5,21,7)});
+await p.waitForTimeout(600);await p.screenshot({path:O+'pond_rim_occlusion.png'});
+// 대문 회전
+for(let i=0;i<4;i++){await setup(()=>{const D=__dbg;D.S.objs=D.S.objs.filter(o=>o.k=='gate'||D.DEF[o.k].isPath);D.occ();rotateGate();const g=D.gate();D.focusXY(g.x+1,g.y+1,3)});await p.waitForTimeout(400);await p.screenshot({path:O+`gate_rot_${i}.png`})}
 console.log('ERR',JSON.stringify(errs));await b.close()})();

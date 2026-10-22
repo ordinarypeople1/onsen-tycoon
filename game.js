@@ -92,7 +92,7 @@ const fmt=n=>Math.floor(n).toLocaleString('ko-KR');
 function avgNet(){const h=S.fin.hist;if(!h.length)return 0;const a=h.slice(-24);return a.reduce((s,x)=>s+x,0)/a.length}
 // ===== 에셋 =====
 const TIERED=['rock','hinoki','sauna','milky','ramen','teishoku','izakaya','yuzu','gift','room'];
-const IMG={},VAR=new Proxy({},{get(t,k){if(typeof k!='string'||t[k]||!k.includes('~m'))return t[k];const src=t[k.replace('~m','')];if(!src)return undefined;const b=src.base,c=mk(b.width,b.height),g=c.getContext('2d');g.translate(c.width,0);g.scale(-1,1);g.drawImage(b,0,0);variants(k,c);return t[k]}});const NAMES=[...TIERED.flatMap(n=>[1,2,3,4,5].map(l=>n+'_lv'+l)),'rock','hinoki','sauna','milky','ramen','teishoku','izakaya','yuzu','gift','room','sakura','maple','pine','lantern','rocks','shishi','nodate','pagoda','bamboofence','cafe','lamppost','olive','lounger','cedar','mushroom','fern','birdhouse','snowman','hydrangea','tsukimi','kadomatsu','cb1','cb2','cb3','cb4','cw1','cw2','cw3','cw4','gate'];
+const IMG={},VAR=new Proxy({},{get(t,k){if(typeof k!='string'||t[k]||!k.includes('~m'))return t[k];const src=t[k.replace('~m','')];if(!src)return undefined;const b=src.base,c=mk(b.width,b.height),g=c.getContext('2d');g.translate(c.width,0);g.scale(-1,1);g.drawImage(b,0,0);variants(k,c);return t[k]}});const NAMES=[...TIERED.flatMap(n=>[1,2,3,4,5].flatMap(l=>[n+'_lv'+l,n+'_lv'+l+'_b'])),'rock','hinoki','sauna','milky','ramen','teishoku','izakaya','yuzu','gift','room','sakura','maple','pine','lantern','rocks','shishi','nodate','pagoda','bamboofence','cafe','lamppost','olive','lounger','cedar','mushroom','fern','birdhouse','snowman','hydrangea','tsukimi','kadomatsu','cb1','cb2','cb3','cb4','cw1','cw2','cw3','cw4','gate'];
 function loadImgs(){return Promise.all(NAMES.map(n=>new Promise(r=>{const i=new Image();i.onload=()=>{IMG[n]=i;r()};i.onerror=r;i.src='assets/'+n+'.png'})))}
 // 멀티 레이어 스프라이트: 마스크 경로 순서대로 픽셀을 잘라 레이어로 분리 (나머지 = ground)
 const roofY=(x,W,H)=>H*(0.294+0.144*x/W);
@@ -175,7 +175,7 @@ function tileTex(cob,vr,par){const key=cob+'_'+vr+'_'+par;const ty=typeof cob=='
 // ===== 오브젝트 =====
 const occ=()=>{const m={};for(const o of S.objs){if(o===moving)continue;for(const[x,y]of tilesOf(o))m[x+','+y]=o}return m};
 const tierOf=lv=>Math.max(1,Math.min(5,lv|0));
-function skey(o){if(o.k=='gate')return o.dir=='y'?'gate_f':'gate';if(DEF[o.k].photo){const pk='pic_'+o.k+'_'+(o.pic||'');return VAR[pk]?pk:o.k}const d=DEF[o.k];const b=o.k=='milk'?'milk':d.img;const k=b+'_lv'+tierOf((o.lv||1)-(o.build&&o.build.t<0.9?1:0));const r=(d.price&&VAR[k])?k:(o.k=='milk'?'milk':o.k);return (o.rot&1)?r+'~m':r}
+function skey(o){if(o.k=='gate')return o.dir=='y'?'gate_f':'gate';if(DEF[o.k].photo){const pk='pic_'+o.k+'_'+(o.pic||'');return VAR[pk]?pk:o.k}const d=DEF[o.k];const b=o.k=='milk'?'milk':d.img;const k=b+'_lv'+tierOf((o.lv||1)-(o.build&&o.build.t<0.9?1:0));let r=(d.price&&VAR[k])?k:(o.k=='milk'?'milk':o.k);if((o.rot&2)&&VAR[r+'_b'])r=r+'_b';return (o.rot&1)?r+'~m':r}
 const gTiles=(x,y,dir)=>dir=='x'?[[x,y],[x+1,y],[x+2,y]]:[[x,y],[x,y+1],[x,y+2]];
 function tilesOf(o){if(o.k=='gate')return gTiles(o.x,o.y,o.dir);const f=DEF[o.k].fp,t=[];for(let i=0;i<f;i++)for(let j=0;j<f;j++)t.push([o.x+i,o.y+j]);return t}
 function gateOut(x,y,dir){const t=gTiles(x,y,dir);const cand=dir=='x'?[[0,1],[0,-1]]:[[1,0],[-1,0]];for(const[a,b]of cand)if(t.every(([u,v])=>!tileOpen(u+a,v+b)))return[a,b];return null}
@@ -187,7 +187,14 @@ function ensureGate(){if(gateObj())return;OCC=occ();let sp=null,bd=1e9;for(let x
  if(!sp)return;placeGate(sp);const gi=gateInfo(),b=S.objs.find(o=>DEF[o.k].bath);OCC=occ();if(b){const d=doorTile(b);const p=d&&findPath(gi.m[0],gi.m[1],d[0],d[1]);if(p)for(const[px,py]of p){const x=px|0,y=py|0;if(!OCC[x+','+y])S.objs.push({k:'path',x,y,lv:1,price:0,uses:0,earn:0})}}OCC=occ();groundDirty=true}
 function placeGate(sp){const t=gTiles(sp.x,sp.y,sp.dir);const set=new Set(t.map(p=>p.join(',')));S.objs=S.objs.filter(o=>!(DEF[o.k].isPath&&set.has(o.x+','+o.y)));let g=gateObj();if(!g){g={k:'gate',lv:1,price:0,uses:0,earn:0};S.objs.push(g)}g.x=sp.x;g.y=sp.y;g.dir=sp.dir}
 let OCC={};let ROT=0;function rotateObj(o){if(!o||o.k=='gate'||DEF[o.k].isPath)return;const old=o.rot||0;o.rot=(old+1)&3;if(!moving&&!window.__dbg.reachOK()){o.rot=old;toast('그 방향으론 손님이 들어갈 수 없어요');return}groundDirty=true;guests.forEach(g=>{if(g.cur===o&&g.inBath){const[a,b]=bathSlot(o,g.slot||0);g.x=a;g.y=b}if(g.target===o&&g.st=='walk'){g.target=null;g.path=[]}});save()}
-window.rotateObj=rotateObj;setTimeout(()=>{const gb=document.getElementById('ghRot');if(gb){gb.onclick=e=>{e.stopPropagation();ROT=(ROT+1)&3};setInterval(()=>{gb.style.display=(ghost&&ghost!='gate'&&DEF[ghost]&&!DEF[ghost].isPath&&!DEF[ghost].erase&&!moving)?'block':'none'},200)}const b=document.getElementById('mvRot');if(b)b.onclick=e=>{e.stopPropagation();rotateObj(moving)}},0);let moving=null,infoT=null;
+window.rotateObj=rotateObj;
+function rotateGate(){const g=gateObj();if(!g)return;const cur=gateOut(g.x,g.y,g.dir);const key=d=>d[0]+','+d[1];const order=['0,1','1,0','0,-1','-1,0'];const gm=gTiles(g.x,g.y,g.dir)[1];const save_=[g.x,g.y,g.dir];
+ S.objs.splice(S.objs.indexOf(g),1);OCC=occ();let best=null;
+ for(let step=1;step<=4&&!best;step++){const want=order[(order.indexOf(key(cur))+step)%4];let bd=1e9;for(let x=0;x<N;x++)for(let y=0;y<N;y++)for(const dir of['x','y']){if(!gateValid(x,y,dir))continue;const o_=gateOut(x,y,dir);if(key(o_)!==want)continue;const m=gTiles(x,y,dir)[1];const dd=Math.hypot(m[0]-gm[0],m[1]-gm[1]);if(dd<bd){bd=dd;best={x,y,dir}}}}
+ S.objs.push(g);if(!best){OCC=occ();toast('돌릴 수 있는 다른 가장자리가 없어요');return}
+ placeGate(best);OCC=occ();if(!window.__dbg.reachOK()){placeGate({x:save_[0],y:save_[1],dir:save_[2]});OCC=occ();toast('그쪽으로는 길이 이어지지 않아요');return}
+ groundDirty=true;guests.forEach(q=>{if(q.st=='walk'){q.target=null;q.path=[]}});save();if(INFO_O===g)requestAnimationFrame(popPlace)}
+window.rotateGate=rotateGate;setTimeout(()=>{const gb=document.getElementById('ghRot');if(gb){gb.onclick=e=>{e.stopPropagation();ROT=(ROT+1)&3};setInterval(()=>{gb.style.display=(ghost&&ghost!='gate'&&DEF[ghost]&&!DEF[ghost].isPath&&!DEF[ghost].erase&&!moving)?'block':'none'},200)}const b=document.getElementById('mvRot');if(b)b.onclick=e=>{e.stopPropagation();rotateObj(moving)}},0);let moving=null,infoT=null;
 function startMove(o){if(window.READONLY)return;clearTimeout(infoT);if(moving)cancelMove();hideInfo();mode=null;
  guests.forEach(g=>{if(g.cur===o)finish(g);if(g.target===o){g.target=null;g.path=[]}});
  moving=o;o._from=[o.x,o.y,o.dir];ghost=o.k;OCC=occ();groundDirty=true;$('moveBar').style.display='flex';toast('놓을 곳을 눌러주세요 (Esc·우클릭 취소)')}
@@ -381,7 +388,7 @@ function render(t){
  if(paint){const{t}=paintPlan();const er=DEF[ghost].erase;cx.fillStyle=er?'rgba(240,110,100,0.5)':'rgba(140,230,140,0.5)';for(const[x,y]of t){const[X,Y]=iso(x,y);cx.beginPath();cx.moveTo(X,Y);cx.lineTo(X+16,Y+8);cx.lineTo(X,Y+16);cx.lineTo(X-16,Y+8);cx.fill()}}
  // 그림자 + 오브젝트 + 손님 정렬
  const list=[];
- for(const o of S.objs){if(!!DEF[o.k].isPath||DEF[o.k].flat||o===moving)continue;const t=tilesOf(o),l=t[t.length-1];
+ for(const o of S.objs){if(DEF[o.k].pond&&o!==moving){list.push({x0:o.x,y0:o.y,x1:o.x+3,y1:o.y+3,o,part:'pondrim'});continue}if(!!DEF[o.k].isPath||DEF[o.k].flat||o===moving)continue;const t=tilesOf(o),l=t[t.length-1];
   if(o.k=='gate'){list.push({x0:t[0][0],y0:t[0][1],x1:t[0][0]+1,y1:t[0][1]+1,o,part:'back'});list.push({x0:l[0],y0:l[1],x1:l[0]+1,y1:l[1]+1,o,part:'front'});continue}
   list.push({x0:o.x,y0:o.y,x1:l[0]+1,y1:l[1]+1,o})}
  for(const g of guests)if(!g.hide&&!g.inBath)list.push({x0:g.x-0.15,y0:g.y-0.15,x1:g.x+0.15,y1:g.y+0.15,g});
@@ -396,7 +403,7 @@ function render(t){
  // 손님: 반드시 앞서야 하는 마지막 오브젝트 뒤에 삽입
  for(const g of GS){let i=0;for(let j=0;j<sorted.length;j++){const o=sorted[j];if(o.g){if(o.z<=g.z)i=Math.max(i,j+1);continue}if(ov(o,g)&&cmp(o,g)<0)i=j+1;else if(!ov(o,g)&&o.z<=g.z)i=Math.max(i,j+1)}
   for(let j=i-1;j>=0;j--){const o=sorted[j];if(!o.g&&ov(o,g)&&cmp(o,g)>0){i=j}}sorted.splice(i,0,g)}
- list.length=0;list.push(...sorted);window._order=list.filter(it=>it.o&&!it.part).map(it=>it.o);
+ list.length=0;list.push(...sorted);window._order=list.filter(it=>it.o&&(!it.part||it.part=='pondrim')).map(it=>it.o);
  // 뒤에 가려진 손님/커서가 있으면 건물 반투명
  const hidden=new Set();for(const it of list){if(!it.o)continue;const o=it.o,G=objGeom(o);
   const pts=guests.filter(g=>!g.hide&&!g.inBath&&g.x<it.x1&&g.y<it.y1&&!(g.x>=it.x0&&g.y>=it.y0)&&(g.x+g.y)<it.x1+it.y1-0.5).map(g=>iso(g.x,g.y));
@@ -404,7 +411,7 @@ function render(t){
   if(pts.some(([X,Y])=>Math.abs(X-G.X)<G.W*0.42&&Y<G.Y-6&&Y>G.Y-G.H*0.9))hidden.add(o)}
  for(const it of list)if(it.o&&it.part!='front'){const o=it.o,G=objGeom(o),key=skey(o);if(o.k=='gate'){drawSprite(key+'_ground',o,G.X,G.Y,G.W,lt,sv,1)}ao(G.X,G.cY,G.W*0.5,G.W*0.25,0.3);drawShadow(key,G.X,G.Y,G.W,lt,sv,DEF[o.k].bath?0.4:1)}
  for(const it of list){
-  if(it.part){const o=it.o,G=objGeom(o);drawSprite(skey(o)+'_'+it.part,o,G.X,G.Y,G.W,lt,sv,1)}
+  if(it.part=='pondrim'){if(window.drawPondRim)drawPondRim(it.o);continue}if(it.part){const o=it.o,G=objGeom(o);drawSprite(skey(o)+'_'+it.part,o,G.X,G.Y,G.W,lt,sv,1)}
   else if(it.o){const o=it.o,d=DEF[o.k],G=objGeom(o);const an=anims['o'+S.objs.indexOf(o)];const pop=an?Math.min(1,an.t*3):1;
    const Wp=G.W*(0.7+0.3*easeOut(pop));const fade=hidden.has(o)&&!d.bath&&d.fp>1&&!window.READONLY&&!document.body.classList.contains('zen');const sw_=(d.tree||d.flutter)?(Math.sin(t/1100+o.x*1.7+o.y)*0.018+(window.WIND||0)*0.025+(o.sway||0)*Math.sin(t/110)*0.25):0;if(sw_){cx.save();cx.translate(G.X,G.Y);cx.transform(1,0,-sw_,1,0,0);cx.translate(-G.X,-G.Y)}drawSprite(skey(o),o,G.X,G.Y,Wp,lt,sv,pop*(fade?0.5:1));if(sw_)cx.restore();
    if(d.bath){drawWater(o,G,t,lt);cx.save();bathClip(o);guests.filter(g=>g.inBath&&g.cur===o).sort((a,b)=>a.x+a.y-b.x-b.y).forEach(g=>drawGuest(g,t,lt,sv));cx.restore();const ov=skey(o)+'_over';if(VAR[ov]&&guests.some(g=>g.inBath&&g.cur===o))drawSprite(ov,o,G.X,G.Y,Wp,lt,sv,pop)}
@@ -450,17 +457,12 @@ function drawGrid(){const P=N/PS;
   const E=[[[x0,y0],[x0+PS,y0],!plotOpen(px,py-1)],[[x0+PS,y0],[x0+PS,y0+PS],!plotOpen(px+1,py)],[[x0+PS,y0+PS],[x0,y0+PS],!plotOpen(px,py+1)],[[x0,y0+PS],[x0,y0],!plotOpen(px-1,py)]];
   for(const[a,b,on]of E)if(on){cx.moveTo(...iso(...a));cx.lineTo(...iso(...b))}}cx.stroke();cx.restore()}
 const easeOut=t=>1-Math.pow(1-t,3);
-const EMI={};function emiOf(key){if(key in EMI)return EMI[key];const v=VAR[key];if(!v){return EMI[key]=null}const W=v.base.width,H=v.base.height;const id=v.base.getContext('2d').getImageData(0,0,W,H).data;const c=mk(W,H),g=c.getContext('2d'),o=g.createImageData(W,H),od=o.data;const C=12,cw=Math.ceil(W/C),cell=new Float32Array(cw*Math.ceil(H/C));
- for(let i=0;i<W*H;i++){const j=i*4;if(id[j+3]<200)continue;const r=id[j],gg=id[j+1],b=id[j+2];let e=0;
-  if(r>185&&r-gg>70&&gg>60&&b<130)e=1; // 붉은/주황 등롱
-  else if(r>200&&gg>165&&b>100&&b<200&&r-b>55&&gg-b>25)e=0.7; // 따뜻한 창호지 불빛
-  else if(r>235&&gg>220&&b<190)e=0.9; // 불꽃·전구
-  if(!e)continue;od[j]=255;od[j+1]=Math.min(255,gg+40);od[j+2]=Math.min(255,b+10);od[j+3]=255*e;const x=i%W,y=(i/W)|0;cell[((y/C)|0)*cw+((x/C)|0)]+=e}
- g.putImageData(o,0,0);const pts=[];for(let k=0;k<cell.length;k++)if(cell[k]>=6)pts.push([((k%cw)+0.5)*C/W,(((k/cw)|0)+0.5)*C/H,cell[k]]);pts.sort((a,b)=>b[2]-a[2]);
- const sel=[];for(const p of pts){if(sel.length>=7)break;if(sel.every(q=>Math.hypot((q[0]-p[0])*W,(q[1]-p[1])*H)>26))sel.push(p)}
- // 번짐: 축소-확대로 소프트 글로우
- const s2=mk(Math.max(1,W>>2),Math.max(1,H>>2)),g2=s2.getContext('2d');g2.drawImage(c,0,0,s2.width,s2.height);const out=mk(W,H),go=out.getContext('2d');go.imageSmoothingEnabled=true;go.globalAlpha=0.9;go.drawImage(s2,0,0,W,H);go.globalAlpha=1;go.drawImage(c,0,0);
- return EMI[key]={c:out,pts:sel}}
+const EMI={},LMI={};function emiOf(key){if(key in EMI)return EMI[key];const mir=key.includes('~m'),bk=key.replace('~m','');const L=(window.LIGHTS||{})[bk];if(!L)return EMI[key]=null;
+ let im=LMI[bk];if(!im){im=LMI[bk]=new Image();im.src='assets/lights/'+bk+'.png'}if(!im.complete||!im.naturalWidth)return null;
+ const W=im.naturalWidth,H=im.naturalHeight,c=mk(W,H),g=c.getContext('2d');if(mir){g.translate(W,0);g.scale(-1,1)}
+ // 번짐: 축소-확대 소프트 글로우 + 원본
+ const s2=mk(Math.max(1,W>>2),Math.max(1,H>>2)),g2=s2.getContext('2d');g2.drawImage(im,0,0,s2.width,s2.height);g.imageSmoothingEnabled=true;g.globalAlpha=0.9;g.drawImage(s2,0,0,W,H);g.globalAlpha=1;g.drawImage(im,0,0);
+ return EMI[key]={c,pts:L.map(([x,y,w])=>[mir?1-x:x,y,w])}}
 function nightLights(t,lt,z){const k0=Math.min(1,(lt.night-0.18)/0.5),k=k0*k0*(3-2*k0);cx.globalCompositeOperation='lighter';const low=window.GFX_LOW;
  for(const o of S.objs){const d=DEF[o.k];if(d.isPath||o===moving)continue;const G=objGeom(o);const[sx,sy]=toScreen(G.X,G.Y);if(sx<-G.W*z||sx>VW+G.W*z||sy<-20||sy-G.H*z>VH+40)continue;
   const lv=o.lv||1,key=skey(o),ph=(o.x*7.1+o.y*3.3);
@@ -599,7 +601,7 @@ function popPlace(){const el=$('info');if(!INFO_O||el.style.display=='none')retu
  if(y<64){y=by+10;below=true}if(y+h>VH-8)y=Math.max(64,VH-8-h);x=Math.max(8,Math.min(VW-w-8,x));el.style.left=x+'px';el.style.top=y+'px';el.classList.toggle('below',below);el.style.setProperty('--ax',Math.max(14,Math.min(w-14,ax-x))+'px')}
 BUS.on('frame',popPlace);
 function showInfo(o){const el=$('info');if(INFO_O!==o)POPSEC=null;INFO_O=o;el.classList.add('pop');el.style.right='auto';el.style.bottom='auto';el.style.maxHeight='';el.style.display='block';
- if(o.k=='gate'){el.innerHTML=`<div class="ph"><b>${IC('gate')} 대문</b><button class="px" id="iCl">${IC('close')}</button></div><div class="pdesc">손님이 드나드는 유일한 입구예요. 열린 땅 가장자리로 이동만 할 수 있어요.</div><div class="pacts"><button class="pa" id="iMove">${IC('move')}<i>이동</i></button></div>`;$('iMove').onclick=()=>startMove(o);$('iCl').onclick=()=>hideInfo();requestAnimationFrame(popPlace);return}
+ if(o.k=='gate'){el.innerHTML=`<div class="ph"><b>${IC('gate')} 대문</b><button class="px" id="iCl">${IC('close')}</button></div><div class="pdesc">손님이 드나드는 유일한 입구예요. 열린 땅 가장자리로 이동만 할 수 있어요.</div><div class="pacts"><button class="pa" id="iMove">${IC('move')}<i>이동</i></button><button class="pa" id="iRot">${IC('rotate')}<i>회전</i></button></div>`;$('iMove').onclick=()=>startMove(o);$('iRot').onclick=e=>{e.stopPropagation();rotateGate()};$('iCl').onclick=()=>hideInfo();requestAnimationFrame(popPlace);return}
  const d=DEF[o.k];const up=Math.round(d.cost*Math.pow(1.7,o.lv));const users=guests.filter(g=>g.cur===o).length;
  const gauge=d.price?(()=>{const fr=fairPrice(o),r=o.price/fr;const [c,t]=r<0.9?["#5f9e5a","저렴 · 손님 만족 ↑"]:r<1.15?["#3f6aa0","적정가"]:r<1.4?["#c98a2c","조금 비쌈 · 만족 ↓"]:["#c0442e","너무 비쌈 · 손님이 거절해요"];const pos=Math.max(0,Math.min(100,(r-0.6)/1.0*100));return `<div class="pfb"><div class="pbar"><i style="left:${pos}%;background:${c}"></i></div><small style="color:${c}">${t}</small><small style="opacity:.7"> · 추천 ¥${fmt(Math.round(fr*1.1/10)*10)}${o.rej?` · 거절 ${o.rej}회`:""}</small></div>`})():'';
  const stars='◆'.repeat(o.lv)+'◇'.repeat(5-o.lv);
@@ -650,7 +652,7 @@ function initInput(){
  const objAt=(sx,sy)=>{const o=pickObj(sx,sy);return o&&!DEF[o.k].isPath?o:null};
  cv.addEventListener('dblclick',e=>{if(moving||ghost&&!moving)return;const o=objAt(e.clientX,e.clientY);if(o)startMove(o)});
  $('mvCancel').onclick=cancelMove;
- addEventListener('keydown',e=>{if((e.key=='r'||e.key=='R')&&!e.ctrlKey&&!e.metaKey&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){if(moving)rotateObj(moving);else if(ghost&&ghost!='gate'&&!DEF[ghost].isPath)ROT=(ROT+1)&3;else if(INFO_O)rotateObj(INFO_O);return}if(e.key=='Escape'){$('toast').style.display='none';if(moving){cancelMove();return}ghost=null;mode=null;$('tDel').classList.remove('on');$('info').style.display='none';$('modal').style.display='none';buildCards()}});
+ addEventListener('keydown',e=>{if((e.key=='r'||e.key=='R')&&!e.ctrlKey&&!e.metaKey&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){if(moving)rotateObj(moving);else if(ghost&&ghost!='gate'&&!DEF[ghost].isPath)ROT=(ROT+1)&3;else if(INFO_O){INFO_O.k=='gate'?rotateGate():rotateObj(INFO_O)}return}if(e.key=='Escape'){$('toast').style.display='none';if(moving){cancelMove();return}ghost=null;mode=null;$('tDel').classList.remove('on');$('info').style.display='none';$('modal').style.display='none';buildCards()}});
  $('zs').min=zmin().toFixed(2);$('zs').oninput=e=>{zoomTarget=null;cam.tz=+e.target.value};$('zIn').onclick=()=>{zoomTarget=null;cam.tz=Math.min(8,cam.tz*1.3)};$('zOut').onclick=()=>{zoomTarget=null;cam.tz=Math.max(zmin(),cam.tz/1.3)};
  $('zHome').onclick=()=>{const b=S.objs.find(o=>DEF[o.k].bath)||S.objs[0];homeAnim={t:0,from:{...cam},to:b}};
  $('tFin').onclick=modalFin;$('tGuest').onclick=modalGuest;

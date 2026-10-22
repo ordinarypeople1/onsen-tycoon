@@ -67,6 +67,11 @@ const AMB=(()=>{
    cx.fillStyle='#3f6e33';cx.beginPath();cx.ellipse(px,py,2.6*p.s,1.3*p.s,0,0.5,6.0);cx.lineTo(px,py);cx.fill();cx.fillStyle='#6d9a4c';cx.beginPath();cx.ellipse(px-0.4,py-0.3,1.6*p.s,0.7*p.s,0,0.5,6.0);cx.lineTo(px,py);cx.fill();
    cx.fillStyle='rgba(200,230,150,0.5)';cx.fillRect(px-1.6*p.s,py-0.1,1.4*p.s,0.35);
    if(p.fl){cx.fillStyle='#f3c2cf';cx.beginPath();cx.ellipse(px+0.5,py-1,1.3,0.9,0,0,6.283);cx.fill();cx.fillStyle='#fff3f5';cx.fillRect(px+0.1,py-1.8,0.8,0.8)}}
+  // 돌 테두리는 깊이 정렬 패스(drawPondRim)에서 그려 손님과 올바르게 겹침
+  if(ghostA)drawPondRim(o,ghostA);
+  cx.restore()}
+
+ window.drawPondRim=drawPondRim;function drawPondRim(o,ghostA){const d=pondData(o);const[cX,cY]=iso(o.x+1.5,o.y+1.5);const rx=3*TW*0.4,ry=rx/2;cx.save();cx.globalAlpha=ghostA||1;
   // 돌 테두리 + 이끼 (뒤→앞)
   const st=d.stones.slice().sort((a,b)=>Math.sin(a.a)-Math.sin(b.a));const SC=[['#8f8a80','#b4ad9f'],['#7d7a72','#a39e92'],['#9a9384','#c2baa8']];
   for(const s of st){const px=cX+Math.cos(s.a)*(rx+0.5),py=cY+Math.sin(s.a)*(ry+0.3);const w=3.2*s.s,h=2.2*s.s;const front=Math.sin(s.a)>0;

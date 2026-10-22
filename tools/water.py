@@ -17,10 +17,11 @@ def detect(path,milky):
     return dict(cx=(x0+x1)/2/W,cy=(y0+y1)/2/H,rx=(x1-x0)/2/W,ry=(y1-y0)/2/H,n=int(len(xs)))
 for k in sys.argv[1:]:
     for l in [1,2,3,4,5]:
-        p=f'{k}_lv{l}.png'
+      for sf in ['','_b']:
+        p=f'{k}_lv{l}{sf}.png'
         try: d=detect(p,k=='milky')
         except FileNotFoundError: continue
-        if d: out[f'{k}_lv{l}']={q:round(v,4) if isinstance(v,float) else v for q,v in d.items()}
+        if d: out[f'{k}_lv{l}{sf}']={q:round(v,4) if isinstance(v,float) else v for q,v in d.items()}
 OVR={'hinoki_lv5':dict(cx=0.27,cy=0.635,rx=0.15,ry=0.055)}
 for k,v in OVR.items():
     if k in out or k.split('_')[0] in sys.argv: out[k]=v
