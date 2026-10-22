@@ -108,3 +108,6 @@ body.titling #zenHint{display:none}
 .pxw canvas{image-rendering:pixelated;display:block;max-width:220px;height:auto;margin:auto}.pxw .lab{font-size:11px;text-align:center;opacity:.7;margin-top:4px}
 #modal select{font:500 12px Pretendard,sans-serif;padding:3px;border-radius:5px;border:1.5px solid #a07a50;background:#fbf1dc}
 .pxw canvas{position:static!important;inset:auto!important;width:auto!important;height:auto!important;pointer-events:none}
+.cp{display:flex;gap:6px;align-items:flex-start}.cp input,.cp textarea,#shI{flex:1;width:100%;box-sizing:border-box;font:500 11px monospace;border:1.5px solid #a07a50;border-radius:6px;padding:6px;background:#fffaf0;color:#4a3220;resize:none}
+#visitBar{position:fixed;top:56px;left:50%;transform:translateX(-50%);z-index:40;display:flex;gap:10px;align-items:center;padding:6px 8px 6px 14px;font:600 13px Pretendard,sans-serif}
+body.visit #build,body.visit #bOpen,body.visit #tDel,body.visit #quest,body.visit #bPause{display:none!important}

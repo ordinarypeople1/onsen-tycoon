@@ -3,8 +3,8 @@
 const SHELL=(()=>{
  const SET=Object.assign({vol:{master:0.8,bgm:0.6,sfx:0.8,amb:0.8},gfx:'auto',lang:'ko',fps:false},(()=>{try{return JSON.parse(localStorage.onsenSet||'{}')}catch(e){return{}}})());
  const saveSet=()=>{try{localStorage.onsenSet=JSON.stringify(SET)}catch(e){}};
- const I18N={ko:{cont:'이어하기',newg:'새로 시작',slots:'저장 슬롯',set:'설정',cred:'크레딧',resume:'계속하기',title:'타이틀로',paused:'일시정지',vol:'음량',master:'전체',bgm:'배경음악',sfx:'효과음',amb:'환경음',gfx:'그래픽 품질',auto:'자동',high:'높음',low:'낮음',lang:'언어',fps:'FPS 표시',close:'닫기',slot:'슬롯',empty:'비어 있음',use:'사용',del:'삭제',zen:'감상 모드',press:'아무 키나 눌러 시작'},
-  en:{cont:'Continue',newg:'New Game',slots:'Save Slots',set:'Settings',cred:'Credits',resume:'Resume',title:'Title',paused:'Paused',vol:'Volume',master:'Master',bgm:'Music',sfx:'Effects',amb:'Ambience',gfx:'Graphics',auto:'Auto',high:'High',low:'Low',lang:'Language',fps:'Show FPS',close:'Close',slot:'Slot',empty:'Empty',use:'Load',del:'Delete',zen:'Zen Mode',press:'Press any key'}};
+ const I18N={ko:{cont:'이어하기',newg:'새로 시작',slots:'저장 슬롯',set:'설정',cred:'크레딧',resume:'계속하기',title:'타이틀로',paused:'일시정지',vol:'음량',master:'전체',bgm:'배경음악',sfx:'효과음',amb:'환경음',gfx:'그래픽 품질',auto:'자동',high:'높음',low:'낮음',lang:'언어',fps:'FPS 표시',close:'닫기',slot:'슬롯',empty:'비어 있음',use:'사용',del:'삭제',zen:'감상 모드',share:'저장 코드 · 방문 링크',press:'아무 키나 눌러 시작'},
+  en:{cont:'Continue',newg:'New Game',slots:'Save Slots',set:'Settings',cred:'Credits',resume:'Resume',title:'Title',paused:'Paused',vol:'Volume',master:'Master',bgm:'Music',sfx:'Effects',amb:'Ambience',gfx:'Graphics',auto:'Auto',high:'High',low:'Low',lang:'Language',fps:'Show FPS',close:'Close',slot:'Slot',empty:'Empty',use:'Load',del:'Delete',zen:'Zen Mode',share:'Save Code · Visit Link',press:'Press any key'}};
  const T=k=>(I18N[SET.lang]||I18N.ko)[k]||I18N.ko[k]||k;
  const el=(h)=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstChild};
  const slotKey=n=>n==1?'onsen2':'onsen2_s'+n;
@@ -38,9 +38,22 @@ const SHELL=(()=>{
   o.querySelectorAll('[data-use]').forEach(b=>b.onclick=()=>{const n=+b.dataset.use;if(n==cur){close('ovSlot');if(fromTitle)start();else resume();return}save();localStorage.onsenSlot=n;localStorage.onsenSkipTitle='1';location.reload()});
   o.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const n=+b.dataset.del;if(confirm(`${T('slot')} ${n} 을(를) 삭제할까요? 되돌릴 수 없어요.`)){localStorage.removeItem(slotKey(n));slots(fromTitle)}});
   o.querySelector('[data-x]').onclick=()=>close('ovSlot')}
+ // ---- 저장 코드 · 방문 링크 ----
+ async function share(){save();let code='';try{code=await SAVE.codec.encode(S)}catch(e){toast('저장 코드를 만들지 못했어요');return}
+  const link=location.origin+location.pathname+'#visit='+code;
+  const o=overlay('ovShare',`<h2>📤 ${T('share')}</h2>
+   <h3>방문 링크 (읽기 전용으로 내 료칸 구경)</h3><div class="cp"><input readonly value="${link}" id="shL"><button class="mb sm" data-c="shL">복사</button></div><p class="note">${fmt(link.length)}자 · 링크를 받은 사람은 구경만 할 수 있어요</p>
+   <h3>저장 코드 (백업 · 다른 기기로 옮기기)</h3><div class="cp"><textarea readonly id="shC" rows="3">${code}</textarea><button class="mb sm" data-c="shC">복사</button></div>
+   <h3>저장 코드 가져오기 → 현재 슬롯(${SLOT})</h3><textarea id="shI" rows="3" placeholder="YUZU1. 로 시작하는 코드를 붙여넣으세요"></textarea>
+   <div class="btns"><button class="mb" id="shGo">가져오기</button><button class="mb ghost" data-x>${T('close')}</button></div>`);
+  o.querySelectorAll('[data-c]').forEach(b=>b.onclick=async()=>{const t=o.querySelector('#'+b.dataset.c);t.select();try{await navigator.clipboard.writeText(t.value)}catch(e){document.execCommand('copy')}b.textContent='복사됨 ✓';setTimeout(()=>b.textContent='복사',1500)});
+  o.querySelector('#shGo').onclick=async()=>{const v=o.querySelector('#shI').value;try{const d=await SAVE.codec.decode(v);if(!confirm(`Day ${Math.floor(d.min/1440)+1} · ¥${fmt(d.yen)} 저장으로 슬롯 ${SLOT}을(를) 덮어쓸까요?`))return;localStorage[SKEY+'_bak']=localStorage[SKEY]||'';window.READONLY=true;localStorage[SKEY]=JSON.stringify(d);localStorage.onsenSkipTitle='1';location.reload()}catch(e){toast('코드를 읽지 못했어요: '+e.message)}};
+  o.querySelector('[data-x]').onclick=()=>close('ovShare')}
+ // ---- 방문 모드 ----
+ function visitUI(){document.body.classList.add('visit');const b=el(`<div id="visitBar" class="box"><span>👀 다른 료칸을 구경 중이에요 · 읽기 전용</span><button class="mb sm" id="vHome">내 료칸으로</button></div>`);document.body.appendChild(b);b.querySelector('#vHome').onclick=()=>{location.href=location.pathname}}
  // ---- 크레딧 ----
  function credits(){const o=overlay('ovCred',`<h2>🌸 ${T('cred')}</h2><div class="cred">
-  <p><b>유자 온센 료칸 타이쿤</b><br>v2.7 · 웹 아이들 타이쿤</p>
+  <p><b>유자 온센 료칸 타이쿤</b><br>v3.0 · 웹 아이들 타이쿤</p>
   <p><b>기획 · 개발</b><br>ordinarypeople1 & Grok Bot</p>
   <p><b>아트</b><br>이미지 생성 후 수작업 파이프라인(크로마키·디스필·박스 축소·팔레트 정리)으로 픽셀화</p>
   <p><b>사운드</b><br>WebAudio 절차적 합성 — 물소리, 풍경, 고토풍 선율</p>
@@ -49,15 +62,15 @@ const SHELL=(()=>{
  // ---- 일시정지 ----
  let inTitle=true;
  function pause(){if(inTitle||document.getElementById('ovPause'))return;paused=true;SND.suspend&&SND.suspend(false);
-  const o=overlay('ovPause',`<h2>⏸ ${T('paused')}</h2><div class="col"><button class="mb big" data-a="resume">▶ ${T('resume')}</button><button class="mb" data-a="slots">💾 ${T('slots')}</button><button class="mb" data-a="set">⚙️ ${T('set')}</button><button class="mb" data-a="zen">🍃 ${T('zen')}</button><button class="mb" data-a="cred">🌸 ${T('cred')}</button><button class="mb ghost" data-a="title">🏠 ${T('title')}</button></div>`,'dim');
-  o.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;if(a=='resume')resume();else if(a=='slots')slots();else if(a=='set')settings();else if(a=='cred')credits();else if(a=='zen'){resume();AMB.setZen(true)}else if(a=='title'){save();resume();showTitle()}})}
+  const o=overlay('ovPause',`<h2>⏸ ${T('paused')}</h2><div class="col"><button class="mb big" data-a="resume">▶ ${T('resume')}</button><button class="mb" data-a="slots">💾 ${T('slots')}</button><button class="mb" data-a="share">📤 ${T('share')}</button><button class="mb" data-a="set">⚙️ ${T('set')}</button><button class="mb" data-a="zen">🍃 ${T('zen')}</button><button class="mb" data-a="cred">🌸 ${T('cred')}</button><button class="mb ghost" data-a="title">🏠 ${T('title')}</button></div>`,'dim');
+  o.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;if(a=='resume')resume();else if(a=='slots')slots();else if(a=='share')share();else if(a=='set')settings();else if(a=='cred')credits();else if(a=='zen'){resume();AMB.setZen(true)}else if(a=='title'){save();resume();showTitle()}})}
  function resume(){close('ovPause');paused=false}
  // ---- 타이틀 ----
  function showTitle(){inTitle=true;paused=true;document.body.classList.add('titling');AMB.setZen(true,true);const has=!!slotInfo(SLOT);
   const o=el(`<div id="title"><div class="tl"><img src="assets/emblem.png" class="emb" alt=""><h1><span class="k">유자 온센</span><span class="s">YUZU ONSEN · 료칸 타이쿤</span></h1>
    <div class="col">${has?`<button class="mb big" data-a="cont">▶ ${T('cont')} <small>(${T('slot')} ${SLOT})</small></button>`:`<button class="mb big" data-a="cont">▶ ${T('newg')}</button>`}
-   <button class="mb" data-a="slots">💾 ${T('slots')}</button><button class="mb" data-a="set">⚙️ ${T('set')}</button><button class="mb" data-a="zen">🍃 ${T('zen')}</button><button class="mb ghost" data-a="cred">🌸 ${T('cred')}</button></div>
-   <div class="ver">v2.7 · Esc 일시정지 · Z 감상 모드</div></div></div>`);
+   <button class="mb" data-a="slots">💾 ${T('slots')}</button><button class="mb" data-a="share">📤 ${T('share')}</button><button class="mb" data-a="set">⚙️ ${T('set')}</button><button class="mb" data-a="zen">🍃 ${T('zen')}</button><button class="mb ghost" data-a="cred">🌸 ${T('cred')}</button></div>
+   <div class="ver">v3.0 · Esc 일시정지 · Z 감상 모드</div></div></div>`);
   document.body.appendChild(o);requestAnimationFrame(()=>o.classList.add('on'));
   o.querySelectorAll('[data-a]').forEach(b=>b.onclick=e=>{e.stopPropagation();SND.init();const a=b.dataset.a;if(a=='cont')start();else if(a=='slots')slots(true);else if(a=='set')settings();else if(a=='cred')credits();else if(a=='zen'){start();AMB.setZen(true)}})}
  function start(){const o=document.getElementById('title');if(o){o.classList.remove('on');o.id='';setTimeout(()=>o.remove(),700)}inTitle=false;paused=false;document.body.classList.remove('titling');AMB.setZen(false)}
@@ -75,8 +88,9 @@ const SHELL=(()=>{
  let errShown=0;const onErr=m=>{console.warn('[onsen]',m);try{save()}catch(e){}if(!errShown++)toast('앗, 작은 문제가 생겼지만 진행은 안전하게 저장했어요')};
  addEventListener('error',e=>onErr(e.message));addEventListener('unhandledrejection',e=>onErr(String(e.reason)));
  applyGfx();
- const boot=()=>{if(localStorage.onsenSkipTitle==='1'||window.VISIT_SAVE||/[?&]notitle/.test(location.search)){localStorage.removeItem('onsenSkipTitle');inTitle=false;paused=false;return}showTitle()};
+ BUS.on('info',(o,el)=>{if(window.READONLY){const b=el.lastElementChild;if(b)b.querySelectorAll('button').forEach(x=>{if(x.id!='iCl')x.remove()});el.querySelectorAll('[data-p]').forEach(x=>x.remove())}});
+ const boot=()=>{if(window.READONLY){visitUI();inTitle=false;paused=false;return}if(localStorage.onsenSkipTitle==='1'||/[?&]notitle/.test(location.search)){localStorage.removeItem('onsenSkipTitle');inTitle=false;paused=false;return}showTitle()};
  if(window.__ready)boot();else{const iv=setInterval(()=>{if(window.__ready){clearInterval(iv);boot()}},50)}
- return{SET,T,pause,resume,settings,slots,credits,showTitle,start,get inTitle(){return inTitle}};
+ return{share,SET,T,pause,resume,settings,slots,credits,showTitle,start,get inTitle(){return inTitle}};
 })();
 window.SHELL=SHELL;
