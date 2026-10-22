@@ -1,7 +1,7 @@
 const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch();const errs=[];
  const p=await b.newPage({viewport:{width:1440,height:900}});p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()=='error'&&errs.push(m.text()));
- await p.goto('http://localhost:8765/index.html');await p.waitForFunction(()=>window.__ready);
+ await p.goto('http://localhost:8765/index.html?notitle');await p.waitForFunction(()=>window.__ready);
  await p.evaluate(()=>{const S=__dbg.S;S.yen=900000;S.objs=[];const add=(k,x,y,lv)=>S.objs.push({k,x,y,lv,price:600,uses:0,earn:0,users:0});
   add('rock',17,17,1);add('rock',22,17,3);add('rock',27,17,5);add('milky',17,23,1);add('milky',22,23,3);add('milky',27,23,5);
   __dbg.refresh();__dbg.ensureGate();__dbg.setHour(10);

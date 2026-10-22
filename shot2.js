@@ -3,7 +3,7 @@ const {chromium}=require('playwright');
 for(const [w,h,tag] of [[1440,900,''],[390,844,'_m']]){
  const p=await b.newPage({viewport:{width:w,height:h},deviceScaleFactor:tag?2:1});
  p.on('pageerror',e=>errs.push(tag+' '+e.message));p.on('console',m=>m.type()=='error'&&errs.push(tag+' '+m.text()));
- await p.goto('http://localhost:8765/index.html');await p.waitForFunction(()=>window.__ready);
+ await p.goto('http://localhost:8765/index.html?notitle');await p.waitForFunction(()=>window.__ready);
  await p.evaluate(()=>{const S=__dbg.S;S.yen=50000;const add=(k,x,y)=>S.objs.push({k,x,y,lv:1,price:({ramen:900,yuzu:350,hinoki:450,room:6000})[k]||0,uses:0,earn:0,users:0});
   add('yuzu',18,23);add('ramen',27,24);add('hinoki',19,19);add('maple',27,20);add('pine',20,25);add('rocks',28,27);add('room',25,17);
   __dbg.setHour(10);__dbg.refresh();__dbg.mig();for(let i=0;i<8;i++)__dbg.spawn()});

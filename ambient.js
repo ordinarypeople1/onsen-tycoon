@@ -8,7 +8,7 @@ const AMB=(()=>{
  // ---- 풀잎 (열린 빈 잔디 타일, 캐시) ----
  let tufts=[],tuftSig='';
  function rebuildTufts(){const r=rng(99);tufts=[];for(let y=0;y<N;y++)for(let x=0;x<N;x++){if(!tileOpen(x,y)||OCC[x+','+y])continue;const n=r()<0.55?1:r()<0.3?2:0;for(let i=0;i<n;i++)tufts.push({x:x+0.15+r()*0.7,y:y+0.15+r()*0.7,h:2+r()*2.5,c:r(),p:r()*6,f:r()<0.06?(r()<0.5?'#f4e7d2':'#f2b8c8'):null})}}
- function drawTufts(t,lt){const sig=Object.keys(OCC).length+'|'+Object.keys(S.plots).length;if(sig!=tuftSig){tuftSig=sig;rebuildTufts()}
+ function drawTufts(t,lt){if(window.GFX_LOW)return;const sig=Object.keys(OCC).length+'|'+Object.keys(S.plots).length;if(sig!=tuftSig){tuftSig=sig;rebuildTufts()}
   const x0=-cam.x/cam.z-20,x1=(VW-cam.x)/cam.z+20,y0=-cam.y/cam.z-20,y1=(VH-cam.y)/cam.z+20;
   const cols=['#5f8a46','#78a356','#93b866'];cx.lineWidth=0.7;
   for(let ci=0;ci<3;ci++){cx.strokeStyle=cols[ci];cx.beginPath();
@@ -65,7 +65,7 @@ const AMB=(()=>{
  const flies=[],butts=[],birds=[],fx=[];
  function updCreatures(dt,t,lt){
   const open=Object.keys(S.plots).map(k=>k.split(',').map(Number));const rp=()=>{const p=open[(R()*open.length)|0];return[p[0]*PS+R()*PS,p[1]*PS+R()*PS]};
-  const want=Math.round(Math.max(0,lt.night-0.3)*40);while(flies.length<want){const[x,y]=rp();flies.push({x,y,h:3+R()*12,vx:0,vy:0,p:R()*6,l:0})}if(flies.length>want&&R()<dt*3)flies.pop();
+  const want=Math.round(Math.max(0,lt.night-0.3)*(window.GFX_LOW?14:40));while(flies.length<want){const[x,y]=rp();flies.push({x,y,h:3+R()*12,vx:0,vy:0,p:R()*6,l:0})}if(flies.length>want&&R()<dt*3)flies.pop();
   for(const f of flies){f.vx+=(R()-0.5)*dt*1.2;f.vy+=(R()-0.5)*dt*1.2;f.vx*=0.97;f.vy*=0.97;f.x+=f.vx*dt;f.y+=f.vy*dt;f.h=Math.max(2,Math.min(18,f.h+(R()-0.5)*dt*10));f.l+=dt}
   const sea=season();const bw=lt.sun>0.35&&sea!=3?Math.min(7,2+S.objs.filter(o=>DEF[o.k].tree||DEF[o.k].pond).length):0;
   while(butts.length<bw){const[x,y]=rp();butts.push({x,y,h:6+R()*8,a:R()*6,c:['#f6e7a8','#f0b6c8','#ffffff','#bcd8f2'][(R()*4)|0],p:R()*6})}if(butts.length>bw)butts.pop();
@@ -98,7 +98,7 @@ const AMB=(()=>{
    else if(e.k=='spark'){const[X,Y]=iso(e.x,e.y);const k=1-e.l/e.L;cx.fillStyle=`rgba(255,246,200,${a})`;for(let i=0;i<6;i++){const an=i/6*6.28+k;const r=4+k*9;cx.fillRect(X+Math.cos(an)*r-0.6,Y-e.h+Math.sin(an)*r*0.6-0.6,1.2,1.2)}}
    else if(e.k=='ring'){const[X,Y]=iso(e.x,e.y);const k=1-e.l/e.L;cx.strokeStyle=`rgba(255,255,255,${a*0.8})`;cx.lineWidth=0.7;cx.beginPath();cx.ellipse(X,Y,3+k*12,1.5+k*6,0,0,6.283);cx.stroke()}}
   // 구름 그림자
-  if(lt.sun>0.15){cx.save();cx.globalCompositeOperation='multiply';cx.globalAlpha=0.16*lt.sun;const T=t/1000;
+  if(lt.sun>0.15&&!window.GFX_LOW){cx.save();cx.globalCompositeOperation='multiply';cx.globalAlpha=0.16*lt.sun;const T=t/1000;
    for(let i=0;i<5;i++){const wx=((T*(6+wind*4)+i*380)%2200)-500,wy=-200+i*170+Math.sin(T/40+i)*60;const s=160+i%3*70;cx.drawImage(B_SH,wx-s,wy-s*0.5,s*2,s);cx.drawImage(B_SH,wx-s*0.3,wy-s*0.6,s*1.4,s*0.8)}cx.restore()}
  });
  BUS.on('screen',(t,lt)=>{const z=cam.z;
@@ -124,9 +124,9 @@ const AMB=(()=>{
  function zenStep(dt,t){if(!zen)return;zT+=dt;const P=Object.keys(S.plots).map(k=>k.split(',').map(Number));let cx_=0,cy_=0;for(const[a,b]of P){cx_+=a*PS+PS/2;cy_+=b*PS+PS/2}cx_/=P.length;cy_/=P.length;
   const span=PS*0.28*Math.sqrt(P.length);const tx_=cx_+Math.sin(zT/37)*span,ty_=cy_+Math.sin(zT/53+1)*span;const zz=(VW>820?3.4:2.6)+Math.sin(zT/29)*0.5;
   const[wx,wy]=iso(tx_,ty_);const k=Math.min(1,dt*(zT<3?1.6:0.35));cam.z+=(zz-cam.z)*k;cam.tz=cam.z;const gx=VW/2-wx*cam.z,gy=VH/2-wy*cam.z;cam.x+=(gx-cam.x)*k;cam.y+=(gy-cam.y)*k}
- function setZen(on){zen=on;zT=0;document.body.classList.toggle('zen',on);if(on){zHint=document.createElement('div');zHint.id='zenHint';zHint.textContent='감상 모드 · 아무 곳이나 누르거나 Esc로 나가기';document.body.appendChild(zHint);setTimeout(()=>zHint&&zHint.classList.add('fade'),2500);window.SND&&SND.init&&SND.init()}else{zHint&&zHint.remove();zHint=null}}
- addEventListener('keydown',e=>{if(e.key=='Escape'&&zen){setZen(false);e.stopPropagation()}else if((e.key=='z'||e.key=='Z')&&!e.ctrlKey&&document.activeElement.tagName!='INPUT')setZen(!zen)},true);
- addEventListener('pointerdown',e=>{if(zen&&!e.target.closest('#zenBtn')){setZen(false);e.stopPropagation();e.preventDefault()}},true);
+ function setZen(on,quiet){zen=on;zT=0;document.body.classList.toggle('zen',on);if(on&&!quiet){zHint=document.createElement('div');zHint.id='zenHint';zHint.textContent='감상 모드 · 아무 곳이나 누르거나 Esc로 나가기';document.body.appendChild(zHint);setTimeout(()=>zHint&&zHint.classList.add('fade'),2500);window.SND&&SND.init&&SND.init()}else{zHint&&zHint.remove();zHint=null}}
+ addEventListener('keydown',e=>{if(window.SHELL&&SHELL.inTitle)return;if(e.key=='Escape'&&zen){setZen(false);e.stopPropagation()}else if((e.key=='z'||e.key=='Z')&&!e.ctrlKey&&document.activeElement.tagName!='INPUT')setZen(!zen)},true);
+ addEventListener('pointerdown',e=>{if(zen&&!document.body.classList.contains('titling')&&!e.target.closest('#zenBtn,#title,.ovl')){setZen(false);e.stopPropagation();e.preventDefault()}},true);
  const tb=document.getElementById('tools');if(tb){const b=document.createElement('button');b.className='tool';b.id='zenBtn';b.innerHTML='🍃<i>감상</i>';b.title='감상 모드 (Z)';b.onclick=e=>{e.stopPropagation();setZen(true)};tb.appendChild(b)}
  return{tap,setZen,get zen(){return zen},flies,butts,birds,fx};
 })();

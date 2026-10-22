@@ -1,7 +1,7 @@
 const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch();const errs=[];
  const p=await b.newPage({viewport:{width:1440,height:900}});p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()=='error'&&errs.push(m.text()));
- await p.goto('http://localhost:8765/index.html');await p.waitForFunction(()=>window.__ready);
+ await p.goto('http://localhost:8765/index.html?notitle');await p.waitForFunction(()=>window.__ready);
  await p.evaluate(()=>{__dbg.setHour(16);const g=__dbg.gate();__dbg.focus(g.x+1.5,g.y-3,3.2)});
  await p.waitForTimeout(12000);await p.screenshot({path:'shot_gate.png'});
  console.log('gate',JSON.stringify(await p.evaluate(()=>__dbg.gate())),'guests',await p.evaluate(()=>__dbg.guests().length));

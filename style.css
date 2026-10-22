@@ -64,3 +64,41 @@ body.zen #top,body.zen #build,body.zen #bOpen,body.zen #tools,body.zen #info,bod
 #zenHint{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:rgba(20,24,20,.45);color:#f4efe2;font:500 13px Pretendard,sans-serif;padding:8px 16px;border-radius:20px;backdrop-filter:blur(6px);transition:opacity 1.5s;z-index:50}
 #zenHint.fade{opacity:0}
 body.zen::after{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 55%,rgba(20,15,10,.28) 100%);z-index:5}
+/* ===== 셸 UI ===== */
+.ovl{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .25s;pointer-events:none}
+.ovl.on{opacity:1;pointer-events:auto}
+.ovl.dim{background:rgba(24,20,14,.38);backdrop-filter:blur(3px)}
+.ovl .menu{position:relative;display:block;width:min(400px,92vw);max-height:86vh;overflow:auto;padding:18px 20px;transform:translateY(8px) scale(.98);transition:transform .25s cubic-bezier(.2,.9,.3,1.2)}
+.ovl.on .menu{transform:none}
+.menu h2{margin:0 0 12px;font-size:19px;color:#4a3220;text-align:center}
+.menu h3{margin:12px 0 4px;font-size:13px;color:#7a5634}
+.menu .row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 0}
+.menu input[type=range]{flex:1;max-width:220px;accent-color:#c0703a}
+.menu .seg{display:flex;gap:4px}.menu .seg button{flex:1;font:600 12px Pretendard,sans-serif;padding:6px;border-radius:6px;border:1.5px solid #a07a50;background:#f7ead0;color:#5b3e22;cursor:pointer}
+.menu .seg button.on{background:#c0703a;color:#fff;border-color:#7a3f1a}
+.col{display:flex;flex-direction:column;gap:8px}.btns{display:flex;justify-content:center;margin-top:14px;gap:8px}
+.mb{font:700 14px Pretendard,sans-serif;color:#fff;background:linear-gradient(#d4844a,#b8642e);border:0;border-radius:8px;padding:10px 16px;box-shadow:0 3px 0 #7a3f1a,inset 0 1px 0 rgba(255,255,255,.35);cursor:pointer;transition:transform .12s,filter .12s}
+.mb:hover{filter:brightness(1.08);transform:translateY(-1px)}.mb:active{transform:translateY(2px);box-shadow:0 1px 0 #7a3f1a}
+.mb.big{font-size:17px;padding:13px}.mb.sm{font-size:12px;padding:6px 10px}.mb small{font-weight:500;opacity:.85}
+.mb.ghost{background:linear-gradient(#a3a882,#858a66);box-shadow:0 3px 0 #50543a,inset 0 1px 0 rgba(255,255,255,.3)}
+.slot{display:grid;grid-template-columns:56px 1fr auto;align-items:center;gap:8px;padding:9px;border-radius:8px;background:rgba(255,255,255,.45);margin-bottom:6px;border:1.5px solid transparent;font-size:12px}
+.slot.cur{border-color:#c0703a}.slot small{opacity:.7}.note{font-size:11px;opacity:.7;text-align:center;margin:6px 0 0}
+.cred p{margin:0 0 10px;text-align:center;font-size:13px;line-height:1.55}.cred a{color:#9a4a1a}
+#title{position:fixed;inset:0;z-index:55;display:flex;align-items:center;justify-content:flex-start;padding-left:max(6vw,24px);opacity:0;transition:opacity .7s;background:linear-gradient(90deg,rgba(30,24,16,.45),rgba(30,24,16,.08) 55%,rgba(0,0,0,0))}
+#title.on{opacity:1}
+#title .tl{display:flex;flex-direction:column;align-items:center;gap:14px;width:320px;animation:tin 1.2s cubic-bezier(.2,.9,.3,1) both}
+@keyframes tin{from{transform:translateY(16px);opacity:0}}
+#title .emb{width:200px;image-rendering:pixelated;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));animation:bob 5s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6px)}}
+#title h1{margin:0;text-align:center;line-height:1}
+#title h1 .k{display:block;font:900 52px Pretendard,sans-serif;color:#fff7e0;letter-spacing:2px;text-shadow:0 3px 0 #b8642e,0 6px 0 #6a3a1a,0 10px 18px rgba(0,0,0,.4)}
+#title h1 .s{display:block;margin-top:10px;font:600 13px Pretendard,sans-serif;color:#fbe9c6;letter-spacing:3px;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+#title .col{width:100%}#title .ver{font:500 11px Pretendard,sans-serif;color:rgba(255,248,230,.75)}
+body.titling #top,body.titling #build,body.titling #bOpen,body.titling #tools,body.titling #quest,body.titling #info,body.titling #warn{opacity:0!important;pointer-events:none!important}
+body.titling #zenHint{display:none}
+#fps{position:fixed;right:8px;bottom:8px;z-index:70;font:600 11px monospace;color:#fff;background:rgba(0,0,0,.4);padding:2px 6px;border-radius:4px;display:none}
+#modal,#info{animation:pop .22s cubic-bezier(.2,.9,.3,1.25)}
+@keyframes pop{from{opacity:0;transform:translate(-50%,-48%) scale(.96)}}
+#info{animation-name:popi}@keyframes popi{from{opacity:0;transform:translateY(6px)}}
+#top .box,#tools .tool{transition:transform .12s,filter .12s}#tools .tool:hover{transform:translateY(-2px)}
+@media(max-width:700px){#title{padding-left:0;justify-content:center;background:rgba(30,24,16,.35)}#title h1 .k{font-size:40px}#title .emb{width:150px}}

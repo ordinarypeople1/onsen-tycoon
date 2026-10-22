@@ -1,6 +1,6 @@
 const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:800,height:600}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
- await p.goto('http://localhost:8765/index.html');await p.waitForFunction(()=>window.__ready);
+ await p.goto('http://localhost:8765/index.html?notitle');await p.waitForFunction(()=>window.__ready);
  const HOURS=+process.env.H||120, BOT=process.env.BOT||'smart';
  const res=await p.evaluate(async({HOURS,BOT})=>{const D=__dbg,S=D.S,DEF=D.DEF;const log=[],starAt={};let minYen=1e9;
   const place=k=>{const d=DEF[k];if(S.yen<d.cost||d.star>D.stars())return false;for(let r=0;r<20;r++)for(let i=0;i<60;i++){const ks=Object.keys(S.plots).map(k=>k.split(',').map(Number));const pk=ks[Math.random()*ks.length|0];const x=pk[0]*16+Math.floor(Math.random()*16),y=pk[1]*16+Math.floor(Math.random()*16);if(D.canPlace(k,x,y)){S.yen-=d.cost;S.fin.exp+=d.cost;const o={k,x,y,lv:1,price:d.price||0,uses:0,earn:0,users:0};S.objs.push(o);D.occ();if(!D.reachOK()){S.objs.pop();D.occ();S.yen+=d.cost;continue}D.emit('build',o);return true}}return false};

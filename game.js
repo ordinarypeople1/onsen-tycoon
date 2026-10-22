@@ -35,7 +35,9 @@ const TIPS={bath:'🍃 탕은 손님의 피로를 풀어주고 만족도를 높�
 const SEASONS=['봄','여름','가을','겨울'],SEMO=['🌸','🌻','🍁','❄️'],STEMP=[16,27,14,-1];
 const NEEDK=['fatigue','hunger','thirst','fun'],NEEDN={fatigue:'피로',hunger:'배고픔',thirst:'목마름',fun:'재미'};
 // ===== 상태 =====
-let S;
+let S;let paused=false;
+const SLOT=(()=>{const n=+localStorage.onsenSlot||1;return n>=1&&n<=3?n:1})();const SKEY=SLOT==1?'onsen2':'onsen2_s'+SLOT;
+window.READONLY=false;
 function fresh(){
  const plots={};plots[START_PLOT.join(',')]=1;
  const o=[];const b=(k,x,y)=>o.push({k,x,y,lv:1,price:DEF[k].price||0,uses:0,earn:0});
@@ -43,7 +45,9 @@ function fresh(){
  return {layout:16,yen:8000,min:8*60+40,plots,objs:o,fin:{inc:0,exp:0,hist:[]},rep:55,t:Date.now(),served:0,ver:2};
 }
 function load(){
- try{const d=JSON.parse(localStorage.onsen2||'null');if(d&&d.ver==2){S=d;
+ if(window.VISIT_SAVE){S=window.VISIT_SAVE;window.READONLY=true;return}
+ try{const raw=localStorage[SKEY];let d=null;try{d=JSON.parse(raw||'null')}catch(e){localStorage[SKEY+'_corrupt']=raw;setTimeout(()=>toast('저장 파일이 손상되어 백업 후 새로 시작했어요'),1500)}
+  if(d&&d.ver==2&&Array.isArray(d.objs)&&d.plots){S=d;d.objs=d.objs.filter(o=>o&&DEF[o.k]);if(!isFinite(S.yen))S.yen=0;
    const off=Math.min((Date.now()-d.t)/1000,8*3600);
    const hr=avgNet();const g=Math.floor(Math.max(0,hr)*(off/3600)*0.5);
    if(off>60&&g>0){S.yen+=g;setTimeout(()=>toast(`쉬는 동안 ${fmt(g)}엔 벌었어요! (${Math.floor(off/60)}분)`),800)}
@@ -60,7 +64,7 @@ function migrate(){ // 겹치거나 잠긴 땅의 건물 → 재배치 또는 �
    if(best){o.x=best[0];o.y=best[1];ok=true;moved++}}
   if(ok){const f=DEF[o.k].fp;for(let i=0;i<f;i++)for(let j=0;j<f;j++)m[(o.x+i)+','+(o.y+j)]=1;keep.push(o)}else{refund+=DEF[o.k].cost;S.yen+=DEF[o.k].cost}}
  S.objs=keep;if(moved||refund)setTimeout(()=>toast(`겹친 건물 정리: ${moved}개 이동${refund?`, ¥${fmt(refund)} 환불`:''}`),1200)}
-function save(){S.t=Date.now();localStorage.onsen2=JSON.stringify(S)}
+function save(){if(window.READONLY||!S)return;S.t=Date.now();try{localStorage[SKEY]=JSON.stringify(S)}catch(e){if(!save._w){save._w=1;toast('저장 공간이 부족해요 (사진 장식을 줄여보세요)')}}}
 const fmt=n=>Math.floor(n).toLocaleString('ko-KR');
 function avgNet(){const h=S.fin.hist;if(!h.length)return 0;const a=h.slice(-24);return a.reduce((s,x)=>s+x,0)/a.length}
 // ===== 에셋 =====
@@ -88,7 +92,7 @@ function variants(key,img,filter){ // 실루엣/림라이트 생성 (컴포지�
 }
 // ===== 카메라 =====
 let DPR=1,VW=0,VH=0;const cam={x:0,y:0,z:3.2,tz:3.2};
-function resize(){DPR=Math.min(2,window.devicePixelRatio||1);VW=innerWidth;VH=innerHeight;for(const c of[cv,tc]){c.width=VW*DPR;c.height=VH*DPR;c.style.width=VW+'px';c.style.height=VH+'px'}}
+function resize(){DPR=window.GFX_LOW?1:Math.min(2,window.devicePixelRatio||1);VW=innerWidth;VH=innerHeight;for(const c of[cv,tc]){c.width=VW*DPR;c.height=VH*DPR;c.style.width=VW+'px';c.style.height=VH+'px'}}
 const iso=(x,y)=>[(x-y)*TW/2,(x+y)*TH/2];
 function toScreen(wx,wy){return[(wx*cam.z+cam.x),(wy*cam.z+cam.y)]}
 function toTile(sx,sy){const wx=(sx-cam.x)/cam.z,wy=(sy-cam.y)/cam.z;return[(wy/(TH/2)+wx/(TW/2))/2,(wy/(TH/2)-wx/(TW/2))/2]}
@@ -537,7 +541,7 @@ function checkReach(){const gi=gateInfo();const w=$('warn');if(!gi){w.style.disp
  const bad=S.objs.filter(o=>DEF[o.k].price&&o!==moving).filter(o=>{const t=[];for(const[x,y]of tilesOf(o))for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]])t.push((x+dx)+','+(y+dy));return !t.some(k=>seen.has(k))});
  if(bad.length){w.textContent='⚠️ 대문에서 갈 수 없는 시설: '+[...new Set(bad.map(o=>DEF[o.k].n))].join(', ');w.style.display='block'}else w.style.display='none'}
 function frame(now){warnAcc+=1;if(warnAcc%90==1)checkReach();const dt=Math.min(0.1,(now-last)/1000||0);last=now;
- for(let i=0;i<speed;i++)step(dt);
+ if(!paused&&!window.READONLY)for(let i=0;i<speed;i++)step(dt);else if(window.READONLY&&!paused)step(dt);
  if(Math.abs(cam.tz-cam.z)>0.001){const z=cam.z+(cam.tz-cam.z)*Math.min(1,dt*10);const p=zoomTarget||[VW/2,VH/2];zoomAt(p[0],p[1],z)}
  if(homeAnim){homeAnim.t+=dt/0.9;const k=easeOut(Math.min(1,homeAnim.t));const f=homeAnim.to.k?DEF[homeAnim.to.k].fp:1;const save_=cam.z;
   const z=lerp(homeAnim.from.z,VW>820?5.2:3.6,k);cam.z=z;cam.tz=z;const[wx,wy]=iso(homeAnim.to.x+f/2,homeAnim.to.y+f/2);const tx_=VW*(VW>820?0.42:0.5)-wx*z,ty_=VH*(VW>820?0.5:0.33)-wy*z;
