@@ -118,7 +118,7 @@ const AMB=(()=>{
    if(DEF[o.k].pond){const d=pondData(o);const[X,Y]=iso(fx_,fy_);d.rip.push({x:X,y:Y,l:1.6},{x:X+2,y:Y+1,l:1.2})}}
   return false}
  // ---- 바람 & 갱신 ----
- BUS.on('frame',(dt,t)=>{windT+=dt;const target=Math.sin(windT/23)*0.6+Math.sin(windT/7.3)*0.25;wind+=(target-wind)*Math.min(1,dt*0.5);window.WIND=wind;updCreatures(dt,t,light());zenStep(dt,t)});
+ BUS.on('frame',(dt,t)=>{windT+=dt;const target=Math.sin(windT/23)*0.6+Math.sin(windT/7.3)*0.25;wind+=(target-wind)*Math.min(1,dt*0.5);window.WIND=wind;updCreatures(dt,t,light());zenStep(dt,t);shT-=dt;if(shT<=0){shT=9+R()*6;const sh=S.objs.find(o=>o.k=='shishi');if(sh){window.SND&&SND.tok&&SND.tok();const c=ctr(sh);fx.push({k:'drop',x:c[0],y:c[1],n:6,l:0.6,L:0.6});sh.sway=0.3}}});let shT=5;
  // ---- 감상 모드 ----
  let zen=false,zT=0,zHint=null;
  function zenStep(dt,t){if(!zen)return;zT+=dt;const P=Object.keys(S.plots).map(k=>k.split(',').map(Number));let cx_=0,cy_=0;for(const[a,b]of P){cx_+=a*PS+PS/2;cy_+=b*PS+PS/2}cx_/=P.length;cy_/=P.length;

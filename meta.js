@@ -65,7 +65,7 @@ const QX=(()=>{
  function flash(){const f=document.createElement('div');f.className='flash';document.body.appendChild(f);setTimeout(()=>f.remove(),500)}
  // ----- 이벤트 -----
  BUS.on('pay',(o,g,p)=>{st().earned+=p;if(g.vip)st().vip++;const now=performance.now();if(now-coinT>180){coinT=now;const[sx,sy]=toScreenT(...ctr(o));if(sx>0&&sy>0&&sx<innerWidth&&sy<innerHeight){flyCoin(sx,sy-20);SND.coin()}}});
- BUS.on('build',o=>{const d=DEF[o.k];st().built++;if(d.tab=='deco'&&!d.isPath)st().decor++;M().col.i[o.k]=Math.max(M().col.i[o.k]||0,1);SND.build()});
+ BUS.on('build',o=>{const d=DEF[o.k];st().built++;if((d.tab=='deco'||d.tab=='theme')&&!d.isPath&&!d.price)st().decor++;const _sd=setsDone();for(const k of _sd)if(!(M().sets||(M().sets=[])).includes(k)){M().sets.push(k);toast('🎐 '+SETS[k][0]+' 세트 완성! 평판 점수 +15');SND.quest&&SND.quest()}M().col.i[o.k]=Math.max(M().col.i[o.k]||0,1);SND.build()});
  BUS.on('upgrade',o=>{st().upgrades++;M().col.i[o.k]=Math.max(M().col.i[o.k]||0,o.lv);SND.upgrade();if(o.lv==3||o.lv==5)flash()});
  BUS.on('unlock',()=>{st().unlock++;SND.unlock()});
  BUS.on('paint',(k,n)=>{st().paint+=n;M().col.i[k]=Math.max(M().col.i[k]||0,1)});

@@ -22,6 +22,26 @@ const DEF={
  pine:{tree:1,n:'눈 내린 소나무',tab:'deco',img:'pine',fp:1,sc:2.0,cost:2000,beauty:10,star:2,emit:'snow',desc:'주변에 눈이 내려요'},
  lantern:{n:'석등롱',tab:'deco',img:'lantern',fp:1,sc:1.25,cost:600,beauty:5,star:1,light:[[0,-0.55]],desc:'밤이면 은은히 빛나요'},
  rocks:{n:'정원석',tab:'deco',img:'rocks',fp:1,sc:1.4,cost:400,beauty:4,star:1,desc:'이끼 낀 정원석'},
+ shishi:{set:'trad',n:'시시오도시',tab:'theme',img:'shishi',fp:1,sc:1.3,cost:1800,beauty:9,star:1,sound:'shishi',desc:'딱! 대나무 소리가 정원에 울려요'},
+ nodate:{set:'trad',n:'노다테 다과석',tab:'theme',img:'nodate',fp:2,sc:0.95,cost:5000,price:500,cap:3,dur:14,eff:{thirst:-40,fun:20},wage:30,star:2,appeal:8,desc:'붉은 양산 아래 말차 한 잔'},
+ pagoda:{set:'trad',n:'석탑',tab:'theme',img:'pagoda',fp:1,sc:1.3,cost:2400,beauty:10,star:2,light:[[0,-0.62]],desc:'이끼 낀 오층 석탑'},
+ bamboofence:{set:'trad',n:'대나무 울타리',tab:'theme',img:'bamboofence',fp:1,sc:1.3,cost:300,beauty:3,star:1,desc:'정갈하게 엮은 대나무'},
+ cafe:{set:'modern',n:'카페 스탠드',tab:'theme',img:'cafe',fp:2,sc:0.9,cost:8000,price:700,cap:3,dur:9,eff:{thirst:-60,fun:12},wage:45,star:2,appeal:9,light:[[0.0,-0.45]],desc:'갓 내린 유자 라테'},
+ lamppost:{set:'modern',n:'모던 가로등',tab:'theme',img:'lamppost',fp:1,sc:0.55,cost:900,beauty:4,star:2,light:[[0.28,-0.9]],desc:'따뜻한 전구색 가로등'},
+ olive:{set:'modern',tree:1,n:'올리브 화분',tab:'theme',img:'olive',fp:1,sc:1.3,cost:1500,beauty:7,star:2,desc:'은빛 잎이 바람에 살랑'},
+ lounger:{set:'modern',n:'선베드',tab:'theme',img:'lounger',fp:1,sc:1.45,cost:1200,beauty:6,star:3,desc:'탕 옆에서 낮잠 한숨'},
+ cedar:{set:'forest',tree:1,n:'신목 삼나무',tab:'theme',img:'cedar',fp:1,sc:2.1,cost:3500,beauty:14,star:2,desc:'금줄을 두른 오래된 삼나무'},
+ mushroom:{set:'forest',n:'숲 버섯',tab:'theme',img:'mushroom',fp:1,sc:1.25,cost:500,beauty:5,star:1,desc:'밤이면 반딧불이 모여요'},
+ fern:{set:'forest',tree:1,n:'고사리 덤불',tab:'theme',img:'fern',fp:1,sc:1.35,cost:400,beauty:4,star:1,desc:'촉촉한 숲의 초록'},
+ birdhouse:{set:'forest',n:'새집',tab:'theme',img:'birdhouse',fp:1,sc:0.85,cost:800,beauty:5,star:2,desc:'참새가 놀러 와요'},
+ snowman:{set:'season',sea:3,n:'눈사람',tab:'theme',img:'snowman',fp:1,sc:1.15,cost:700,beauty:5,star:2,desc:'겨울엔 아름다움 두 배'},
+ hydrangea:{set:'season',sea:1,tree:1,n:'수국',tab:'theme',img:'hydrangea',fp:1,sc:1.4,cost:900,beauty:6,star:2,desc:'여름엔 아름다움 두 배'},
+ tsukimi:{set:'season',sea:2,n:'달맞이 상',tab:'theme',img:'tsukimi',fp:1,sc:0.95,cost:1100,beauty:6,star:3,desc:'가을엔 아름다움 두 배'},
+ kadomatsu:{set:'season',sea:0,n:'카도마츠',tab:'theme',img:'kadomatsu',fp:1,sc:0.95,cost:1300,beauty:6,star:3,desc:'봄(새해)엔 아름다움 두 배'},
+ banner:{photo:'banner',flutter:1,n:'사진 노보리 깃발',tab:'custom',img:null,ic:'🎏',fp:1,sc:0.75,cost:800,beauty:6,star:1,desc:'내 사진으로 만든 픽셀 깃발'},
+ frame:{photo:'frame',n:'사진 액자 이젤',tab:'custom',img:null,ic:'🖼️',fp:1,sc:0.95,cost:1000,beauty:7,star:1,desc:'내 사진을 픽셀 그림으로'},
+ noren:{photo:'noren',flutter:1,n:'사진 노렌 문틀',tab:'custom',img:null,ic:'🎐',fp:1,sc:1.25,cost:1500,beauty:8,star:1,desc:'바람에 살랑이는 내 사진 노렌'},
+ sign:{photo:'sign',n:'사진 간판',tab:'custom',img:null,ic:'🪧',fp:1,sc:1.1,cost:1200,beauty:7,star:1,desc:'료칸 앞 나만의 간판'},
  gate:{n:'대문',img:'gate',fp:1,cost:0,star:9,walk:1,gate:1,light:[[-0.33,-0.42],[0.22,-0.3]],desc:'손님이 드나드는 유일한 입구'},
  path:{n:'돌길',tab:'deco',img:null,ic:'🪨',fp:1,cost:50,beauty:1,star:1,isPath:1,desc:'드래그해서 칠하세요'},
  path_wood:{n:'나무 데크길',tab:'deco',img:null,ic:'🪵',fp:1,cost:80,beauty:2,star:1,isPath:1,desc:'따뜻한 나무 데크'},
@@ -30,8 +50,11 @@ const DEF={
  pond:{n:'비단잉어 연못',tab:'deco',img:null,ic:'🐟',fp:3,cost:3000,beauty:14,star:1,flat:1,pond:1,desc:'잉어가 헤엄치고 연잎이 떠 있어요'},
  path_erase:{n:'길 지우기',tab:'deco',img:null,ic:'🧽',fp:1,cost:0,star:1,erase:1,desc:'드래그해서 길 제거 (50% 환불)'},
 };
-const TABS=[['bath','♨️','탕'],['food','🍜','음식'],['shop','🏮','상점'],['deco','🌸','장식']];
-const TIPS={bath:'🍃 탕은 손님의 피로를 풀어주고 만족도를 높여요!',food:'🍜 배고픈 손님은 식당을 찾아가요. 가격은 시설을 눌러 조절!',shop:'🏮 목마른 손님은 매점으로. 밤엔 객실에 묵어가요.',deco:'🌸 장식은 주변 분위기를 바꾸고 아름다움을 더해요.'};
+const TABS=[['bath','♨️','탕'],['food','🍜','음식'],['shop','🏮','상점'],['deco','🌸','장식'],['theme','🎐','테마'],['custom','📷','사진']];
+const SETS={trad:['전통','⛩️',['shishi','nodate','pagoda','bamboofence']],modern:['모던','☕',['cafe','lamppost','olive','lounger']],forest:['숲','🌲',['cedar','mushroom','fern','birdhouse']],season:['계절','🍂',['snowman','hydrangea','tsukimi','kadomatsu']]};
+const setsDone=()=>Object.keys(SETS).filter(k=>SETS[k][2].every(i=>S.objs.some(o=>o.k==i)));
+const bMul=d=>d.sea!=null&&d.sea==season()?2:1;
+const TIPS={bath:'🍃 탕은 손님의 피로를 풀어주고 만족도를 높여요!',food:'🍜 배고픈 손님은 식당을 찾아가요. 가격은 시설을 눌러 조절!',shop:'🏮 목마른 손님은 매점으로. 밤엔 객실에 묵어가요.',deco:'🌸 장식은 주변 분위기를 바꾸고 아름다움을 더해요.',custom:'📷 사진을 올리면 픽셀 아트로 바꿔 장식을 만들어요. 저장 파일에 함께 보관돼요.',theme:'🎐 같은 테마 4종을 모두 놓으면 세트 보너스(평판 점수 +15)!'};
 const SEASONS=['봄','여름','가을','겨울'],SEMO=['🌸','🌻','🍁','❄️'],STEMP=[16,27,14,-1];
 const NEEDK=['fatigue','hunger','thirst','fun'],NEEDN={fatigue:'피로',hunger:'배고픔',thirst:'목마름',fun:'재미'};
 // ===== 상태 =====
@@ -69,7 +92,7 @@ const fmt=n=>Math.floor(n).toLocaleString('ko-KR');
 function avgNet(){const h=S.fin.hist;if(!h.length)return 0;const a=h.slice(-24);return a.reduce((s,x)=>s+x,0)/a.length}
 // ===== 에셋 =====
 const TIERED=['rock','hinoki','sauna','milky','ramen','teishoku','izakaya','yuzu','gift','room'];
-const IMG={},VAR={};const NAMES=[...TIERED.flatMap(n=>[1,3,5].map(l=>n+'_lv'+l)),'rock','hinoki','sauna','milky','ramen','teishoku','izakaya','yuzu','gift','room','sakura','maple','pine','lantern','rocks','cb1','cb2','cb3','cb4','cw1','cw2','cw3','cw4','gate'];
+const IMG={},VAR={};const NAMES=[...TIERED.flatMap(n=>[1,3,5].map(l=>n+'_lv'+l)),'rock','hinoki','sauna','milky','ramen','teishoku','izakaya','yuzu','gift','room','sakura','maple','pine','lantern','rocks','shishi','nodate','pagoda','bamboofence','cafe','lamppost','olive','lounger','cedar','mushroom','fern','birdhouse','snowman','hydrangea','tsukimi','kadomatsu','cb1','cb2','cb3','cb4','cw1','cw2','cw3','cw4','gate'];
 function loadImgs(){return Promise.all(NAMES.map(n=>new Promise(r=>{const i=new Image();i.onload=()=>{IMG[n]=i;r()};i.onerror=r;i.src='assets/'+n+'.png'})))}
 // 멀티 레이어 스프라이트: 마스크 경로 순서대로 픽셀을 잘라 레이어로 분리 (나머지 = ground)
 const roofY=(x,W,H)=>H*(0.294+0.144*x/W);
@@ -152,7 +175,7 @@ function tileTex(cob,vr,par){const key=cob+'_'+vr+'_'+par;const ty=typeof cob=='
 // ===== 오브젝트 =====
 const occ=()=>{const m={};for(const o of S.objs){if(o===moving)continue;for(const[x,y]of tilesOf(o))m[x+','+y]=o}return m};
 const tierOf=lv=>lv>=5?5:lv>=3?3:1;
-function skey(o){if(o.k=='gate')return o.dir=='y'?'gate_f':'gate';const d=DEF[o.k];const b=o.k=='milk'?'milk':d.img;const k=b+'_lv'+tierOf(o.lv||1);return (d.price&&VAR[k])?k:(o.k=='milk'?'milk':o.k)}
+function skey(o){if(o.k=='gate')return o.dir=='y'?'gate_f':'gate';if(DEF[o.k].photo){const pk='pic_'+o.k+'_'+(o.pic||'');return VAR[pk]?pk:o.k}const d=DEF[o.k];const b=o.k=='milk'?'milk':d.img;const k=b+'_lv'+tierOf(o.lv||1);return (d.price&&VAR[k])?k:(o.k=='milk'?'milk':o.k)}
 const gTiles=(x,y,dir)=>dir=='x'?[[x,y],[x+1,y],[x+2,y]]:[[x,y],[x,y+1],[x,y+2]];
 function tilesOf(o){if(o.k=='gate')return gTiles(o.x,o.y,o.dir);const f=DEF[o.k].fp,t=[];for(let i=0;i<f;i++)for(let j=0;j<f;j++)t.push([o.x+i,o.y+j]);return t}
 function gateOut(x,y,dir){const t=gTiles(x,y,dir);const cand=dir=='x'?[[0,1],[0,-1]]:[[1,0],[-1,0]];for(const[a,b]of cand)if(t.every(([u,v])=>!tileOpen(u+a,v+b)))return[a,b];return null}
@@ -173,11 +196,11 @@ function cancelMove(){if(!moving)return;moving.x=moving._from[0];moving.y=moving
 function endMove(){if(moving)delete moving._from;moving=null;ghost=null;OCC=occ();groundDirty=true;$('moveBar').style.display='none';guests.forEach(g=>{if(g.st=='walk'&&g.target){const t=g.target;g.target=null;g.path=[]}});buildCards()}
 function canPlace(k,x,y){if(k=='gate')return !!gateSpot(x,y);const f=DEF[k].fp;for(let i=0;i<f;i++)for(let j=0;j<f;j++){const o=OCC[(x+i)+','+(y+j)];if(!tileOpen(x+i,y+j)||(o&&!(DEF[o.k].isPath&&!DEF[k].isPath)))return false}return true}
 function clearPaths(k,x,y){const f=DEF[k].fp;S.objs=S.objs.filter(o=>!(DEF[o.k].isPath&&o.x>=x&&o.x<x+f&&o.y>=y&&o.y<y+f))}
-function starScore(){let s=S.rep*0.5,b=0;for(const o of S.objs){const d=DEF[o.k];s+=(d.appeal||0)*(1+0.35*(o.lv-1))*0.4;b+=d.beauty||0}s+=Math.sqrt(b)*3+Object.keys(S.plots).length*4;return s}
+function starScore(){let s=S.rep*0.5,b=0;for(const o of S.objs){const d=DEF[o.k];s+=(d.appeal||0)*(1+0.35*(o.lv-1))*0.4;b+=(d.beauty||0)*bMul(d)}s+=Math.sqrt(b)*3+Object.keys(S.plots).length*4+setsDone().length*15;return s}
 const STAR_REQ=[0,0,[55,500,1],[105,1700,2],[190,5000,3],[320,12000,4]]; // [점수, 누적손님, 구역수]
 function stars(){const s=starScore(),pl=Object.keys(S.plots).length;let r=1;for(let i=2;i<=5;i++){const[q,sv,p]=STAR_REQ[i];if(s>=q&&S.served>=sv&&pl>=p)r=i;else break}return r}
 function nextStarInfo(){const r=stars();if(r>=5)return null;const[q,sv,p]=STAR_REQ[r+1];return{r:r+1,score:[Math.floor(starScore()),q],served:[S.served,sv],plots:[Object.keys(S.plots).length,p]}}
-function beautyAt(x,y){let b=0;for(const o of S.objs){const d=DEF[o.k];if(!d.beauty)continue;const dd=Math.hypot(o.x-x,o.y-y);if(dd<4)b+=d.beauty*(1-dd/4)}return b}
+function beautyAt(x,y){let b=0;for(const o of S.objs){const d=DEF[o.k];if(!d.beauty)continue;const dd=Math.hypot(o.x-x,o.y-y);if(dd<4)b+=d.beauty*bMul(d)*(1-dd/4)}return b}
 // ===== 시간/조명 =====
 const hour=()=>(S.min/60)%24,dayN=()=>Math.floor(S.min/1440)+1,season=()=>Math.floor((dayN()-1)/7)%4;
 const KEYS=[ // h, 하늘, 주변광(곱), 밝기, 따뜻함
@@ -197,7 +220,7 @@ const THOUGHT={
  none:{fatigue:'쉴 곳이 없네…',hunger:'뭐 먹을 데 없나…',thirst:'목말라요…',fun:'좀 심심하다'},
  want:{fatigue:'온천 하고 싶다',hunger:'배고파요',thirst:'우유 마시고 싶다',fun:'구경하고 싶어요'}};
 function entrance(){const s=START_PLOT;return[s[0]*PS+PS/2,s[1]*PS+PS]}
-function wageNow(h){const nt=(h%24)>=23||(h%24)<6;return Math.round(S.objs.reduce((s,o)=>{const d=DEF[o.k];if(!d.wage)return s;const w=d.wage*(1+0.5*(o.lv-1));return s+(nt&&!d.stay&&!d.night?w*0.3:w)},0)+S.objs.filter(o=>!DEF[o.k].isPath&&!DEF[o.k].wage).length*4)}
+function wageNow(h){const nt=(h%24)>=23||(h%24)<6;return Math.round(S.objs.reduce((s,o)=>{const d=DEF[o.k];if(!d.wage)return s;const w=d.wage*(1+0.5*(o.lv-1))*(0.35+0.65*Math.min(1,(o.hu||0)/2));o.hu=0;return s+(nt&&!d.stay&&!d.night?w*0.3:w)},0)+S.objs.filter(o=>!DEF[o.k].isPath&&!DEF[o.k].wage).length*4)}
 function capTotal(){return S.objs.reduce((a,o)=>{const d=DEF[o.k];return a+(d.cap&&!d.stay?d.cap+o.lv-1:0)},0)}
 function maxGuests(){return Math.min(12+stars()*8,Math.round(capTotal()*1.5)+4)}
 function spawnRate(){const h=hour();const f=h<6?0.05:h<9?0.5:h<12?0.7:h<15?0.6:h<17?0.8:h<21?1.15:h<23?0.5:0.15;return f*(0.12+stars()*0.06)}
@@ -262,7 +285,7 @@ function arrive(g){g.ax=g.x;g.ay=g.y;const o=g.target,d=DEF[o.k];g.target=null;o
  const cap=d.cap+o.lv-1;if(o.users>=cap){if(!g.waited){g.waited=1;if(Math.random()<0.5)think(g,'자리가 날 때까지 기다릴게요');g.st='wait';g.t=5;g.target=o;return}g.waited=0;think(g,'자리가 없네…');g.happy-=3;(g.used=g.used||[]).push(o);return}
  const fair=d.price*(1+o.lv*0.12)*(0.8+g.happy/150);
  if(o.price>g.budget||o.price>fair*1.45){think(g,THOUGHT.pricey[Math.random()*3|0]);g.happy-=10;(g.used=g.used||[]).push(o);return}
- g.budget-=o.price;S.yen+=o.price;S.fin.inc+=o.price;o.earn=(o.earn||0)+o.price;o.uses=(o.uses||0)+1;S.served++;BUS.emit('pay',o,g,o.price);
+ g.budget-=o.price;S.yen+=o.price;S.fin.inc+=o.price;o.earn=(o.earn||0)+o.price;o.uses=(o.uses||0)+1;o.hu=(o.hu||0)+1;S.served++;BUS.emit('pay',o,g,o.price);
  const[sx,sy]=toScreenT(...ctr(o));floats.push({x:ctr(o)[0],y:ctr(o)[1],t:'+¥'+fmt(o.price),l:1.6});
  o.users++;g.cur=o;g.st='use';g.t=d.stay?Math.max(30,((30-hour()+24)%24+7)*60/120):d.dur*(1+o.lv*0.1);
  if(d.bath){g.slot=freeSlot(o);const[a,b]=bathSlot(o,g.slot);g.x=a;g.y=b;g.inBath=true}else g.hide=true;
@@ -334,7 +357,7 @@ function render(t){
  for(const it of list){
   if(it.part){const o=it.o,G=objGeom(o);drawSprite(skey(o)+'_'+it.part,o,G.X,G.Y,G.W,lt,sv,1)}
   else if(it.o){const o=it.o,d=DEF[o.k],G=objGeom(o);const an=anims['o'+S.objs.indexOf(o)];const pop=an?Math.min(1,an.t*3):1;
-   const Wp=G.W*(0.7+0.3*easeOut(pop));const fade=hidden.has(o)&&!d.bath&&d.fp>1;const sw_=d.tree?(Math.sin(t/1100+o.x*1.7+o.y)*0.018+(window.WIND||0)*0.025+(o.sway||0)*Math.sin(t/110)*0.25):0;if(sw_){cx.save();cx.translate(G.X,G.Y);cx.transform(1,0,-sw_,1,0,0);cx.translate(-G.X,-G.Y)}drawSprite(skey(o),o,G.X,G.Y,Wp,lt,sv,pop*(fade?0.5:1));if(sw_)cx.restore();
+   const Wp=G.W*(0.7+0.3*easeOut(pop));const fade=hidden.has(o)&&!d.bath&&d.fp>1;const sw_=(d.tree||d.flutter)?(Math.sin(t/1100+o.x*1.7+o.y)*0.018+(window.WIND||0)*0.025+(o.sway||0)*Math.sin(t/110)*0.25):0;if(sw_){cx.save();cx.translate(G.X,G.Y);cx.transform(1,0,-sw_,1,0,0);cx.translate(-G.X,-G.Y)}drawSprite(skey(o),o,G.X,G.Y,Wp,lt,sv,pop*(fade?0.5:1));if(sw_)cx.restore();
    if(d.bath){drawWater(o,G,t,lt);guests.filter(g=>g.inBath&&g.cur===o).sort((a,b)=>a.x+a.y-b.x-b.y).forEach(g=>drawGuest(g,t,lt,sv));const ov=skey(o)+'_over';if(VAR[ov]&&guests.some(g=>g.inBath&&g.cur===o))drawSprite(ov,o,G.X,G.Y,Wp,lt,sv,pop)}
    if(o.lv>1){for(let i=0;i<o.lv-1;i++){cx.fillStyle='#f6cf5a';cx.fillRect(G.X-8+i*4,G.Y+1,3,3)}}}
   else drawGuest(it.g,t,lt,sv);}
@@ -357,7 +380,7 @@ function render(t){
  if(ghost=='gate'&&hoverT){const sp=gateSpot(hoverT[0],hoverT[1]);const t=sp?gTiles(sp.x,sp.y,sp.dir):[hoverT];cx.fillStyle=sp?'rgba(140,230,140,0.5)':'rgba(240,110,100,0.5)';for(const[x,y]of t){const[X,Y]=iso(x,y);cx.beginPath();cx.moveTo(X,Y);cx.lineTo(X+16,Y+8);cx.lineTo(X,Y+16);cx.lineTo(X-16,Y+8);cx.fill()}if(sp){const o={k:'gate',...sp};const G=objGeom(o);drawSprite(skey(o),o,G.X,G.Y,G.W,lt,sv,0.65)}}
  else if(ghost&&hoverT){const ok=canPlace(ghost,hoverT[0],hoverT[1]);const f=DEF[ghost].fp;cx.fillStyle=ok?'rgba(140,230,140,0.45)':'rgba(240,110,100,0.45)';
   for(let i=0;i<f;i++)for(let j=0;j<f;j++){const[X,Y]=iso(hoverT[0]+i,hoverT[1]+j);cx.beginPath();cx.moveTo(X,Y);cx.lineTo(X+16,Y+8);cx.lineTo(X,Y+16);cx.lineTo(X-16,Y+8);cx.fill()}
-  if(DEF[ghost].img){const o={k:ghost,x:hoverT[0],y:hoverT[1],lv:moving?moving.lv:1};const G=objGeom(o);drawSprite(skey(o),o,G.X,G.Y,G.W,lt,sv,0.65)}}
+  if(DEF[ghost].img||VAR[ghost]){const o={k:ghost,x:hoverT[0],y:hoverT[1],lv:moving?moving.lv:1};const G=objGeom(o);drawSprite(skey(o),o,G.X,G.Y,G.W,lt,sv,0.65)}}
  // 조명: 주변광 곱하기
  cx.setTransform(DPR,0,0,DPR,0,0);cx.globalCompositeOperation='multiply';cx.fillStyle=`rgb(${lt.amb})`;cx.fillRect(0,0,VW,VH);
  // 따뜻한 햇살 그라디언트
@@ -439,7 +462,7 @@ let tab='bath',speed=1;
 function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t.h);t.h=setTimeout(()=>t.style.display='none',2600)}
 function buildTabs(){$('tabs').innerHTML=TABS.map(([k,i,n])=>`<div class="tab ${k==tab?'on':''}" data-k="${k}"><span class="ic">${i}</span>${n}</div>`).join('');
  document.querySelectorAll('.tab').forEach(e=>e.onclick=()=>{tab=e.dataset.k;buildTabs();buildCards();$('tip').textContent=TIPS[tab]});buildCards()}
-function buildCards(){const st=stars();$('cards').innerHTML=Object.entries(DEF).filter(([k,d])=>d.tab==tab).map(([k,d])=>`<div class="card ${ghost==k?'sel':''} ${d.star>st?'lock':''}" data-k="${k}" data-need="${d.star}★ 필요" title="${d.desc}">
+function buildCards(){const st=stars();$('cards').innerHTML=Object.entries(DEF).filter(([k,d])=>d.tab==tab).map(([k,d])=>`${d.set&&SETS[d.set][2][0]==k?`<div class="sethd">${SETS[d.set][1]} ${SETS[d.set][0]} 세트 ${setsDone().includes(d.set)?'✅':`(${SETS[d.set][2].filter(i=>S.objs.some(o=>o.k==i)).length}/4)`}</div>`:''}<div class="card ${ghost==k?'sel':''} ${d.star>st?'lock':''}" data-k="${k}" data-need="${d.star}★ 필요" title="${d.desc}">
  ${d.img?`<img src="assets/${d.img}.png" style="${d.filter?'filter:'+d.filter:''}">`:`<div style="height:56px;display:flex;align-items:center;justify-content:center;font-size:30px">${d.ic||'🪨'}</div>`}<b>${d.n}</b><span class="p">${d.erase?'50% 환불':d.isPath?'¥'+fmt(d.cost)+'/칸':'¥'+fmt(d.cost)}</span></div>`).join('');
  document.querySelectorAll('.card').forEach(e=>e.onclick=()=>{const k=e.dataset.k;if(moving)cancelMove();if(DEF[k].star>stars())return toast(`료칸 등급 ${DEF[k].star}★ 에서 해금돼요`);ghost=ghost==k?null:k;mode=null;$('tDel').classList.remove('on');buildCards();if(ghost)toast(DEF[ghost].isPath||DEF[ghost].erase?'드래그해서 칠하세요 · Shift+드래그 = 사각형 (Esc 취소)':'놓을 곳을 눌러주세요 (Esc 취소)')})}
 let lastStars=0;
@@ -458,9 +481,9 @@ function showInfo(o){if(o.k=='gate'){const el=$('info');el.style.display='block'
  `<div style="margin-top:6px">${o.lv<5&&d.price?`<button class="b" id="iUp">업그레이드 ¥${fmt(up)}</button>`:''}<button class="b g" id="iMove">이동</button><button class="b g" id="iDel">철거</button><button class="b g" id="iCl">닫기</button></div>`;
  el.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const p=+b.dataset.p;o.price=p==0?d.price:Math.max(50,Math.round(o.price*(1+p)/10)*10);showInfo(o)});
  if($('iUp'))$('iUp').onclick=()=>{if(S.yen<up)return toast('엔이 부족해요');S.yen-=up;S.fin.exp+=up;o.lv++;anims['o'+S.objs.indexOf(o)]={t:0};upFx(o);BUS.emit('upgrade',o);toast(`${d.n} Lv.${o.lv}!${o.lv==3||o.lv==5?' 외관이 바뀌었어요 ✨':''}`);showInfo(o);save()};
- $('iDel').onclick=()=>remove(o);$('iMove').onclick=()=>startMove(o);$('iCl').onclick=()=>el.style.display='none';}
+ $('iDel').onclick=()=>remove(o);$('iMove').onclick=()=>startMove(o);$('iCl').onclick=()=>el.style.display='none';BUS.emit('info',o,el);}
 function remove(o){if(o.k=='gate')return toast('대문은 철거할 수 없어요. 이동만 가능해요');if(S.objs.length<=1)return;S.yen+=Math.floor(DEF[o.k].cost*0.4);guests.forEach(g=>{if(g.cur===o)finish(g);if(g.target===o)g.target=null});S.objs.splice(S.objs.indexOf(o),1);OCC=occ();groundDirty=true;$('info').style.display='none';save()}
-function modalFin(){const m=$('modal');const up=S.objs.filter(o=>!DEF[o.k].isPath&&!DEF[o.k].wage).length*4,wages=wageNow(12)-up;
+function modalFin(){const m=$('modal');const up=S.objs.filter(o=>!DEF[o.k].isPath&&!DEF[o.k].wage).length*4,wages=S.objs.reduce((a,o)=>a+(DEF[o.k].wage||0)*(1+0.5*(o.lv-1)),0);
  const rows=S.objs.filter(o=>DEF[o.k].price).sort((a,b)=>(b.earn||0)-(a.earn||0)).slice(0,8).map(o=>`<div class="row"><span>${DEF[o.k].n} Lv.${o.lv}</span><b>¥${fmt(o.earn||0)}</b></div>`).join('');
  m.innerHTML=`<h3>📊 재정</h3><div class="row"><span>보유 자금</span><b>¥${fmt(S.yen)}</b></div><div class="row"><span>평균 순이익</span><b>¥${fmt(avgNet())}/시</b></div><div class="row"><span>오늘 수입</span><b>¥${fmt(S.fin.inc)}</b></div><div class="row"><span>오늘 지출</span><b>¥${fmt(S.fin.exp)}</b></div>
  <div class="row"><span>직원 급여</span><b>¥${fmt(wages)}/시</b></div><div class="row"><span>시설 유지비</span><b>¥${fmt(up)}/시</b></div><h3 style="margin-top:10px">시설별 매출</h3>${rows}<div style="text-align:right"><button class="b" onclick="this.closest('.panel').style.display='none'">닫기</button></div>`;m.style.display='block'}

@@ -12,7 +12,7 @@ canvas{display:block;position:fixed;left:0;top:0}#tc{pointer-events:none}
 #build{position:fixed;right:8px;top:64px;bottom:76px;width:300px;display:flex;flex-direction:column;background:linear-gradient(#fbf1dc,#efdcb6);border:2px solid #8a6238;border-radius:10px;box-shadow:0 3px 0 #5b3e22;padding:8px}
 .bh{display:flex;justify-content:space-between;font-size:17px;font-weight:bold;padding:2px 4px 6px}
 .bh button{background:none;border:0;font-size:16px;cursor:pointer;color:#6b4a2b}
-.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:3px}
 .tab{background:#f7ecd6;border:2px solid #c7a57a;border-radius:6px;padding:4px 0;text-align:center;font-size:13px;cursor:pointer}
 .tab .ic{font-size:20px;display:block}.tab.on{background:#7fb1d9;border-color:#3d6f9a;color:#fff}
 .cards{flex:1;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;align-content:start}
@@ -102,3 +102,9 @@ body.titling #zenHint{display:none}
 #info{animation-name:popi}@keyframes popi{from{opacity:0;transform:translateY(6px)}}
 #top .box,#tools .tool{transition:transform .12s,filter .12s}#tools .tool:hover{transform:translateY(-2px)}
 @media(max-width:700px){#title{padding-left:0;justify-content:center;background:rgba(30,24,16,.35)}#title h1 .k{font-size:40px}#title .emb{width:150px}}
+.sethd{grid-column:1/-1;font:700 12px Pretendard,sans-serif;color:#7a5634;padding:6px 2px 0;border-top:1px dashed rgba(122,86,52,.35)}
+.sethd:first-child{border-top:0}
+.pxw{display:flex;gap:14px;justify-content:center;align-items:flex-end;margin:8px 0;padding:10px;background:repeating-conic-gradient(#e9dcc2 0 25%,#f4ead6 0 50%) 0 0/16px 16px;border-radius:8px}
+.pxw canvas{image-rendering:pixelated;display:block;max-width:220px;height:auto;margin:auto}.pxw .lab{font-size:11px;text-align:center;opacity:.7;margin-top:4px}
+#modal select{font:500 12px Pretendard,sans-serif;padding:3px;border-radius:5px;border:1.5px solid #a07a50;background:#fbf1dc}
+.pxw canvas{position:static!important;inset:auto!important;width:auto!important;height:auto!important;pointer-events:none}
