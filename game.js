@@ -8,7 +8,7 @@ const cv=$('c'),tc=$('tc'),tx=tc.getContext('2d');let cx=cv.getContext('2d');
 const DEF={
  rock:{n:'바위 노천탕',tab:'bath',img:'rock',fp:4,sc:1,cost:6000,price:600,cap:5,dur:28,eff:{fatigue:-70,fun:12},wage:60,star:1,bath:1,water:'#8fe3df',appeal:12,desc:'김이 피어오르는 바위 노천탕'},
  hinoki:{n:'히노키 욕조',tab:'bath',img:'hinoki',fp:2,sc:1,cost:3500,price:450,cap:2,dur:22,eff:{fatigue:-50,fun:8},wage:35,star:1,bath:1,water:'#9fd6e6',appeal:7,desc:'편백나무 향 가득한 욕조'},
- sauna:{n:'사우나',tab:'bath',img:'sauna',fp:2,sc:1,cost:7000,price:700,cap:3,dur:20,eff:{fatigue:-40,fun:25},wage:55,star:2,appeal:8,light:[[0.1,-0.45]],desc:'땀 빼고 나면 개운!'},
+ sauna:{n:'사우나',tab:'bath',inside:1,img:'sauna',fp:2,sc:1,cost:7000,price:700,cap:3,dur:20,eff:{fatigue:-40,fun:25},wage:55,star:2,appeal:8,light:[[0.1,-0.45]],desc:'땀 빼고 나면 개운!'},
  milky:{n:'유백 대욕장',tab:'bath',img:'milky',fp:4,sc:1,cost:15000,price:1100,cap:6,dur:30,eff:{fatigue:-85,fun:15},wage:110,star:3,bath:1,water:'#f1ede0',appeal:16,desc:'우윳빛 온천수의 대욕장'},
  ramen:{n:'라멘집',tab:'food',img:'ramen',fp:2,sc:1,cost:4000,price:900,cap:3,dur:15,eff:{hunger:-70,fun:5},wage:45,star:1,appeal:6,light:[[0.15,-0.55],[0.28,-0.3]],desc:'유자 시오 라멘이 명물'},
  teishoku:{n:'정식당',tab:'food',img:'teishoku',fp:2,sc:1,cost:9000,price:1600,cap:4,dur:20,eff:{hunger:-90,fun:10},wage:80,star:2,appeal:8,light:[[0.3,-0.35]],desc:'오늘의 유자 연어 정식'},
@@ -222,7 +222,6 @@ const THOUGHT={
  want:{fatigue:'온천 하고 싶다',hunger:'배고파요',thirst:'우유 마시고 싶다',fun:'구경하고 싶어요'}};
 function entrance(){const s=START_PLOT;return[s[0]*PS+PS/2,s[1]*PS+PS]}
 function wageNow(h){const nt=(h%24)>=23||(h%24)<6;return Math.round(S.objs.reduce((s,o)=>{const d=DEF[o.k];if(!d.wage)return s;const w=d.wage*(1+0.5*(o.lv-1))*(0.35+0.65*Math.min(1,(o.hu||0)/2));o.hu=0;return s+(nt&&!d.stay&&!d.night?w*0.3:w)},0)+S.objs.filter(o=>!DEF[o.k].isPath&&!DEF[o.k].wage).length*4)}
-function capOf(o){const d=DEF[o.k];return d.cap+(o.lv-1)*(d.bath&&d.fp>=4?2:1)}
 function capTotal(){return S.objs.reduce((a,o)=>{const d=DEF[o.k];return a+(d.cap&&!d.stay?capOf(o):0)},0)}
 function maxGuests(){return Math.min(12+stars()*8,Math.round(capTotal()*1.5)+4)}
 function spawnRate(){const h=hour();const f=h<6?0.05:h<9?0.5:h<12?0.7:h<15?0.6:h<17?0.8:h<21?1.15:h<23?0.5:0.15;return f*(0.12+stars()*0.06)}
@@ -264,7 +263,14 @@ function pathToObj(g,o){const goal=new Set();for(const[x,y]of tilesOf(o))for(con
   const x=k%N,y=(k/N)|0;for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=N||ny>=N||!walkable(nx,ny))continue;const oc=OCC[nx+','+ny];const nk=ny*N+nx,nd=d+(oc&&DEF[oc.k].isPath?0.6:1);if(nd<dist[nk]){dist[nk]=nd;from[nk]=k;heapPush(h,[nd,nk])}}}
  return null}
 function goTo(g,x,y){const p=findPath(g.x,g.y,x,y);if(!p){g.path=[];return false}g.path=p;return true}
-function bathSlot(o,i){const f=DEF[o.k].fp,c=ctr(o),n=capOf(o);const a=(i/n)*Math.PI*2+0.6;const r=f*0.2;return[c[0]+Math.cos(a)*r,c[1]+Math.sin(a)*r]}
+// 탕별 좌석 (수면 기준 정규화 화면 좌표 u,v ∈[-1,1], 뒤→앞 순)
+const SEATS={hinoki:[[-0.36,-0.22],[0.36,0.12]],sauna:[[-0.4,-0.3],[0.38,-0.28],[-0.28,0.3],[0.42,0.32]],
+ rock:[[-0.1,-0.7],[0.45,-0.5],[-0.62,-0.3],[0.05,-0.18],[0.7,0.0],[-0.5,0.22],[0.3,0.35],[-0.08,0.6]],
+ milky:[[0,-0.62],[-0.3,-0.32],[0.3,-0.32],[-0.6,0],[0,-0.02],[0.6,0],[-0.3,0.3],[0.3,0.3],[0,0.6],[-0.15,0.15],[0.15,-0.17],[0.45,0.15]]};
+function capOf(o){const d=DEF[o.k];const c=d.cap+(o.lv-1)*(d.bath&&d.fp>=4?2:1);return SEATS[o.k]?Math.min(c,SEATS[o.k].length):c}
+function bathSlot(o,i){const W=wgeo(o),st=SEATS[o.k];let u,v;if(st){[u,v]=st[i%st.length]}else{const n=capOf(o),a=(i/n)*Math.PI*2+0.6;u=Math.cos(a)*0.6;v=Math.sin(a)*0.6}
+ const sp=W.dia?0.9:0.85;const X=W.cX+u*W.rx*sp,Y=W.cY+v*W.ry*sp+2;return[(X/(TW/2)+Y/(TH/2))/2,(Y/(TH/2)-X/(TW/2))/2]}
+function bathClip(o){const W=wgeo(o);const{cX,cY,rx,ry}=W;cx.beginPath();if(W.dia){cx.moveTo(cX+rx,cY);cx.lineTo(cX,cY+ry);cx.lineTo(cX-rx,cY)}else{cx.moveTo(cX+rx,cY-1);cx.ellipse(cX,cY-1,rx,ry,0,0,Math.PI)}cx.lineTo(cX-rx,cY-40);cx.lineTo(cX+rx,cY-40);cx.lineTo(cX+rx,cY);cx.closePath();cx.clip()}
 function updGuest(g,dt){
  g.life+=dt;if(g.leaving&&g.path&&g.path.length<=1){g.fade=Math.max(0,g.fade-dt*1.4);if(g.fade<=0){g.dead=1;return}}else g.fade=Math.min(1,g.fade+dt*1.5);for(const k of NEEDK)g.need[k]=Math.min(100,g.need[k]+dt*(k=='fatigue'?0.2:0.9));
  g.happy=Math.max(0,Math.min(100,g.happy+(beautyAt(g.x,g.y)*0.02-0.03)*dt));
@@ -292,11 +298,11 @@ function arrive(g){g.ax=g.x;g.ay=g.y;const o=g.target,d=DEF[o.k];g.target=null;o
  g.budget-=o.price;S.yen+=o.price;S.fin.inc+=o.price;o.earn=(o.earn||0)+o.price;o.uses=(o.uses||0)+1;o.hu=(o.hu||0)+1;S.served++;BUS.emit('pay',o,g,o.price);
  const[sx,sy]=toScreenT(...ctr(o));floats.push({x:ctr(o)[0],y:ctr(o)[1],t:'+¥'+fmt(o.price),l:1.6});
  o.users++;g.cur=o;g.st='use';g.t=d.stay?Math.max(30,((30-hour()+24)%24+7)*60/120):d.dur*(1+o.lv*0.1);
- if(d.bath){g.slot=freeSlot(o);const[a,b]=bathSlot(o,g.slot);g.x=a;g.y=b;g.inBath=true}else g.hide=true;
+ if(d.bath&&!d.inside){g.slot=freeSlot(o);const[a,b]=bathSlot(o,g.slot);g.x=a;g.y=b;g.inBath=true}else g.hide=true;
  const bonus=o.price<fair*0.9?8:o.price<fair*1.15?3:-3;g.happy+=bonus+o.lv*2;
  for(const k in d.eff)if(g.need[k]!=null)g.need[k]=Math.max(0,g.need[k]+d.eff[k]*(1+o.lv*0.1));
  if(d.joy)g.happy+=d.joy*0.3;if(d.bath&&Math.random()<0.6)setTimeout(()=>think(g,THOUGHT.good[Math.random()*6|0]),1500);}
-function freeSlot(o){const used=guests.filter(x=>x.cur===o&&x.inBath).map(x=>x.slot);for(let i=0;i<20;i++)if(!used.includes(i))return i;return 0}
+function freeSlot(o){const used=guests.filter(x=>x.cur===o&&x.inBath).map(x=>x.slot);for(let i=0;i<capOf(o);i++)if(!used.includes(i))return i;return 0}
 function finish(g){const o=g.cur;if(g.ax!=null){g.x=g.ax;g.y=g.ay}if(o)o.users=Math.max(0,o.users-1);(g.used=g.used||[]).push(o);if(g.used.length>3)g.used.shift();
  g.cur=null;g.hide=false;const[a,b]=door(o);g.x=a;g.y=b;g.inBath=false;g.st='walk';g.tx=g.x;g.ty=g.y;g.path=[]}
 function leave(g){if(!g.leaving)BUS.emit('leave',g);g.leaving=true;g.target=null;const gi=gateInfo();if(!gi){g.dead=1;return}const[mx,my]=gi.m,[ox,oy]=gi.o;if(!goTo(g,mx,my))g.path=[[mx+0.5,my+0.5]];g.path.push([mx+0.5+ox*1.5,my+0.5+oy*1.5],[mx+0.5+ox*4,my+0.5+oy*4]);
@@ -374,7 +380,7 @@ function render(t){
   if(it.part){const o=it.o,G=objGeom(o);drawSprite(skey(o)+'_'+it.part,o,G.X,G.Y,G.W,lt,sv,1)}
   else if(it.o){const o=it.o,d=DEF[o.k],G=objGeom(o);const an=anims['o'+S.objs.indexOf(o)];const pop=an?Math.min(1,an.t*3):1;
    const Wp=G.W*(0.7+0.3*easeOut(pop));const fade=hidden.has(o)&&!d.bath&&d.fp>1&&!window.READONLY&&!document.body.classList.contains('zen');const sw_=(d.tree||d.flutter)?(Math.sin(t/1100+o.x*1.7+o.y)*0.018+(window.WIND||0)*0.025+(o.sway||0)*Math.sin(t/110)*0.25):0;if(sw_){cx.save();cx.translate(G.X,G.Y);cx.transform(1,0,-sw_,1,0,0);cx.translate(-G.X,-G.Y)}drawSprite(skey(o),o,G.X,G.Y,Wp,lt,sv,pop*(fade?0.5:1));if(sw_)cx.restore();
-   if(d.bath){drawWater(o,G,t,lt);guests.filter(g=>g.inBath&&g.cur===o).sort((a,b)=>a.x+a.y-b.x-b.y).forEach(g=>drawGuest(g,t,lt,sv));const ov=skey(o)+'_over';if(VAR[ov]&&guests.some(g=>g.inBath&&g.cur===o))drawSprite(ov,o,G.X,G.Y,Wp,lt,sv,pop)}
+   if(d.bath){drawWater(o,G,t,lt);cx.save();bathClip(o);guests.filter(g=>g.inBath&&g.cur===o).sort((a,b)=>a.x+a.y-b.x-b.y).forEach(g=>drawGuest(g,t,lt,sv));cx.restore();const ov=skey(o)+'_over';if(VAR[ov]&&guests.some(g=>g.inBath&&g.cur===o))drawSprite(ov,o,G.X,G.Y,Wp,lt,sv,pop)}
    if(o.lv>1){for(let i=0;i<o.lv-1;i++){cx.fillStyle='#f6cf5a';cx.fillRect(G.X-8+i*4,G.Y+1,3,3)}}}
   else drawGuest(it.g,t,lt,sv);}
  // 대문 지붕·노렌 (항상 손님 위) + 노렌 흔들림
@@ -427,7 +433,9 @@ function drawForest_(){const r=rng(42);for(let i=0;i<160;i++){const side=i%2;con
   cx.fillStyle=`rgb(${60+r()*20|0},${104+r()*25|0},${70+r()*15|0})`;const h=18+r()*18;cx.beginPath();cx.moveTo(X,Y-h);cx.lineTo(X+9,Y);cx.lineTo(X-9,Y);cx.fill();
   cx.fillStyle='rgba(255,255,255,0.08)';cx.beginPath();cx.moveTo(X,Y-h);cx.lineTo(X-9,Y);cx.lineTo(X-3,Y);cx.fill()}}
 const WGEO={milky:{ins:0.7,lift:12}};
-function wgeo(o){const d=DEF[o.k],f=d.fp,w=WGEO[o.k];const[cX,cY0]=iso(o.x+f/2,o.y+f/2);if(w){const k=f/2-w.ins;return{d,f,cX,cY:cY0-w.lift,rx:k*TW,ry:k*TH,dia:1}}return{d,f,cX,cY:cY0,rx:f*TW*0.25,ry:f*TH*0.25,dia:0}}
+function wgeo(o){const d=DEF[o.k],f=d.fp,w=WGEO[o.k];const e=(window.WATER||{})[skey(o)];
+ if(e){const G=objGeom(o);const cX=G.X+(e.cx-0.5)*G.W,cY=G.Y-G.H+e.cy*G.H;const dia=o.k=='milky',s=dia?1.5:1;return{d,f,cX,cY,rx:e.rx*G.W*s,ry:e.ry*G.H*s,dia}}
+ const[cX,cY0]=iso(o.x+f/2,o.y+f/2);if(w){const k=f/2-w.ins;return{d,f,cX,cY:cY0-w.lift,rx:k*TW,ry:k*TH,dia:1}}return{d,f,cX,cY:cY0,rx:f*TW*0.25,ry:f*TH*0.25,dia:0}}
 function wpath(W){cx.beginPath();if(W.dia){cx.moveTo(W.cX,W.cY-W.ry);cx.lineTo(W.cX+W.rx,W.cY);cx.lineTo(W.cX,W.cY+W.ry);cx.lineTo(W.cX-W.rx,W.cY);cx.closePath()}else cx.ellipse(W.cX,W.cY-1,W.rx,W.ry,0,0,6.283)}
 function drawMilky(W,t,lt){const{cX,cY,rx,ry}=W;const sk=lt.sky,n=lt.night,su=lt.sun;
  const mix=(a,b,k)=>a.map((v,i)=>Math.round(v*(1-k)+b[i]*k));const base=mix([226,224,212],sk,0.08),deep=mix([112,170,172],sk,0.15);
@@ -459,10 +467,10 @@ function drawWater_(o,G,t,lt){const W=wgeo(o);const{d,f,cX,cY,rx,ry}=W;
 const SUNT={};function sunTex(left,sun,ar){const k=left+'|'+sun+'|'+ar.toFixed(2);if(SUNT.k===k)return SUNT.c;const H=180,W=Math.round(H*ar),c=SUNT.c||document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');const gr=g.createRadialGradient(left?W*0.1:W*0.9,-H*0.2,0,left?W*0.1:W*0.9,-H*0.2,H*1.3);gr.addColorStop(0,`rgba(255,236,190,${0.32*sun})`);gr.addColorStop(1,'rgba(255,236,190,0)');g.fillStyle=gr;g.fillRect(0,0,W,H);SUNT.k=k;SUNT.c=c;return c}
 const WC={};function drawWater(o,G,t,lt){const W=wgeo(o);const{d,f,cX,cY,rx,ry}=W;
  if(window.GFX_LOW||window.__nowc){cx.save();drawWater_(o,G,t,lt);wpath(W);cx.clip();BUS.emit('water',o,cX,cY,rx,ry,t,lt);cx.restore();return}
- const m=cx.getTransform(),sc=m.a;const per=ry*2.4*90,FR=32,fi=Math.floor((t%per)/per*FR);const lk=o.k+'|'+sc.toFixed(2)+'|'+Math.round(lt.sun*12)+'|'+Math.round(lt.night*12)+'|'+lt.sky.map(v=>v>>3).join(',');
- let c=WC[o.k];if(!c||c.lk!==lk){c=WC[o.k]={lk,fr:[]}}
- let im=c.fr[fi];if(!im){const pw=Math.ceil((rx*2+4)*sc),ph=Math.ceil((ry*2+4)*sc);im=document.createElement('canvas');im.width=pw;im.height=ph;const ocx=cx;cx=im.getContext('2d');cx.setTransform(sc,0,0,sc,(rx+2)*sc,(ry+3)*sc);
-  const fo={...o,x:-f/2,y:-f/2};const _l=(WGEO[o.k]||{}).lift||0;cx.translate(0,_l);const sI=iso;try{const tt=fi/FR*per+Math.floor(t/per)*0;drawWater_(fo,G,tt,lt)}finally{cx=ocx}c.fr[fi]=im}
+ const m=cx.getTransform(),sc=m.a;const per=ry*2.4*90,FR=32,fi=Math.floor((t%per)/per*FR);const sk_=skey(o);const lk=sk_+'|'+sc.toFixed(2)+'|'+Math.round(lt.sun*12)+'|'+Math.round(lt.night*12)+'|'+lt.sky.map(v=>v>>3).join(',');
+ let c=WC[sk_];if(!c||c.lk!==lk){c=WC[sk_]={lk,fr:[]}}
+ let im=c.fr[fi];if(!im){const pw=Math.ceil((rx*2+4)*sc),ph=Math.ceil((ry*2+4)*sc);im=document.createElement('canvas');im.width=pw;im.height=ph;const ocx=cx;cx=im.getContext('2d');
+  const fo={...o,x:-f/2,y:-f/2};const Wf=wgeo(fo);cx.setTransform(sc,0,0,sc,(rx+2-Wf.cX)*sc,(ry+3-Wf.cY)*sc);const sI=iso;try{const tt=fi/FR*per+Math.floor(t/per)*0;drawWater_(fo,G,tt,lt)}finally{cx=ocx}c.fr[fi]=im}
  cx.drawImage(im,cX-rx-2,cY-ry-3,rx*2+4,ry*2+4);cx.save();wpath(W);cx.clip();BUS.emit('water',o,cX,cY,rx,ry,t,lt);cx.restore()}
 function drawGuest(g,t,lt,sv){const[X,Y]=iso(g.x,g.y);if(g.vip||g.reg){cx.save();cx.globalCompositeOperation='lighter';cx.globalAlpha=g.vip?0.35:0.28;cx.drawImage(blob(g.vip?'255,215,90':'140,200,255'),X-12,Y-18,24,24);cx.globalAlpha=1;cx.restore()}
  if(g.inBath){const v=VAR[g.cb];if(!v)return;const W=17,h=W*v.base.height/v.base.width,bob=Math.sin(t/600+g.bob)*0.4-(g.hz||0)*0.5,ch=h*0.8;
@@ -632,4 +640,4 @@ async function boot(){resize();addEventListener('resize',resize);if(window.VISIT
 const _drawSprite=drawSprite;
 boot();
 // 테스트 훅
-window.__dbg={focusXY:(x,y,z)=>focus(x,y,z),cam,maxG:()=>maxGuests(),reachOK(){const gi=gateInfo();if(!gi)return true;const seen=new Set([gi.m.join(',')]),q=[gi.m];while(q.length){const[x,y]=q.shift();for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const k=(x+dx)+','+(y+dy);if(seen.has(k)||!walkable(x+dx,y+dy))continue;seen.add(k);q.push([x+dx,y+dy])}}return S.objs.filter(o=>DEF[o.k].price).every(o=>tilesOf(o).some(([x,y])=>[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>seen.has((x+dx)+','+(y+dy)))))},step:dt=>step(dt),stars:()=>stars(),DEF,canPlace,emit:(...a)=>BUS.emit(...a),plotPrice,occ:()=>{OCC=occ();groundDirty=true},ensureGate(){ensureGate()},gate:()=>gateObj(),checkReach,clearGhost(){ghost=null;buildCards()},upFx(o){upFx(o)},setPaint(k,x0,y0,x1,y1,area){ghost=k;paint={x0,y0,x1,y1,area};applyPaint();paint=null},free(k,x0,y0){for(let r=1;r<8;r++)for(let dx=-r;dx<=r;dx++)for(let dy=-r;dy<=r;dy++)if(canPlace(k,x0+dx,y0+dy))return[x0+dx,y0+dy]},scr:(x,y)=>toScreenT(x,y),mig(){migrate();OCC=occ();groundDirty=true},get moving(){return moving},refresh(){OCC=occ();groundDirty=true},get S(){return S},setHour(h){S.min=Math.floor(S.min/1440)*1440+h*60},spawn,guests:()=>guests,focus,cam};
+window.__dbg={capOf,bathSlot,focusXY:(x,y,z)=>focus(x,y,z),cam,maxG:()=>maxGuests(),reachOK(){const gi=gateInfo();if(!gi)return true;const seen=new Set([gi.m.join(',')]),q=[gi.m];while(q.length){const[x,y]=q.shift();for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const k=(x+dx)+','+(y+dy);if(seen.has(k)||!walkable(x+dx,y+dy))continue;seen.add(k);q.push([x+dx,y+dy])}}return S.objs.filter(o=>DEF[o.k].price).every(o=>tilesOf(o).some(([x,y])=>[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>seen.has((x+dx)+','+(y+dy)))))},step:dt=>step(dt),stars:()=>stars(),DEF,canPlace,emit:(...a)=>BUS.emit(...a),plotPrice,occ:()=>{OCC=occ();groundDirty=true},ensureGate(){ensureGate()},gate:()=>gateObj(),checkReach,clearGhost(){ghost=null;buildCards()},upFx(o){upFx(o)},setPaint(k,x0,y0,x1,y1,area){ghost=k;paint={x0,y0,x1,y1,area};applyPaint();paint=null},free(k,x0,y0){for(let r=1;r<8;r++)for(let dx=-r;dx<=r;dx++)for(let dy=-r;dy<=r;dy++)if(canPlace(k,x0+dx,y0+dy))return[x0+dx,y0+dy]},scr:(x,y)=>toScreenT(x,y),mig(){migrate();OCC=occ();groundDirty=true},get moving(){return moving},refresh(){OCC=occ();groundDirty=true},get S(){return S},setHour(h){S.min=Math.floor(S.min/1440)*1440+h*60},spawn,guests:()=>guests,focus,cam};
