@@ -168,7 +168,7 @@ function tileTex(cob,vr,par){const key=cob+'_'+vr+'_'+par;const ty=typeof cob=='
    else if(ty=='path_tatami'){const bx=(px+py*2)%32<2||(px-py*2+256)%64<2;c=bx?[70,78,40]:[196+((px*3+py)%5)-n*8,198-n*8,132-n*6];if(!bx&&(px+py*2)%3==0)c=[c[0]-10,c[1]-10,c[2]-8]}
    else if(cob){const sx=Math.floor((px+py*2)/7),sy=Math.floor((px-py*2+140)/7);const seam=((px+py*2)%7==0)||((px-py*2+140)%7==0);
      const v=((sx*7+sy*13+x*3+y*5)%5)*6;c=seam?[150,140,124]:[196+v-n*10,186+v-n*10,166+v-n*8];}
-   else{const v=n<0.08?22:n<0.2?-12:0;const fl=n>0.995;c=fl?[250,238,226]:[114+v*0.7+par*3,156+v*0.8,90+v*0.5];
+   else{const v=n<0.08?22:n<0.2?-12:0;const fl=n>0.995;c=fl?[250,238,226]:[120+v*0.7+par*3,150+v*0.8,94+v*0.5];
      if(n>0.985&&!fl)c=[140,176,104];}
    const i=(py*TW*2+px)*4;id.data[i]=c[0];id.data[i+1]=c[1];id.data[i+2]=c[2];id.data[i+3]=255;}
   const tmp=mk(TW*2,TH*2);tmp.getContext('2d').putImageData(id,0,0);return TEX[key]=tmp}
@@ -353,7 +353,15 @@ function render(t){
  list.forEach(a=>a.z=a.x1+a.y1);
  const cmp=(a,b)=>{if(a.x1<=b.x0+1e-3&&!(b.x1<=a.x0))return a.y0>=b.y1?1:-1;if(b.x1<=a.x0+1e-3)return b.y0>=a.y1?-1:1;if(a.y1<=b.y0+1e-3)return -1;if(b.y1<=a.y0+1e-3)return 1;return a.z-b.z};
  // 삽입 정렬(위상 근사)
- const sorted=[];for(const a of list.sort((p,q)=>p.z-q.z)){let i=sorted.length;while(i>0&&cmp(sorted[i-1],a)>0)i--;sorted.splice(i,0,a)}list.length=0;list.push(...sorted);
+ const ov=(a,b)=>a.x0<b.x1+2&&b.x0<a.x1+2&&a.y0<b.y1+2&&b.y0<a.y1+2;
+ const OB=list.filter(a=>!a.g).sort((p,q)=>p.z-q.z),GS=list.filter(a=>a.g).sort((p,q)=>p.z-q.z);
+ // 오브젝트: 겹치는 쌍만 비교하는 위상 정렬 (z 우선)
+ const n=OB.length,indeg=new Array(n).fill(0),adj=OB.map(()=>[]);for(let a=0;a<n;a++)for(let b=a+1;b<n;b++){if(!ov(OB[a],OB[b]))continue;const c=cmp(OB[a],OB[b]);if(c<0){adj[a].push(b);indeg[b]++}else if(c>0){adj[b].push(a);indeg[a]++}}
+ const sorted=[],done=new Array(n).fill(false);for(let k=0;k<n;k++){let pick=-1;for(let a=0;a<n;a++)if(!done[a]&&indeg[a]==0){pick=a;break}if(pick<0)for(let a=0;a<n;a++)if(!done[a]){pick=a;break}done[pick]=true;sorted.push(OB[pick]);for(const b of adj[pick])indeg[b]--}
+ // 손님: 반드시 앞서야 하는 마지막 오브젝트 뒤에 삽입
+ for(const g of GS){let i=0;for(let j=0;j<sorted.length;j++){const o=sorted[j];if(o.g){if(o.z<=g.z)i=Math.max(i,j+1);continue}if(ov(o,g)&&cmp(o,g)<0)i=j+1;else if(!ov(o,g)&&o.z<=g.z)i=Math.max(i,j+1)}
+  for(let j=i-1;j>=0;j--){const o=sorted[j];if(!o.g&&ov(o,g)&&cmp(o,g)>0){i=j}}sorted.splice(i,0,g)}
+ list.length=0;list.push(...sorted);
  // 뒤에 가려진 손님/커서가 있으면 건물 반투명
  const hidden=new Set();for(const it of list){if(!it.o)continue;const o=it.o,G=objGeom(o);
   const pts=guests.filter(g=>!g.hide&&!g.inBath&&g.x<it.x1&&g.y<it.y1&&!(g.x>=it.x0&&g.y>=it.y0)&&(g.x+g.y)<it.x1+it.y1-0.5).map(g=>iso(g.x,g.y));
@@ -372,7 +380,7 @@ function render(t){
   const sw=Math.sin(t/140)*(o.sway||0);const top=G.Y-G.H*0.66;cx.save();cx.translate(G.X,top);cx.transform(1,0,sw*(o.dir=='y'?-1:1),1,0,0);cx.translate(-G.X,-top);drawSprite(k+'_noren',o,G.X,G.Y,G.W,lt,sv,1);cx.restore()}
  // 파티클
  for(const p of parts){const[X,Y]=iso(p.x,p.y);const a=Math.min(1,p.l/p.L*2)*(p.k=='steam'?1:1);
-  if(p.k=='steam'){cx.globalAlpha=0.22*Math.min(1,p.l)*(1-0.4*lt.night);const r=p.s;cx.drawImage(blob('255,255,255'),X-r,Y-p.h-r,r*2,r*2)}
+  if(p.k=='steam'){cx.globalAlpha=(0.26+0.06*lt.sun)*Math.min(1,p.l)*(1-0.35*lt.night);const r=p.s;cx.drawImage(blob('255,255,255'),X-r,Y-p.h-r,r*2,r*2)}
   else if(p.k=='spark'){cx.globalAlpha=Math.min(1,p.l);const tw=(Math.sin(t/60+p.x*9)+1)/2;cx.fillStyle=tw>0.5?'#fff6c0':'#ffd65a';cx.fillRect(X-1,Y-p.h-1,2,2);if(tw>0.6){cx.fillRect(X-3,Y-p.h-0.4,6,0.8);cx.fillRect(X-0.4,Y-p.h-3,0.8,6)}}
   else if(p.k=='dust'){cx.globalAlpha=0.5*p.l;cx.fillStyle='#e8dcc0';cx.beginPath();cx.arc(X,Y,2+(0.9-p.l)*4,0,6.283);cx.fill()}
   else{cx.globalAlpha=Math.min(1,p.l);cx.fillStyle=p.k=='petal'?'#ffc6d9':p.k=='leaf'?(p.ph%2<1?'#e8643a':'#f0a03a'):'#ffffff';const w=p.k=='snow'?1:Math.abs(Math.sin(p.ph))*1.5+0.6;cx.fillRect(X,Y-p.h,w,1)}}
@@ -576,7 +584,7 @@ function frame(now){warnAcc+=1;if(warnAcc%90==1)checkReach();const dt=Math.min(0
  if(homeAnim){homeAnim.t+=dt/0.9;const k=easeOut(Math.min(1,homeAnim.t));const f=homeAnim.to.k?DEF[homeAnim.to.k].fp:1;const save_=cam.z;
   const z=lerp(homeAnim.from.z,VW>820?5.2:3.6,k);cam.z=z;cam.tz=z;const[wx,wy]=iso(homeAnim.to.x+f/2,homeAnim.to.y+f/2);const tx_=VW*(VW>820?0.42:0.5)-wx*z,ty_=VH*(VW>820?0.5:0.33)-wy*z;
   cam.x=lerp(homeAnim.from.x,tx_,k);cam.y=lerp(homeAnim.from.y,ty_,k);if(homeAnim.t>=1)homeAnim=null}
- BUS.emit('frame',dt,now);if(!window.GFX_LOW||!window.FPS30||(frameN++&1)==0){render(now);hud()}saveAcc+=dt;if(saveAcc>5){saveAcc=0;save()}
+ BUS.emit('frame',dt,now);if(!window.__norender&&(!window.GFX_LOW||!window.FPS30||(frameN++&1)==0)){render(now);hud()}saveAcc+=dt;if(saveAcc>5){saveAcc=0;save()}
  requestAnimationFrame(frame)}
 async function boot(){resize();addEventListener('resize',resize);if(window.VISIT_PROMISE){try{window.VISIT_SAVE=await window.VISIT_PROMISE}catch(e){window.VISIT_SAVE=null;setTimeout(()=>toast('방문 링크가 올바르지 않아요'),1200)}}load();S.objs.forEach(o=>o.users=0);migrateLayout();migrate();OCC=occ();ensureGate();OCC=occ();
  await Promise.all([loadImgs(),document.fonts.load('700 14px Pretendard'),document.fonts.ready]);
