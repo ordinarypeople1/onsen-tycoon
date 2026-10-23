@@ -102,7 +102,7 @@ window.READONLY=false;
 function fresh(){
  const plots={};plots[START_PLOT.join(',')]=1;
  const o=[];const b=(k,x,y)=>o.push({k,x,y,lv:1,price:DEF[k].price||0,uses:0,earn:0});
- b('rock',22,21);b('lantern',21,26);b('sakura',26,22);b('rocks',20,21);b('lantern',25,26);for(let j=25;j<32;j++)b('path',24,j);for(let i=19;i<30;i++)if(i!=24)b('path',i,28);
+ b('rock',22,21);b('lantern',21,26);b('sakura',26,22);b('maple',18,22);b('rocks',20,21);b('lantern',25,26);for(let j=25;j<32;j++)b('path',24,j);for(let i=19;i<30;i++)if(i!=24)b('path',i,28);
  return {layout:16,yen:8000,min:8*60+40,plots,objs:o,fin:{inc:0,exp:0,hist:[]},rep:55,t:Date.now(),served:0,ver:2};
 }
 function load(){
@@ -146,10 +146,34 @@ function splitLayers(img,masks){const W=img.width,H=img.height,rest=mk(W,H),r=re
   r.globalCompositeOperation='destination-out';r.beginPath();path(r,W,H);r.fill();r.globalCompositeOperation='source-over'}
  out.ground=rest;return out}
 function mk(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c}
-function variants(key,img,filter){ // 실루엣/림라이트 생성 (컴포지팅만 사용)
- const w=img.width,h=img.height,base=mk(w,h),bx=base.getContext('2d');if(filter)bx.filter=filter;bx.drawImage(img,0,0);
- const sil=mk(w,h),s=sil.getContext('2d');s.drawImage(base,0,0);s.globalCompositeOperation='source-in';s.fillStyle='#000';s.fillRect(0,0,w,h);
- const rim=(dx)=>{const c=mk(w,h),g=c.getContext('2d');g.drawImage(base,0,0);g.globalCompositeOperation='destination-out';g.drawImage(base,dx,3);g.globalCompositeOperation='source-in';g.fillStyle='#fff3cf';g.fillRect(0,0,w,h);return c};
+function gradeSprite(bx,w,h){
+ const id=bx.getImageData(0,0,w,h),d=id.data;
+ for(let i=0;i<d.length;i+=4){
+  if(d[i+3]<12)continue;
+  let r=d[i]/255,g=d[i+1]/255,b=d[i+2]/255;
+  // S-curve contrast (zero milky midtones)
+  const sc=v=>{const s=v<0.5?2*v*v:1-2*(1-v)*(1-v);return v*0.74+s*0.26};
+  r=sc(r);g=sc(g);b=sc(b);
+  // Vibrance / saturation boost (+24%)
+  const l=0.299*r+0.587*g+0.114*b;
+  const sat=1.24;
+  r=l+(r-l)*sat;g=l+(g-l)*sat;b=l+(b-l)*sat;
+  // Split-tone: cool deep indigo-plum shadows (#2b2844) & warm butter-cream highlights (#fff1c2)
+  const sh=Math.max(0,(0.46-l)/0.46),hi=Math.max(0,(l-0.54)/0.46);
+  r+=hi*0.045-sh*0.045;
+  g+=hi*0.025-sh*0.052;
+  b-=hi*0.042-sh*0.075;
+  d[i]=Math.max(0,Math.min(255,Math.round(r*255)));
+  d[i+1]=Math.max(0,Math.min(255,Math.round(g*255)));
+  d[i+2]=Math.max(0,Math.min(255,Math.round(b*255)));
+ }
+ bx.putImageData(id,0,0);
+}
+function variants(key,img,filter){ // 실루엣/림라이트 생성 + 레퍼런스 색감 그레이딩
+ const w=img.width,h=img.height,base=mk(w,h),bx=base.getContext('2d');if(filter)bx.filter=filter;bx.drawImage(img,0,0);if(filter)bx.filter='none';
+ gradeSprite(bx,w,h);
+ const sil=mk(w,h),s=sil.getContext('2d');s.drawImage(base,0,0);s.globalCompositeOperation='source-in';s.fillStyle='#1e1a36';s.fillRect(0,0,w,h);
+ const rim=(dx)=>{const c=mk(w,h),g=c.getContext('2d');g.drawImage(base,0,0);g.globalCompositeOperation='destination-out';g.drawImage(base,dx,3);g.globalCompositeOperation='source-in';g.fillStyle='#ffeba8';g.fillRect(0,0,w,h);return c};
  VAR[key]={base,sil,rimL:rim(3),rimR:rim(-3)};
 }
 // ===== 카메라 =====
@@ -175,24 +199,88 @@ function buildGround(){
  const W=N*TW+8,H=N*TH+40;ground=mk(W*2,H*2);const g=ground.getContext('2d');g.scale(2,2);const ox=N*TW/2+4;
  const pathMap={};S.objs.forEach(o=>{if(DEF[o.k].isPath)pathMap[o.x+','+o.y]=o.k});
  const near=new Set();for(const o of S.objs){const d=DEF[o.k],[fw,fh]=fpOf(o.k,o.rot);if(fw*fh>=4&&!d.tree&&o.k!='rocks'&&o.k!='iris'&&o.k!='floating_lanterns')for(let x=o.x-1;x<=o.x+fw;x++)for(let y=o.y-1;y<=o.y+fh;y++)near.add(x+','+y)}
- // 절벽 옆면
- if(0){g.fillStyle='#8a6a48';g.beginPath();g.moveTo(ox-N*TW/2,N*TH/2);g.lineTo(ox,N*TH);g.lineTo(ox+N*TW/2,N*TH/2);g.lineTo(ox+N*TW/2,N*TH/2+14);g.lineTo(ox,N*TH+14);g.lineTo(ox-N*TW/2,N*TH/2+14);g.fill();
- g.fillStyle='#6d5238';g.beginPath();g.moveTo(ox,N*TH);g.lineTo(ox+N*TW/2,N*TH/2);g.lineTo(ox+N*TW/2,N*TH/2+14);g.lineTo(ox,N*TH+14);g.fill()}
- g.fillStyle='#5f8f45';g.fillRect(0,0,0,0);
+ // 열린 구역 경계 계산 -> 전면(남서/남동) 외곽을 따라 흐르는 에메랄드/터콰이즈 계곡 온천천 & 목조 다리
+ let minX=N,maxX=0,minY=N,maxY=0;
+ for(let py=0;py<N/PS;py++)for(let px=0;px<N/PS;px++)if(plotOpen(px,py)){minX=Math.min(minX,px*PS);maxX=Math.max(maxX,(px+1)*PS-1);minY=Math.min(minY,py*PS);maxY=Math.max(maxY,(py+1)*PS-1)}
+ const gi=gateInfo();
+ const brgSet=new Set(),brgBank=new Set();
+ if(gi){const[mx,my]=gi.m,[ox_,oy_]=gi.o;for(let s=1;s<=6;s++)for(let w=-1;w<=1;w++){const bx=mx+ox_*s+(oy_?w:0),by=my+oy_*s+(ox_?w:0);if(s>=2&&s<=5)brgSet.add(bx+','+by);else brgBank.add(bx+','+by)}}
+ const isRiv=(x,y)=>{if(tileOpen(x,y))return false;const dx=minX-x,dy=y-maxY;const sw=dx>=2&&dx<=5&&y>=minY-2&&y<=maxY+5;const se=dy>=2&&dy<=5&&x>=minX-5&&x<=maxX+2;return sw||se};
+ const isBank=(x,y)=>{if(tileOpen(x,y)||isRiv(x,y))return false;const dx=minX-x,dy=y-maxY;return(dx==1&&y>=minY-2&&y<=maxY+6)||(dy==1&&x>=minX-6&&x<=maxX+2)||(dx==6&&y>=minY-1&&y<=maxY+6)||(dy==6&&x>=minX-6&&x<=maxX+1)};
+ const rivTiles=[];
  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
-  const r=rng(x*928371+y*1237+7);const[ix,iy]=iso(x,y);const X=ox+ix,Y=iy;
+  const[ix,iy]=iso(x,y);const X=ox+ix,Y=iy;
   const key=x+','+y,pk=pathMap[key],cob=!pk&&near.has(key);
-  const tmp=tileTex(pk||(cob?1:0),(x*7+y*13)%12,(x+y)%2);g.drawImage(tmp,X-TW/2,Y,TW,TH);
-  if(!pk){g.beginPath();g.moveTo(X,Y+0.25);g.lineTo(X+TW/2-0.5,Y+TH/2);g.lineTo(X,Y+TH-0.25);g.lineTo(X-TW/2+0.5,Y+TH/2);g.closePath();
-  if(cob){g.lineWidth=0.5;g.strokeStyle='rgba(90,78,62,0.35)';g.stroke()}}
-  else{ // 오토타일: 다른 종류와 맞닿은 변에만 테두리
-   const T=[X,Y],R=[X+TW/2,Y+TH/2],B=[X,Y+TH],L=[X-TW/2,Y+TH/2];const ed={path:'#7d7466',path_wood:'#5a3c22',path_gravel:'#9a9286',path_tatami:'#4f5a2a'}[pk];
-   const sides=[[[0,-1],L,T],[[1,0],T,R],[[0,1],R,B],[[-1,0],B,L]];g.lineWidth=1.1;g.strokeStyle=ed;
-   for(const[[dx,dy],a,b]of sides){if(pathMap[(x+dx)+','+(y+dy)]===pk)continue;g.beginPath();g.moveTo(...a);g.lineTo(...b);g.stroke();
-    g.save();g.globalAlpha=0.25;g.strokeStyle='#000';g.lineWidth=0.6;g.beginPath();g.moveTo(a[0],a[1]+0.8);g.lineTo(b[0],b[1]+0.8);g.stroke();g.restore()}}
+  const riv=isRiv(x,y),brg=riv&&brgSet.has(key),bnk=isBank(x,y)||brgBank.has(key);
+  const ty=pk||(brg?'path_wood':riv?'river':bnk?'bank':cob?1:0);
+  const tmp=tileTex(ty,(x*7+y*13)%12,(x+y)%2);g.drawImage(tmp,X-TW/2,Y,TW,TH);
+  if(riv)rivTiles.push([x,y,brg?1:0]);
+  if(pk||brgBank.has(key)){ // 오토타일: 돌길·데크길의 따뜻한 크림 하이라이트 & 인디고 그림자 단차
+   const tk=pk||'path';
+   const T=[X,Y],R=[X+TW/2,Y+TH/2],B=[X,Y+TH],L=[X-TW/2,Y+TH/2];
+   const ed={path:'#52465c',path_wood:'#3e2d40',path_gravel:'#685c6e',path_tatami:'#43522c'}[tk]||'#52465c';
+   const hi={path:'#fff4c8',path_wood:'#f7cf92',path_gravel:'#faecc0',path_tatami:'#dce298'}[tk]||'#fff4c8';
+   const sides=[[[0,-1],L,T,1],[[1,0],T,R,1],[[0,1],R,B,0],[[-1,0],B,L,0]];
+   for(const[[dx,dy],a,b,sun]of sides){if(pathMap[(x+dx)+','+(y+dy)]===tk)continue;
+    g.lineWidth=1.2;g.strokeStyle=ed;g.beginPath();g.moveTo(a[0],a[1]+0.7);g.lineTo(b[0],b[1]+0.7);g.stroke();
+    g.lineWidth=0.8;g.strokeStyle=sun?hi:ed;g.beginPath();g.moveTo(...a);g.lineTo(...b);g.stroke()}
+  }
  }
+ // 에메랄드/터콰이즈 강물 디테일: 호안 크림색 바위, 깊은 청록 물그림자, 수련 잎, 목조 다리 난간과 교각 그림자
+ for(const[x,y,brg]of rivTiles){
+  const[ix,iy]=iso(x,y),X=ox+ix,Y=iy,r=rng(x*3137+y*997+19);
+  const upL=!isRiv(x-1,y),upR=!isRiv(x,y-1),dnL=!isRiv(x,y+1),dnR=!isRiv(x+1,y);
+  // 위쪽 강변 깊은 청록-인디고 물그림자 (#165872)
+  if(upL||upR){
+   g.fillStyle='rgba(20,76,102,0.68)';g.beginPath();
+   g.moveTo(X,Y);g.lineTo(X+TW/2,Y+TH/2);g.lineTo(X,Y+TH*0.58);g.lineTo(X-TW/2,Y+TH/2);g.closePath();g.fill();
+  }
+  // 호안 바위 단차 (햇살 받은 크림-골드 상판 #fff2c4 / #edd092 + 인디고-슬레이트 그림자 측면 #463c56)
+  const drawBankStones=(ax,ay,bx,by,sh)=>{
+   for(let i=0;i<3;i++){const t0=(i+0.15)/3,t1=(i+0.88)/3,tm=(t0+t1)/2;
+    const sx=ax+(bx-ax)*tm,sy=ay+(by-ay)*tm,sw=3.2+(i%2)*0.9,shh=1.9;
+    // 수면 반사/잠긴 그림자
+    g.fillStyle='#144e68';g.fillRect(sx-sw,sy+0.8,sw*2,2.2);
+    // 바위 그늘진 아랫면 (인디고 슬레이트)
+    g.fillStyle=sh?'#3e364e':'#4e445e';g.beginPath();g.ellipse(sx,sy+0.2,sw,shh,0,0,6.283);g.fill();
+    // 바위 햇살 받은 윗면 (버터 크림-샌드)
+    g.fillStyle=i%2?'#fae5a8':'#fff3c6';g.beginPath();g.ellipse(sx-0.3,sy-0.7,sw*0.85,shh*0.72,0,0,6.283);g.fill();
+   }
+  };
+  if(upL&&!brg)drawBankStones(X-TW/2,Y+TH/2,X,Y,false);
+  if(upR&&!brg)drawBankStones(X,Y,X+TW/2,Y+TH/2,true);
+  if(dnL&&!brg)drawBankStones(X-TW/2,Y+TH/2,X,Y+TH,true);
+  if(dnR&&!brg)drawBankStones(X,Y+TH,X+TW/2,Y+TH/2,false);
+  if(brg){
+   // 레퍼런스 이미지의 목조 다리: 물에 비친 짙은 인디고 교각·그림자 + 따뜻한 허니-오크 널빤지 + 난간
+   g.fillStyle='rgba(26,38,68,0.52)';g.beginPath();g.moveTo(X-TW*0.45,Y+TH*0.55);g.lineTo(X,Y+TH*1.08);g.lineTo(X+TW*0.45,Y+TH*0.55);g.lineTo(X,Y+TH*0.18);g.closePath();g.fill();
+   // 교각 기둥 (#28233c)
+   if((x+y)%2==0){g.fillStyle='#28233c';g.fillRect(X-TW*0.32,Y+TH*0.48,2.2,5.5);g.fillRect(X+TW*0.24,Y+TH*0.48,2.2,5.5)}
+   // 다리 상판 가장자리 햇살 림 & 난간
+   g.strokeStyle='#ffefc0';g.lineWidth=1.1;g.beginPath();g.moveTo(X-TW*0.46,Y+TH*0.46);g.lineTo(X,Y+0.4);g.lineTo(X+TW*0.46,Y+TH*0.46);g.stroke();
+  }else{
+   // 수련 잎 클러스터 (#9ad658 / #def484) & 물결 하이라이트 (#aaf2ea / #eef9c8)
+   if(r()<0.42){
+    const nP=1+(r()*3|0);
+    for(let k=0;k<nP;k++){
+     const px=X+(r()-0.5)*TW*0.46,py=Y+TH*0.25+r()*TH*0.5,ps=1.4+r()*1.2;
+     g.fillStyle='rgba(18,74,94,0.48)';g.beginPath();g.ellipse(px+0.4,py+0.6,ps,ps*0.52,0,0,6.283);g.fill();
+     g.fillStyle=k%2?'#88c84e':'#a8de62';g.beginPath();g.ellipse(px,py,ps,ps*0.5,0,0.4,6.1);g.lineTo(px,py);g.fill();
+     g.fillStyle='#def688';g.fillRect(px-ps*0.5,py-0.3,ps*0.7,0.5);
+     if(k==0&&r()<0.35){g.fillStyle='#fff5c0';g.fillRect(px-0.4,py-0.9,1.1,0.9)}
+    }
+   }
+   if(r()<0.55){
+    const rx_=X+(r()-0.5)*TW*0.4,ry_=Y+TH*0.28+r()*TH*0.44;
+    g.fillStyle=r()<0.5?'rgba(170,246,238,0.65)':'rgba(240,250,200,0.65)';
+    g.fillRect(rx_-2,ry_,3.5+r()*2.5,0.7);
+   }
+  }
+ }
+ window._rivTiles=rivTiles;
+ // 잔디 음영 패치: 레퍼런스 톤의 깊은 인디고-포레스트 그늘과 따뜻한 햇살 풀빛
  {const r=rng(777);g.save();g.beginPath();g.moveTo(ox,0);g.lineTo(ox+N*TW/2,N*TH/2);g.lineTo(ox,N*TH);g.lineTo(ox-N*TW/2,N*TH/2);g.clip();
-  for(let i=0;i<70;i++){const[ix,iy]=iso(r()*N,r()*N);const R=30+r()*70;const dk=r()<0.5;const gr=g.createRadialGradient(ox+ix,iy,0,ox+ix,iy,R);gr.addColorStop(0,dk?'rgba(40,70,40,0.13)':'rgba(230,220,150,0.10)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.save();g.translate(ox+ix,iy);g.scale(1,0.5);g.translate(-ox-ix,-iy);g.fillRect(ox+ix-R,iy-R,R*2,R*2);g.restore()}g.restore()}
+  for(let i=0;i<55;i++){const tx=r()*N,ty=r()*N;if(isRiv(tx|0,ty|0))continue;const[ix,iy]=iso(tx,ty);const R=26+r()*55;const dk=r()<0.52;const gr=g.createRadialGradient(ox+ix,iy,0,ox+ix,iy,R);gr.addColorStop(0,dk?'rgba(32,48,58,0.16)':'rgba(190,214,96,0.11)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.save();g.translate(ox+ix,iy);g.scale(1,0.5);g.translate(-ox-ix,-iy);g.fillRect(ox+ix-R,iy-R,R*2,R*2);g.restore()}g.restore()}
  BUS.emit('groundCache',g,ox);
  groundDirty=false;
 }
@@ -202,13 +290,61 @@ function tileTex(cob,vr,par){const key=cob+'_'+vr+'_'+par;const ty=typeof cob=='
   for(let py=0;py<TH*2;py++)for(let px=0;px<TW*2;px++){
    const dx=Math.abs(px+0.5-TW)/(TW),dy=Math.abs(py+0.5-TH)/(TH);if(dx+dy>1)continue;
    let c;const n=r();
-   if(ty=='path_wood'){const pl=Math.floor((px-py*2+200)/9);const seam=(px-py*2+200)%9==0;const v=(pl*37+vr)%4*7;c=seam?[92,62,38]:[170+v-n*14,118+v*0.6-n*10,74-n*8];if(!seam&&n>0.97)c=[120,82,50]}
-   else if(ty=='path_gravel'){const v=n<0.3?-18:n>0.85?16:0;c=[200+v,196+v,186+v];if(n>0.96)c=[160,150,140]}
-   else if(ty=='path_tatami'){const bx=(px+py*2)%32<2||(px-py*2+256)%64<2;c=bx?[70,78,40]:[196+((px*3+py)%5)-n*8,198-n*8,132-n*6];if(!bx&&(px+py*2)%3==0)c=[c[0]-10,c[1]-10,c[2]-8]}
-   else if(cob){const sx=Math.floor((px+py*2)/7),sy=Math.floor((px-py*2+140)/7);const seam=((px+py*2)%7==0)||((px-py*2+140)%7==0);
-     const v=((sx*7+sy*13+x*3+y*5)%5)*6;c=seam?[150,140,124]:[196+v-n*10,186+v-n*10,166+v-n*8];}
-   else{const v=n<0.08?22:n<0.2?-12:0;const fl=n>0.995;c=fl?[250,238,226]:[120+v*0.7+par*3,150+v*0.8,94+v*0.5];
-     if(n>0.985&&!fl)c=[140,176,104];}
+   if(ty=='river'){
+    // 레퍼런스 이미지의 선명한 터콰이즈-시안 강물 (#1e8ea6 -> #29bad0 -> #48d6e4)
+    const g0=(py/(TH*2))*0.65+(px/(TW*2))*0.35;
+    const v=n<0.18?-10:n>0.84?14:0;
+    c=[Math.round(28+g0*26+v*0.5),Math.round(158+g0*44+v),Math.round(182+g0*36+v)];
+    if(n>0.965)c=[168,242,236];
+    else if(n<0.04)c=[22,116,142];
+   }
+   else if(ty=='bank'){
+    // 강변 햇살 받은 크림-샌드 바위턱 & 이끼 (#f7e4ad / #78a248 / #54485e)
+    const sx=Math.floor((px+py*2)/8),sy=Math.floor((px-py*2+140)/8);
+    const seam=((px+py*2)%8==0)||((px-py*2+140)%8==0);
+    const moss=((sx*5+sy*9+vr)%7)<2;
+    if(seam)c=[76,66,88];
+    else if(moss){const v=n<0.3?-12:10;c=[106+v,152+v,66+v*0.5]}
+    else{const v=((sx*7+sy*13+vr)%4)*6;c=[248-v-n*8,226-v-n*9,172-v-n*10]}
+   }
+   else if(ty=='path'){
+    // 돌길: 레퍼런스 이미지의 햇살 머금은 따뜻한 버터-크림/골드 샌드스톤 + 인디고-슬레이트 줄눈
+    const sx=Math.floor((px+py*2)/8),sy=Math.floor((px-py*2+140)/8);
+    const seam=((px+py*2)%8==0)||((px-py*2+140)%8==0);
+    const bev=!seam&&(((px+py*2)%8==1)||((px-py*2+140)%8==1));
+    const v=((sx*7+sy*13+x*3+y*5)%5)*5;
+    if(seam)c=[92,80,100];
+    else if(bev)c=[255,246,208];
+    else c=[250-v-n*8,230-v*1.1-n*9,176-v*1.3-n*10];
+   }
+   else if(ty=='path_wood'){
+    // 나무 데크길 & 다리: 따뜻한 허니-오크 원목 + 인디고-브라운 틈새
+    const pl=Math.floor((px-py*2+200)/9);const seam=(px-py*2+200)%9==0;const v=(pl*37+vr)%4*7;
+    c=seam?[68,50,64]:[222+v-n*12,166+v*0.7-n*10,102+v*0.4-n*8];if(!seam&&n>0.96)c=[246,206,142]
+   }
+   else if(ty=='path_gravel'){
+    // 자갈길: 따뜻한 골든 크림 모래와 자갈
+    const v=n<0.25?-16:n>0.82?14:0;
+    c=[244+v*0.7,224+v*0.8,176+v];if(n>0.95)c=[112,98,114];else if(n<0.06)c=[255,246,212]
+   }
+   else if(ty=='path_tatami'){const bx=(px+py*2)%32<2||(px-py*2+256)%64<2;c=bx?[64,74,38]:[214+((px*3+py)%5)-n*8,204-n*8,136-n*6];if(!bx&&(px+py*2)%3==0)c=[c[0]-10,c[1]-10,c[2]-8]}
+   else if(cob){
+    // 시설 주변 마당: 회색 콘크리트 대신 따뜻한 크림 디딤돌과 생생한 이끼 잔디의 조화
+    const sx=Math.floor((px+py*2)/9),sy=Math.floor((px-py*2+140)/9);
+    const isStone=((sx*11+sy*7+vr)%5)<2&&((px+py*2)%9>1)&&((px-py*2+140)%9>1);
+    if(isStone){const v=((sx+sy)%3)*6;c=[244-v-n*8,224-v-n*8,174-v-n*8]}
+    else{const v=n<0.15?-12:n>0.85?16:0;c=[104+v*0.7,150+v*0.85,64+v*0.5]}
+   }
+   else{
+    // 잔디: 레퍼런스 이미지의 깊고 풍부한 모스 그린 & 햇살 받은 올리브-메도우 그린 + 단풍잎 포인트
+    const v=n<0.12?24:n<0.28?-14:0;
+    const leaf=n>0.996,fl=n>0.992&&!leaf;
+    if(leaf)c=par?[242,104,48]:[247,162,58];
+    else if(fl)c=[255,242,190];
+    else if(n>0.97)c=[154,192,82];
+    else if(n<0.04)c=[66,104,58];
+    else c=[100+v*0.75+par*3,146+v*0.85,62+v*0.45];
+   }
    const i=(py*TW*2+px)*4;id.data[i]=c[0];id.data[i+1]=c[1];id.data[i+2]=c[2];id.data[i+3]=255;}
   const tmp=mk(TW*2,TH*2);tmp.getContext('2d').putImageData(id,0,0);return TEX[key]=tmp}
 // ===== 오브젝트 =====
@@ -252,9 +388,9 @@ function nextStarInfo(){const r=stars();if(r>=5)return null;const[q,sv,p]=STAR_R
 function beautyAt(x,y){let b=0;for(const o of S.objs){const d=DEF[o.k];if(!d.beauty)continue;const dd=Math.hypot(o.x-x,o.y-y);if(dd<4)b+=d.beauty*bMul(d)*(1-dd/4)}return b}
 // ===== 시간/조명 =====
 const hour=()=>(S.min/60)%24,dayN=()=>Math.floor(S.min/1440)+1,season=()=>Math.floor((dayN()-1)/7)%4;
-const KEYS=[ // h, 하늘, 주변광(곱), 밝기, 따뜻함 (밤에도 답답하지 않고 은은하고 따뜻하게 밝은 야경 톤)
- [0,'#2b3968',[176,182,224],0.0],[5,'#4a5286',[188,186,226],0.16],[6.5,'#f6cfa8',[255,232,212],0.62],[8.5,'#bfe3f0',[255,248,236],0.95],
- [12,'#cfeefa',[255,255,252],1],[16,'#f6e2b8',[255,240,218],0.9],[18,'#f4b07e',[255,222,192],0.62],[19.3,'#7265a0',[198,186,224],0.28],[21,'#303e70',[180,186,226],0.08],[24,'#2b3968',[176,182,224],0]];
+const KEYS=[ // h, 하늘, 주변광(곱), 밝기 (뿌연 느낌 없이 맑고 선명한 채도 + 인디고 야경)
+ [0,'#242d58',[172,182,232],0.0],[5,'#3e467c',[190,192,234],0.18],[6.5,'#f4ba8e',[255,240,224],0.68],[8.2,'#48bed4',[255,254,250],0.96],
+ [12,'#38b8ce',[255,255,255],1],[16,'#58c4d4',[255,250,240],0.94],[18,'#f29b68',[255,228,204],0.65],[19.3,'#5e508e',[196,190,232],0.28],[21,'#283364',[176,184,232],0.08],[24,'#242d58',[172,182,232],0]];
 function lerp(a,b,t){return a+(b-a)*t}
 function hex(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]}
 function light(){const h=hour();let i=0;while(KEYS[i+1][0]<=h)i++;const a=KEYS[i],b=KEYS[i+1],t=(h-a[0])/(b[0]-a[0]);
@@ -391,7 +527,7 @@ function emit(dt){if(parts.length>(window.GFX_LOW?140:600))return;if(window.GFX_
   if(d.fire&&Math.random()<dt*4.5){parts.push({k:'spark',x:cx_+(Math.random()-0.5)*0.28,y:cy_+(Math.random()-0.5)*0.28,h:12+Math.random()*6,vh:10+Math.random()*16,l:0.7+Math.random()*0.5,L:1.2})}}
  if(season()==3&&Math.random()<dt*6){const r=rng(Date.now()|0);parts.push({k:'snow',x:Math.random()*N,y:Math.random()*N,h:60,l:8,L:8,ph:Math.random()*6})}
 }
-function updParts(dt){for(const o of S.objs)if(o.sway)o.sway=Math.max(0,o.sway-dt*0.35);for(const p of parts){p.l-=dt;if(p.k=='spark'){p.h+=p.vh*dt;p.vh*=0.96;continue}if(p.k=='dust'){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=0.92;p.vy*=0.92;continue}if(p.k=='steam'){p.h+=dt*9;p.x+=(p.vx+(window.WIND||0)*0.12)*dt;p.y-=(window.WIND||0)*0.06*dt;p.s+=dt*2.5}else{if(p.h>0){p.h-=dt*(p.k=='snow'?6:8);p.ph+=dt*2;p.x+=Math.sin(p.ph)*dt*0.25+dt*0.12}else{p.h=0;p.l=Math.min(p.l,1.5)}}}
+function updParts(dt){for(const o of S.objs)if(o.sway)o.sway=Math.max(0,o.sway-dt*0.35);for(const p of parts){p.l-=dt;if(p.k=='spark'){p.h+=p.vh*dt;p.vh*=0.96;continue}if(p.k=='dust'){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=0.92;p.vy*=0.92;continue}if(p.k=='steam'){p.h+=dt*9;p.x+=(p.vx+(window.WIND||0)*0.12)*dt;p.y-=(window.WIND||0)*0.06*dt;p.s+=dt*1.1}else{if(p.h>0){p.h-=dt*(p.k=='snow'?6:8);p.ph+=dt*2;p.x+=Math.sin(p.ph)*dt*0.25+dt*0.12}else{p.h=0;p.l=Math.min(p.l,1.5)}}}
  parts=parts.filter(p=>p.l>0);if(parts.length>900)parts.splice(0,parts.length-900);floats.forEach(f=>f.l-=dt);floats=floats.filter(f=>f.l>0);bubbles.forEach(b=>b.l-=dt);bubbles=bubbles.filter(b=>b.l>0&&!b.g.dead&&!b.g.hide);
  for(const k in anims){anims[k].t+=dt;if(anims[k].t>1.6)delete anims[k]}}
 // ===== 렌더 =====
@@ -401,15 +537,15 @@ function drawSprite(key,o,X,Y,W,lt,sv,alpha){ // X,Y: 바닥 중앙(월드), W: 
  const v=VAR[key];if(!v)return;const h=W*v.base.height/v.base.width;if(offscreen(X,Y,W,h))return h;
  if(o&&(o===window.HOVER||o===INFO_O)&&!ghost&&!moving&&key===skey(o)){const wl=whiteSil(key.replace('~m',''),v);const q=1.1/cam.z+0.25;if(v.m){cx.save();cx.translate(X*2,0);cx.scale(-1,1)}cx.globalAlpha=o===INFO_O?0.95:0.7;for(const[dx,dy]of[[-q,0],[q,0],[0,-q],[0,q]])cx.drawImage(wl,X-W/2+dx,Y-h+dy,W,h);if(v.m)cx.restore()}
  if(v.m){cx.save();cx.translate(X*2,0);cx.scale(-1,1)}cx.globalAlpha=alpha??1;cx.drawImage(v.base,X-W/2,Y-h,W,h);
- if(lt.sun>0.15){cx.globalAlpha=(alpha??1)*lt.sun*0.55;cx.drawImage(sv.left?v.rimL:v.rimR,X-W/2,Y-h,W,h)}
+ if(lt.sun>0.15){cx.globalAlpha=(alpha??1)*lt.sun*0.68;cx.drawImage(sv.left?v.rimL:v.rimR,X-W/2,Y-h,W,h)}
  if(v.m)cx.restore();cx.globalAlpha=1;return h}
 const WSIL={};function whiteSil(key,v){if(WSIL[key])return WSIL[key];const c=document.createElement('canvas');c.width=v.base.width;c.height=v.base.height;const g=c.getContext('2d');g.drawImage(v.base,0,0);g.globalCompositeOperation='source-in';g.fillStyle='#fff6d8';g.fillRect(0,0,c.width,c.height);return WSIL[key]=c}
 function drawShadow(key,X,Y,W,lt,sv,str){const v=VAR[key];if(!v||lt.sun<0.1)return;const h=W*v.base.height/v.base.width;if(offscreen(X,Y+h,W*2,h*2))return;
- cx.save();cx.globalAlpha=0.28*lt.sun*(str||1);cx.translate(X,Y);cx.transform(1,0,-sv.kx,sv.ky,0,0);if(v.m)cx.scale(-1,1);cx.drawImage(v.sil,-W/2,-h,W,h);cx.restore()}
+ cx.save();cx.globalAlpha=(0.42*lt.sun+0.12*(1-lt.sun))*(str||1);cx.translate(X,Y);cx.transform(1,0,-sv.kx,sv.ky,0,0);if(v.m)cx.scale(-1,1);cx.drawImage(v.sil,-W/2,-h,W,h);cx.restore()}
 // ===== 블롭 스프라이트 캐시 (프레임당 그라디언트 생성 제거) =====
 let BLOB={},_bN=0;function blob(rgb){if(BLOB[rgb])return BLOB[rgb];if(++_bN>300){BLOB={};_bN=0}const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');const gr=g.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,`rgba(${rgb},1)`);gr.addColorStop(1,`rgba(${rgb},0)`);g.fillStyle=gr;g.fillRect(0,0,64,64);return BLOB[rgb]=c}
 let _gc={},_gcN=0;function parseC(c){let v=_gc[c];if(v)return v;if(++_gcN>3000){_gc={};_gcN=0}const m=c.match(/rgba?\(([^)]+)\)/);const p=m[1].split(',').map(x=>x.trim());v=_gc[c]=[p.slice(0,3).join(','),p[3]!=null?+p[3]:1];return v}
-function ao(X,Y,rx,ry,a){const pa=cx.globalAlpha;cx.globalAlpha=pa*a;cx.drawImage(blob('40,30,20'),X-rx,Y-ry,rx*2,ry*2);cx.globalAlpha=pa;return;const g=cx.createRadialGradient(X,Y,0,X,Y,rx);g.addColorStop(0,`rgba(40,30,20,${a})`);g.addColorStop(1,'rgba(40,30,20,0)');cx.save();cx.translate(X,Y);cx.scale(1,ry/rx);cx.translate(-X,-Y);cx.fillStyle=g;cx.fillRect(X-rx,Y-rx,rx*2,rx*2);cx.restore()}
+function ao(X,Y,rx,ry,a){const pa=cx.globalAlpha;cx.globalAlpha=pa*a*1.25;cx.drawImage(blob('28,24,52'),X-rx,Y-ry,rx*2,ry*2);cx.globalAlpha=pa;return;const g=cx.createRadialGradient(X,Y,0,X,Y,rx);g.addColorStop(0,`rgba(40,30,20,${a})`);g.addColorStop(1,'rgba(40,30,20,0)');cx.save();cx.translate(X,Y);cx.scale(1,ry/rx);cx.translate(-X,-Y);cx.fillStyle=g;cx.fillRect(X-rx,Y-rx,rx*2,rx*2);cx.restore()}
 function objGeom(o){if(o.k=='gate'){const w=o.dir=='x'?3:1,h=o.dir=='x'?1:3;const[cX,cY]=iso(o.x+w/2,o.y+h/2);const sY=iso(o.x+w,o.y+h)[1];const W=(w+h)*TW/2*1.05;const v=VAR[skey(o)];const H=v?W*v.base.height/v.base.width:W;return{X:cX,Y:sY+1,cY,W,H}}
  const d=DEF[o.k],[fw,fh]=fpOf(o.k,o.rot);const[cX,cY]=iso(o.x+fw/2,o.y+fh/2);const sY=iso(o.x+fw,o.y+fh)[1];const W=(fw+fh)*TW/2*(d.sc||1);const v=VAR[skey(o)];const H=v?W*v.base.height/v.base.width:W;return{X:cX,Y:sY+(fw==1&&fh==1?-1:0.5),cY,W,H}}
 function render(t){
@@ -465,7 +601,7 @@ function render(t){
  // 파티클
  let _fs='';const FS=c=>{if(c!==_fs){cx.fillStyle=c;_fs=c}};const _sb=blob('255,255,255');const _vb=cx.getTransform(),_iv=_vb.inverse(),_m=60,_q=[_iv.transformPoint({x:-_m,y:-_m}),_iv.transformPoint({x:cv.width+_m,y:cv.height+_m})];
  for(const p of parts){const[X,Y]=iso(p.x,p.y);if(X<_q[0].x||X>_q[1].x||Y-p.h<_q[0].y-40||Y-p.h>_q[1].y)continue;const a=Math.min(1,p.l/p.L*2)*(p.k=='steam'?1:1);
-  if(p.k=='steam'){cx.globalAlpha=(0.26+0.06*lt.sun)*Math.min(1,p.l)*(1-0.35*lt.night);const r=p.s;cx.drawImage(_sb,X-r,Y-p.h-r,r*2,r*2)}
+  if(p.k=='steam'){cx.globalAlpha=(0.13+0.04*lt.sun)*Math.min(1,p.l)*(1-0.35*lt.night);const r=p.s*0.85;cx.drawImage(_sb,X-r,Y-p.h-r,r*2,r*2)}
   else if(p.k=='spark'){cx.globalAlpha=Math.min(1,p.l);const tw=(Math.sin(t/60+p.x*9)+1)/2;FS(tw>0.5?'#fff6c0':'#ffd65a');cx.fillRect(X-1,Y-p.h-1,2,2);if(tw>0.6){cx.fillRect(X-3,Y-p.h-0.4,6,0.8);cx.fillRect(X-0.4,Y-p.h-3,0.8,6)}}
   else if(p.k=='dust'){cx.globalAlpha=0.5*p.l;FS('#e8dcc0');cx.beginPath();cx.arc(X,Y,2+(0.9-p.l)*4,0,6.283);cx.fill()}
   else{cx.globalAlpha=Math.min(1,p.l);FS(p.k=='petal'?'#ffc6d9':p.k=='leaf'?(p.ph%2<1?'#e8643a':'#f0a03a'):'#ffffff');const w=p.k=='snow'?1:Math.abs(Math.sin(p.ph))*1.5+0.6;cx.fillRect(X,Y-p.h,w,1)}}
@@ -558,11 +694,23 @@ function drawBackdrop(lt){if(!BG.complete||!BG.naturalWidth)return;const iw=BG.n
  const se=SEA_T[season()];if(se){cx.fillStyle=se;cx.fillRect(0,0,VW,VH)}
  cx.globalCompositeOperation='multiply';cx.fillStyle=`rgba(${lt.sky},0.32)`;cx.fillRect(0,0,VW,VH);cx.globalCompositeOperation='source-over';
  if(lt.night>0.05){cx.fillStyle=`rgba(22,32,62,${Math.min(0.22,lt.night*0.22)})`;cx.fillRect(0,0,VW,VH)}
- const mg=cx.createLinearGradient(0,VH*0.15,0,VH*0.6);mg.addColorStop(0,'rgba(240,244,246,0)');mg.addColorStop(0.5,`rgba(235,240,244,${0.10+0.08*Math.sin(performance.now()/9000)})`);mg.addColorStop(1,'rgba(240,244,246,0)');cx.fillStyle=mg;cx.fillRect(0,0,VW,VH)}
+}
 function drawForest(lt){if(!FOREST){const x0=-60*TW/2,y0=-160,W=(N+12)*TW,H=(N+8)*TH/2+200;const c=mk(W*2,H*2),g=c.getContext('2d');g.scale(2,2);g.translate(-x0,-y0);const _cx=cx;cx=g;drawForest_();cx=_cx;FOREST={c,x0,y0,W,H}}cx.drawImage(FOREST.c,FOREST.x0,FOREST.y0,FOREST.W,FOREST.H)}
-function drawForest_(){const r=rng(42);for(let i=0;i<160;i++){const side=i%2;const k=r()*N;const x=side?-1.5-r()*3:k,y=side?k:-1.5-r()*3;const[X,Y]=iso(x,y);
-  cx.fillStyle=`rgb(${60+r()*20|0},${104+r()*25|0},${70+r()*15|0})`;const h=18+r()*18;cx.beginPath();cx.moveTo(X,Y-h);cx.lineTo(X+9,Y);cx.lineTo(X-9,Y);cx.fill();
-  cx.fillStyle='rgba(255,255,255,0.08)';cx.beginPath();cx.moveTo(X,Y-h);cx.lineTo(X-9,Y);cx.lineTo(X-3,Y);cx.fill()}}
+function drawForest_(){const r=rng(42);for(let i=0;i<180;i++){const side=i%2;const k=r()*N;const x=side?-1.5-r()*3.5:k,y=side?k:-1.5-r()*3.5;const[X,Y]=iso(x,y);const h=18+r()*18;const aut=r()<0.42;
+  // 깊은 인디고-플럼 나무 그림자 및 줄기 (#28243c)
+  cx.fillStyle='rgba(34,30,56,0.55)';cx.beginPath();cx.ellipse(X+2,Y+1,8,3.8,0,0,6.283);cx.fill();
+  cx.fillStyle='#2d2740';cx.fillRect(X-1.5,Y-5,3,5);
+  if(aut){
+   // 레퍼런스 이미지의 선명한 주홍·산호·호박색 단풍나무 군락
+   cx.fillStyle='#8c242b';cx.beginPath();cx.arc(X+1.5,Y-h*0.48,7.5,0,6.283);cx.fill();
+   cx.fillStyle=r()<0.5?'#e85228':'#d63828';cx.beginPath();cx.arc(X-1,Y-h*0.58,7,0,6.283);cx.fill();
+   cx.fillStyle='#f79d38';cx.beginPath();cx.arc(X-2.5,Y-h*0.66,4.5,0,6.283);cx.fill();
+  }else{
+   // 깊은 청록 그림자와 따뜻한 올리브 하이라이트의 삼나무/소나무
+   cx.fillStyle='#2b4a3e';cx.beginPath();cx.moveTo(X,Y-h);cx.lineTo(X+9.5,Y);cx.lineTo(X-9.5,Y);cx.fill();
+   cx.fillStyle=`rgb(${68+r()*24|0},${122+r()*28|0},${56+r()*16|0})`;cx.beginPath();cx.moveTo(X,Y-h);cx.lineTo(X+2,Y);cx.lineTo(X-9.5,Y);cx.fill();
+   cx.fillStyle='rgba(166,204,84,0.55)';cx.beginPath();cx.moveTo(X,Y-h);cx.lineTo(X-3,Y-h*0.2);cx.lineTo(X-8.5,Y-h*0.1);cx.fill();
+  }}}
 const WGEO={milky:{ins:0.7,lift:12}};
 function wgeo(o){const d=DEF[o.k],f=d.fp,w=WGEO[o.k];const sk0=skey(o),e0=(window.WATER||{})[sk0.replace('~m','')],e=e0&&sk0.includes('~m')?{...e0,cx:1-e0.cx}:e0;
  if(e){const G=objGeom(o);const cX=G.X+(e.cx-0.5)*G.W,cY=G.Y-G.H+e.cy*G.H;const dia=o.k=='milky',s=dia?1.5:1;return{d,f,cX,cY,rx:e.rx*G.W*s,ry:e.ry*G.H*s,dia}}
@@ -586,16 +734,31 @@ function drawMilky(W,t,lt){const{cX,cY,rx,ry}=W;const sk=lt.sky,n=lt.night,su=lt
  cx.strokeStyle='rgba(255,255,255,0.35)';cx.lineWidth=0.7;cx.beginPath();cx.moveTo(cX-rx+3,cY+1);cx.lineTo(cX,cY-ry+2.2);cx.lineTo(cX+rx-3,cY+1);cx.stroke();
 }
 function drawWater_(o,G,t,lt){const W=wgeo(o);const{d,f,cX,cY,rx,ry}=W;
- cx.save();wpath(W);cx.clip();if(W.dia)drawMilky(W,t,lt);
- // 반짝이는 하이라이트 띠
- cx.globalCompositeOperation='screen';for(let i=0;i<4;i++){const y=cY-ry+((t/90+i*ry*0.6)%(ry*2.4));cx.fillStyle=`rgba(255,255,255,${0.10+0.08*lt.sun})`;cx.fillRect(cX-rx,y,rx*2,0.6)}
- // 하늘 반사
- const sk=lt.sky;cx.fillStyle=`rgba(${sk},${0.18})`;cx.fillRect(cX-rx,cY-ry,rx*2,ry);
- // 스펙큘러
- const r=rng(Math.floor(t/220)+o.x*31);for(let i=0;i<10;i++){const a=r()*6.28,rr=Math.sqrt(r());cx.fillStyle=`rgba(255,255,240,${0.5+0.5*lt.sun})`;cx.fillRect(cX+Math.cos(a)*rx*rr,cY+Math.sin(a)*ry*rr,1,0.6)}
- if(lt.night>0.4){cx.fillStyle=`rgba(255,200,120,${0.12*lt.night})`;cx.fillRect(cX-rx,cY-ry,rx*2,ry*2)}
+ cx.save();wpath(W);cx.clip();
+ if(W.dia){drawMilky(W,t,lt)}
+ else if(o.k=='wine'){
+  const wg=cx.createLinearGradient(cX,cY-ry,cX,cY+ry);
+  wg.addColorStop(0,'rgba(88,16,42,0.78)');wg.addColorStop(0.55,'rgba(148,28,64,0.72)');wg.addColorStop(1,'rgba(186,48,86,0.70)');
+  cx.fillStyle=wg;cx.fillRect(cX-rx,cY-ry,rx*2,ry*2);
+ }else{
+  // 레퍼런스 이미지의 투명하고 선명한 터콰이즈-시안 온천수 (#187a94 -> #28b9cc -> #4edae6)
+  const wg=cx.createLinearGradient(cX,cY-ry,cX,cY+ry);
+  wg.addColorStop(0,'rgba(22,116,142,0.76)');
+  wg.addColorStop(0.5,'rgba(40,185,204,0.72)');
+  wg.addColorStop(1,'rgba(76,218,230,0.70)');
+  cx.fillStyle=wg;cx.fillRect(cX-rx,cY-ry,rx*2,ry*2);
+  // 위쪽 바위 턱 아래 깊은 인디고-틸 수중 그림자 (#14485e)
+  const sg=cx.createLinearGradient(cX,cY-ry,cX,cY-ry*0.2);
+  sg.addColorStop(0,'rgba(18,64,86,0.58)');sg.addColorStop(1,'rgba(18,64,86,0)');
+  cx.fillStyle=sg;cx.fillRect(cX-rx,cY-ry,rx*2,ry);
+ }
+ // 선명한 크림-민트 물결 하이라이트 띠
+ for(let i=0;i<4;i++){const y=cY-ry+((t/90+i*ry*0.6)%(ry*2.4));cx.fillStyle=o.k=='wine'?`rgba(255,190,210,${0.18+0.10*lt.sun})`:`rgba(190,252,244,${0.22+0.12*lt.sun})`;cx.fillRect(cX-rx*0.8,y,rx*1.6,0.65)}
+ // 스펙큘러 반짝임
+ const r=rng(Math.floor(t/220)+o.x*31);for(let i=0;i<10;i++){const a=r()*6.28,rr=Math.sqrt(r());cx.fillStyle=`rgba(245,255,215,${0.6+0.4*lt.sun})`;cx.fillRect(cX+Math.cos(a)*rx*rr,cY+Math.sin(a)*ry*rr,1.2,0.7)}
+ if(lt.night>0.4){cx.globalCompositeOperation='screen';cx.fillStyle=`rgba(255,200,120,${0.12*lt.night})`;cx.fillRect(cX-rx,cY-ry,rx*2,ry*2)}
  cx.globalCompositeOperation='source-over';cx.restore()}
-const SUNT={};function sunTex(left,sun,ar){const k=left+'|'+sun+'|'+ar.toFixed(2);if(SUNT.k===k)return SUNT.c;const H=180,W=Math.round(H*ar),c=SUNT.c||document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');const gr=g.createRadialGradient(left?W*0.1:W*0.9,-H*0.2,0,left?W*0.1:W*0.9,-H*0.2,H*1.3);gr.addColorStop(0,`rgba(255,236,190,${0.32*sun})`);gr.addColorStop(1,'rgba(255,236,190,0)');g.fillStyle=gr;g.fillRect(0,0,W,H);SUNT.k=k;SUNT.c=c;return c}
+const SUNT={};function sunTex(left,sun,ar){const k=left+'|'+sun+'|'+ar.toFixed(2);if(SUNT.k===k)return SUNT.c;const H=180,W=Math.round(H*ar),c=SUNT.c||document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');const gr=g.createRadialGradient(left?W*0.05:W*0.95,-H*0.15,0,left?W*0.05:W*0.95,-H*0.15,H*0.55);gr.addColorStop(0,`rgba(255,240,195,${0.08*sun})`);gr.addColorStop(1,'rgba(255,240,195,0)');g.fillStyle=gr;g.fillRect(0,0,W,H);SUNT.k=k;SUNT.c=c;return c}
 const WC={};function drawWater(o,G,t,lt){const W=wgeo(o);const{d,f,cX,cY,rx,ry}=W;
  if(window.GFX_LOW||window.__nowc){cx.save();drawWater_(o,G,t,lt);wpath(W);cx.clip();BUS.emit('water',o,cX,cY,rx,ry,t,lt);cx.restore();return}
  const m=cx.getTransform(),sc=m.a;const per=ry*2.4*90,FR=32,fi=Math.floor((t%per)/per*FR);const sk_=skey(o);const lk=sk_+'|'+sc.toFixed(2)+'|'+Math.round(lt.sun*12)+'|'+Math.round(lt.night*12)+'|'+lt.sky.map(v=>v>>3).join(',');
@@ -619,9 +782,7 @@ function drawPlots(t,lt){const P=N/PS;window._signs=[];
   let fog=open?0:1;if(an)fog=1-easeOut(Math.min(1,an.t));if(fog<=0)continue;
   const x0=px*PS,y0=py*PS;const c=[iso(x0,y0),iso(x0+PS,y0),iso(x0+PS,y0+PS),iso(x0,y0+PS)];
   cx.beginPath();cx.moveTo(...c[0]);c.slice(1).forEach(p=>cx.lineTo(...p));cx.closePath();
-  cx.save();cx.clip();cx.fillStyle=`rgba(200,214,206,${0.2*fog})`;cx.fill();cx.fillStyle=`rgba(40,60,55,${0.22*fog})`;cx.fill();
-  // 안개 덩어리
-  const r=rng(px*7+py*13+3);for(let i=0;i<14;i++){const fx=x0+r()*PS,fy=y0+r()*PS;const[X,Y]=iso(fx,fy);const s=10+r()*10;if(window.GFX_LOW&&i%2)continue;const pa=cx.globalAlpha;cx.globalAlpha=pa*0.22*fog;cx.drawImage(blob('255,255,255'),X+Math.sin(t/4000+i)*6-s,Y-s,s*2,s*2);cx.globalAlpha=pa}cx.restore();
+  cx.save();cx.clip();cx.fillStyle=`rgba(28,26,52,${0.12*fog})`;cx.fill();cx.restore();
   if(!open&&plotAdj(px,py)){ // 로프 울타리
    const T=[[x0,y0],[x0+PS,y0],[x0+PS,y0+PS],[x0,y0+PS]];const gi=gateInfo();const gm=gi?[gi.m[0]+0.5+gi.o[0]*0.5,gi.m[1]+0.5+gi.o[1]*0.5]:null;const NS=8;
    cx.strokeStyle='#c9a46a';cx.lineWidth=0.7;for(let e=0;e<4;e++){const A=T[e],B=T[(e+1)%4];const P=k=>[lerp(A[0],B[0],k/NS),lerp(A[1],B[1],k/NS)];const skip=k=>{if(!gm)return false;const p=P(k+0.5);return Math.hypot(p[0]-gm[0],p[1]-gm[1])<1.7};
@@ -806,7 +967,7 @@ function onTap(sx,sy){const[fx,fy]=toTile(sx,sy);const x=Math.floor(fx),y=Math.f
   S.yen-=d.cost;S.fin.exp+=d.cost;S.objs.push({k:ghost,x,y,lv:1,rot:DEF[ghost].isPath?0:ROT,price:d.price||0,uses:0,earn:0});anims['o'+(S.objs.length-1)]={t:0};OCC=occ();groundDirty=true;
   const[fw,fh]=fpOf(ghost,ROT);for(let i=0;i<10;i++)parts.push({k:'steam',x:x+fw/2+(Math.random()-0.5)*fw,y:y+fh/2+(Math.random()-0.5)*fh,h:0,vx:0,l:1,L:1,s:2});if(ghost=='path'){}else if(!ev.shift){ghost=null;buildCards()}save();return}
  const o=pickObj(sx,sy);if(o&&!DEF[o.k].isPath){if(mode=='del'){remove(o);return}clearTimeout(infoT);infoT=setTimeout(()=>{if(!moving)showInfo(o)},230)}else hideInfo()}
-function unlock(s){const k=s.px+','+s.py;if(S.yen<s.price)return toast(`구역 확장에 ¥${fmt(s.price)} 필요해요`);S.yen-=s.price;S.fin.exp+=s.price;S.plots[k]=1;BUS.emit('unlock',k);anims['p'+k]={t:0};toast('🎉 새 구역이 열렸어요!');
+function unlock(s){const k=s.px+','+s.py;if(S.yen<s.price)return toast(`구역 확장에 ¥${fmt(s.price)} 필요해요`);S.yen-=s.price;S.fin.exp+=s.price;S.plots[k]=1;groundDirty=true;BUS.emit('unlock',k);anims['p'+k]={t:0};toast('🎉 새 구역이 열렸어요!');
  for(let i=0;i<40;i++)parts.push({k:'petal',x:s.px*PS+Math.random()*PS,y:s.py*PS+Math.random()*PS,h:20+Math.random()*30,l:3,L:3,ph:Math.random()*6});save()}
 const ev={shift:false};
 function initInput(){
