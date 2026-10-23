@@ -43,11 +43,8 @@ const AMB=(()=>{
  function drawPond(o,t,lt,ghostA){const d=pondData(o);const[cX,cY]=iso(o.x+1.5,o.y+1.5);const rx=3*TW*0.4,ry=rx/2;
   cx.save();cx.globalAlpha=ghostA||1;if(o.rot&1){cx.translate(cX*2,0);cx.scale(-1,1)}
   cx.fillStyle='rgba(30,40,30,0.25)';cx.beginPath();cx.ellipse(cX,cY+1.5,rx+3,ry+2.5,0,0,6.283);cx.fill();
-  // 캐시된 물 프레임
-  const sc=cx.getTransform().a,FR=24,per=4800,fi=Math.floor((t%per)/per*FR);const lk=sc.toFixed(2)+'|'+Math.round(lt.sun*12)+'|'+Math.round(lt.night*12)+'|'+lt.sky.map(v=>v>>3).join(',');
-  let C=PWC.c;if(!C||C.lk!==lk){C=PWC.c={lk,fr:[]}}let im=C.fr[fi];
-  if(!im){im=document.createElement('canvas');im.width=Math.ceil((rx*2+2)*sc);im.height=Math.ceil((ry*2+2)*sc);const g=im.getContext('2d');g.setTransform(sc,0,0,sc,(rx+1)*sc,(ry+1)*sc);pondWater(g,rx,ry,fi/FR*6.283,lt);C.fr[fi]=im}
-  cx.drawImage(im,cX-rx-1,cY-ry-1,rx*2+2,ry*2+2);
+  // 연못 수면 직접 렌더 (줌·조명 변화 시 오프스크린 캔버스 대량 생성 누수 제거)
+  cx.save();cx.translate(cX,cY);pondWater(cx,rx,ry,(t%4800)/4800*6.283,lt);cx.restore();
   cx.save();cx.beginPath();cx.ellipse(cX,cY,rx-1,ry-0.5,0,0,6.283);cx.clip();
   // 잉어 + 그림자
   for(const k of d.koi){const a=t/1000*k.sp+k.ph;const px=cX+Math.cos(a)*rx*k.r*1.3,py=cY+Math.sin(a)*ry*k.r*1.3;const hd=a+(k.sp>0?1.571:-1.571);
@@ -92,7 +89,7 @@ const AMB=(()=>{
  // ---- 생물 ----
  const flies=[],butts=[],birds=[],fx=[];
  function updCreatures(dt,t,lt){
-  const open=Object.keys(S.plots).map(k=>k.split(',').map(Number));const rp=()=>{const p=open[(R()*open.length)|0];return[p[0]*PS+R()*PS,p[1]*PS+R()*PS]};
+  const open=Object.keys(S.plots).map(k=>k.split(',').map(Number));if(!open.length)return;const rp=()=>{const p=open[(R()*open.length)|0];return[p[0]*PS+R()*PS,p[1]*PS+R()*PS]};
   const want=Math.round(Math.max(0,lt.night-0.5)*2*(window.GFX_LOW?14:36));while(flies.length<want){const[x,y]=rp();flies.push({x,y,h:3+R()*12,vx:0,vy:0,p:R()*6,l:0})}if(flies.length>want&&R()<dt*3)flies.pop();
   for(const f of flies){f.vx+=(R()-0.5)*dt*1.2;f.vy+=(R()-0.5)*dt*1.2;f.vx*=0.97;f.vy*=0.97;f.x+=f.vx*dt;f.y+=f.vy*dt;f.h=Math.max(2,Math.min(18,f.h+(R()-0.5)*dt*10));f.l+=dt}
   const sea=season();const bw=lt.sun>0.35&&sea!=3?Math.min(7,2+S.objs.filter(o=>DEF[o.k].tree||DEF[o.k].pond).length):0;

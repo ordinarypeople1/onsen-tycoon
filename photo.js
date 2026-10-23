@@ -14,7 +14,7 @@ const PHOTO=(()=>{
  const BAYER=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
  function pixelize(img,w,h,opt){const c=mk(w,h),g=c.getContext('2d');const ar=w/h,ia=img.width/img.height;let sx=0,sy=0,sw=img.width,sh=img.height;if(ia>ar){sw=img.height*ar;sx=(img.width-sw)/2}else{sh=img.width/ar;sy=(img.height-sh)/2}
   // 2단계 축소(박스 근사)로 노이즈 억제
-  const m2=mk(w*4,h*4),g2=m2.getContext('2d');g2.imageSmoothingQuality='high';g2.drawImage(img,sx,sy,sw,sh,0,0,w*4,h*4);g.imageSmoothingQuality='high';g.drawImage(m2,0,0,w,h);
+  const m2=mk(w*4,h*4),g2=m2.getContext('2d');g2.imageSmoothingQuality='high';g2.drawImage(img,sx,sy,sw,sh,0,0,w*4,h*4);g.imageSmoothingQuality='high';g.drawImage(m2,0,0,w,h);m2.width=m2.height=0;
   const id=g.getImageData(0,0,w,h),p=id.data;
   // 대비/채도 살짝 보정
   for(let i=0;i<p.length;i+=4){for(let k=0;k<3;k++)p[i+k]=Math.max(0,Math.min(255,(p[i+k]-128)*(1+opt.contrast)+128));const l=(p[i]+p[i+1]+p[i+2])/3;for(let k=0;k<3;k++)p[i+k]=Math.max(0,Math.min(255,l+(p[i+k]-l)*(1+opt.sat)))}
@@ -39,7 +39,7 @@ const PHOTO=(()=>{
   return c}
  function register(id){const e=pics()[id];if(!e)return Promise.resolve();return new Promise(r=>{const im=new Image();im.onload=()=>{variants('pic_'+e.kind+'_'+id,compose(e.kind,im));r()};im.onerror=r;im.src=e.d})}
  // 기본(사진 없음) 플레이스홀더
- function placeholders(){for(const k of Object.keys(SIZE)){const[w,h]=SIZE[k];const c=mk(w,h),g=c.getContext('2d');for(let y=0;y<h;y++)for(let x=0;x<w;x++){g.fillStyle=((x>>2)+(y>>2))%2?'#f6e7cf':'#e8c49a';g.fillRect(x,y,1,1)}g.fillStyle='#f0c64a';g.beginPath();g.arc(w/2,h/2,Math.min(w,h)/3,0,6.3);g.fill();g.fillStyle='#5f7a4a';g.fillRect(w/2-1,h/2-Math.min(w,h)/3-2,2,2);variants(k,compose(k,c))}}
+ function placeholders(){for(const k of Object.keys(SIZE)){const[w,h]=SIZE[k];const c=mk(w,h),g=c.getContext('2d');for(let y=0;y<h;y++)for(let x=0;x<w;x++){g.fillStyle=((x>>2)+(y>>2))%2?'#f6e7cf':'#e8c49a';g.fillRect(x,y,1,1)}g.fillStyle='#f0c64a';g.beginPath();g.arc(w/2,h/2,Math.min(w,h)/3,0,6.3);g.fill();g.fillStyle='#5f7a4a';g.fillRect(w/2-1,h/2-Math.min(w,h)/3-2,2,2);const cp=compose(k,c);variants(k,cp);cp.width=cp.height=0;c.width=c.height=0}}
  // ---- 업로드 UI ----
  let pending=null;
  function open(kind,target){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=()=>{const f=inp.files[0];if(!f)return;if(f.size>15e6)return toast('사진이 너무 커요 (15MB 이하)');const url=URL.createObjectURL(f);const im=new Image();im.onload=()=>editor(kind,im,target);im.onerror=()=>toast('이미지를 읽지 못했어요');im.src=url};inp.click()}

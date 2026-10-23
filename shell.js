@@ -52,7 +52,7 @@ const SHELL=(()=>{
  }
  function close(id){
   if(id==='ovShare'&&pasteHandler){removeEventListener('paste',pasteHandler);pasteHandler=null}
-  const o=document.getElementById(id);if(!o)return;o.classList.remove('on');o.id='';setTimeout(()=>o.remove(),250);
+  const o=document.getElementById(id);if(!o)return;o.querySelectorAll('canvas').forEach(c=>{c.width=c.height=0});o.classList.remove('on');o.id='';setTimeout(()=>o.remove(),250);
  }
  const top=()=>[...document.querySelectorAll('.ovl.on')].pop();
 
@@ -282,6 +282,7 @@ const SHELL=(()=>{
   const a=document.createElement('a');
   a.download=`capybara-onsen-${Date.now().toString(36)}.png`;
   a.href=c.toDataURL('image/png');
+  c.width=c.height=0;qr.width=qr.height=0;
   a.click();
   toast('초대장 이미지를 저장했어요! 메신저나 SNS에 공유해보세요');
  }

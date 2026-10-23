@@ -1176,7 +1176,7 @@ yuzu:`
 ................
 ................`,
 };
-const cache={};function url(n){if(cache[n])return cache[n];const g=I[n];if(!g)return '';const rows=g.trim().split('\n');const c=document.createElement('canvas');c.width=16;c.height=16;const x=c.getContext('2d');
+const cache={};let _ic=null;function url(n){if(cache[n])return cache[n];const g=I[n];if(!g)return '';const rows=g.trim().split('\n');const c=_ic||(_ic=document.createElement('canvas'));c.width=16;c.height=16;const x=c.getContext('2d');x.clearRect(0,0,16,16);
  rows.forEach((r,y)=>{for(let i=0;i<16;i++){const ch=r[i];if(!ch||ch=='.')continue;x.fillStyle=PAL[ch]||'#f0f';x.fillRect(i,y,1,1)}});return cache[n]=c.toDataURL()}
 window.ICONS=I;window.IC=(n,cls)=>`<img class="ic${cls?' '+cls:''}" src="${url(n)}" alt="" draggable="false">`;window.ICURL=url;})();
 // 카탈로그/도감 썸네일(.c-thumb, .bk .ph) 전용 픽셀 아이콘 변환 (일반 UI 버튼·텍스트에는 적용하지 않음)

@@ -2,7 +2,7 @@
 // ===== 연출: 불꽃놀이·등불·반딧불·벚꽃비·섬광·눈·무지개·오로라·퍼레이드 =====
 // 화면 공간 오버레이 캔버스 1장 + 고정 크기 파티클 풀(1600) → 아무리 눌러도 메모리/개수 상한
 (()=>{const $=id=>document.getElementById(id);const cv=document.createElement('canvas');cv.id='fxc';cv.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:4';document.body.appendChild(cv);const g=cv.getContext('2d');
- let W=0,H=0,DP=1;const rs=()=>{DP=Math.min(1.5,devicePixelRatio||1)*(window.GFX_LOW?0.6:1);W=innerWidth;H=innerHeight;cv.width=W*DP|0;cv.height=H*DP|0;cv.style.width=W+'px';cv.style.height=H+'px'};rs();addEventListener('resize',rs);
+ let W=0,H=0,DP=1;const rs=()=>{DP=Math.min(1,devicePixelRatio||1)*(window.GFX_LOW?0.6:1);W=innerWidth;H=innerHeight;cv.width=W*DP|0;cv.height=H*DP|0;cv.style.width=W+'px';cv.style.height=H+'px'};rs();addEventListener('resize',rs);
  const N=1600,X=new Float32Array(N),Y=new Float32Array(N),VX=new Float32Array(N),VY=new Float32Array(N),L=new Float32Array(N),ML=new Float32Array(N),SZ=new Float32Array(N),GR=new Float32Array(N),TY=new Uint8Array(N),CI=new Uint16Array(N),PH=new Float32Array(N);let free=[];for(let i=N-1;i>=0;i--)free.push(i);const act=new Set();
  const COL=[];const ci=c=>{let i=COL.indexOf(c);if(i<0){if(COL.length>60)return 0;COL.push(c);i=COL.length-1}return i};
  // 타입: 0 불꽃 점, 1 로켓, 2 등불, 3 반딧불, 4 꽃잎, 5 눈, 6 섬광
