@@ -102,8 +102,10 @@ body.titling #zenHint{display:none}
 #info{animation-name:popi}@keyframes popi{from{opacity:0;transform:translateY(6px)}}
 #top .box,#tools .tool{transition:transform .12s,filter .12s}#tools .tool:hover{transform:translateY(-2px)}
 @media(max-width:700px){#title{padding-left:0;justify-content:center;background:rgba(30,24,16,.35)}#title h1 .k{font-size:40px}#title .emb{width:150px}}
-.sethd{grid-column:1/-1;font:700 12px Pretendard,sans-serif;color:#7a5634;padding:6px 2px 0;border-top:1px dashed rgba(122,86,52,.35)}
-.sethd:first-child{border-top:0}
+.sethd{grid-column:1/-1;display:flex;align-items:center;gap:5px;font:700 12px Pretendard,sans-serif;color:#6b4624;padding:7px 4px 2px;margin-top:2px;border-top:1px dashed rgba(122,86,52,.38)}
+.sethd:first-child{border-top:0;padding-top:2px;margin-top:0}
+.sethd .ic{width:15px;height:15px;image-rendering:pixelated;flex-shrink:0}
+.sethd .subcnt{margin-left:auto;font:600 11px Pretendard,sans-serif;color:#8c6844}
 .pxw{display:flex;gap:14px;justify-content:center;align-items:flex-end;margin:8px 0;padding:10px;background:repeating-conic-gradient(#e9dcc2 0 25%,#f4ead6 0 50%) 0 0/16px 16px;border-radius:8px}
 .pxw canvas{image-rendering:pixelated;display:block;max-width:220px;height:auto;margin:auto}.pxw .lab{font-size:11px;text-align:center;opacity:.7;margin-top:4px}
 #modal select{font:500 12px Pretendard,sans-serif;padding:3px;border-radius:5px;border:1.5px solid #a07a50;background:#fbf1dc}

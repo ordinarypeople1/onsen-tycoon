@@ -36,7 +36,7 @@ sa=np.asarray(small).copy();al=sa[...,3]
 # 가장자리 배경 번짐 제거: 배경색 쪽으로 물든 반투명 픽셀 제거
 sa[...,3]=np.where(al>150,255,0)
 # 팔레트: 참조 스프라이트들에서 추출
-pix=[]
+pix=[sa[sa[...,3]>200][:,:3]]
 for r in refs:
   ra=np.asarray(Image.open(r).convert('RGBA'));pix.append(ra[ra[...,3]>200][:,:3])
 pix=np.concatenate(pix)

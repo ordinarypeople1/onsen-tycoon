@@ -1,4 +1,4 @@
-# 시설 스프라이트별 명시적 조명 마스크 생성: 등롱·창 같은 '작은 발광 덩어리'만 남기고 넓은 회벽은 제외
+# 시설 스프라이트별 명시적 조명 마스크 생성: 등롱·창 같은 '작은 발광 덩어리'만 남기고 넓은 회벽은 제외 + 조명/네온 장식 발광 마스크
 import glob,json,os,numpy as np
 from PIL import Image
 from scipy import ndimage
@@ -35,5 +35,34 @@ for p in sorted(glob.glob('assets/*_lv[1-5]*.png')):
         if len(sel)>=7:break
         if all(abs(p_[0]-q[0])*W+abs(p_[1]-q[1])*H>24 for q in sel):sel.append(p_)
     out[k]=[[x,y,round(w,1)] for x,y,w in sel]
+
+# 전통 조명 및 네온 간판 장식 발광 마스크
+DECO_LIGHTS=['andon_lantern','takeakari','chochin_tower','kagaribi','floating_lanterns','neon_yu','neon_izakaya','neon_capy','lantern','lanternpath','lamppost']
+for k in DECO_LIGHTS:
+    p=f'assets/{k}.png'
+    if not os.path.exists(p):continue
+    a=np.asarray(Image.open(p).convert('RGBA')).astype(int);r,g,b,al=[a[...,i] for i in range(4)];op=al>200
+    H,W=op.shape;img=np.zeros((H,W,4),np.uint8)
+    if k.startswith('neon_'):
+        mx=np.maximum(np.maximum(r,g),b);mn=np.minimum(np.minimum(r,g),b)
+        glow=op&(((mx>150)&((mx-mn)>55))|((mx>210)&(mn>165)))
+        img[...,0]=np.clip(r*1.15,0,255);img[...,1]=np.clip(g*1.15,0,255);img[...,2]=np.clip(b*1.15,0,255)
+        img[...,3]=np.where(glow,235,0).astype(np.uint8)
+        m=glow.astype(float)
+    else:
+        warm=op&(((r>175)&(g>80)&((r-b)>45))|((r>215)&(g>185)&(b>120)))
+        img[...,0]=255;img[...,1]=np.clip(g+45,0,255);img[...,2]=np.clip(b+15,0,255)
+        img[...,3]=np.where(warm,240,0).astype(np.uint8)
+        m=warm.astype(float)
+    if m.max()==0:continue
+    Image.fromarray(img,'RGBA').save(f'assets/lights/{k}.png')
+    lab,n=ndimage.label(m>0);cs=ndimage.center_of_mass(m,lab,range(1,n+1));ws=ndimage.sum(m,lab,range(1,n+1))
+    pts=sorted([(round(c[1]/W,3),round(c[0]/H,3),float(w)) for c,w in zip(cs,ws)],key=lambda t:-t[2])
+    sel=[]
+    for p_ in pts:
+        if len(sel)>=5:break
+        if all(abs(p_[0]-q[0])*W+abs(p_[1]-q[1])*H>18 for q in sel):sel.append(p_)
+    out[k]=[[x,y,round(w,1)] for x,y,w in sel]
+
 open('assets/lights.js','w').write('// tools/lights.py 생성: 스프라이트별 광원 점 (마스크는 assets/lights/*.png)\nwindow.LIGHTS='+json.dumps(out)+';\n')
-print(len(out))
+print('Total light masks:', len(out))

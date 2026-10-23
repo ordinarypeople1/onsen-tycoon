@@ -44,7 +44,15 @@ const DEF={
  tanuki:{n:'너구리 상',tab:'deco',img:'tanuki',fp:1,sc:0.95,cost:1400,beauty:7,star:2,desc:'복을 부르는 너구리'},
  iris:{n:'붓꽃 화단',tab:'deco',img:'iris',fp:1,sc:1.3,cost:800,beauty:6,star:1,desc:'보랏빛 붓꽃이 한가득'},
  lanternpath:{n:'등롱 길',tab:'deco',img:'lanternpath',fp:1,sc:1.35,cost:1600,beauty:7,star:2,walk:1,light:[[-0.32,-0.4],[0.35,-0.55]],desc:'두 개의 석등이 밝히는 돌길'},
- lantern:{n:'석등롱',tab:'deco',img:'lantern',fp:1,sc:1.25,cost:600,beauty:5,star:1,light:[[0,-0.55]],desc:'밤이면 은은히 빛나요'},
+ andon_lantern:{n:'전통 행등 (안돈)',tab:'deco',img:'andon_lantern',fp:1,sc:1.2,cost:450,beauty:6,star:1,light:[[0,-0.52,[255,210,120],1.15]],desc:'한지 너머로 따뜻한 호박빛이 번지는 목조 전통 행등'},
+ takeakari:{n:'대나무 통 조명 (타케아카리)',tab:'deco',img:'takeakari',fp:1,sc:1.25,cost:680,beauty:8,star:1,light:[[0,-0.50,[255,218,115],1.25]],desc:'정교하게 타공된 대나무 통 사이로 황금빛 문양이 피어나요'},
+ chochin_tower:{n:'축제 제등 기둥 (야구라 제등)',tab:'deco',img:'chochin_tower',fp:1,sc:1.5,cost:1100,beauty:11,star:1,light:[[0,-0.68,[255,150,90],1.35],[0,-0.42,[255,208,118],1.25]],desc:'붉고 따뜻한 제등이 층층이 매달려 밤거리를 환히 밝혀요'},
+ kagaribi:{n:'화톳불 화로대 (카가리비)',tab:'deco',img:'kagaribi',fp:1,sc:1.3,cost:1650,beauty:13,star:2,fire:1,light:[[0,-0.62,[255,155,60],1.4]],desc:'무쇠 삼각 화로 위에서 장작불과 불티가 타오르는 전통 화톳불'},
+ floating_lanterns:{n:'유등 수반 (토로나가시)',tab:'deco',img:'floating_lanterns',fp:2,sc:1.1,cost:2600,beauty:18,star:2,light:[[-0.18,-0.50,[255,212,118],1.2],[0.18,-0.46,[255,195,105],1.2]],desc:'잔잔한 수반 위에 등불이 둥실 떠다니며 수면을 수놓아요'},
+ neon_yu:{n:"온천 'ゆ' 네온 입간판",tab:'deco',img:'neon_yu',fp:1,sc:1.3,cost:950,beauty:9,star:1,neon:1,light:[[0,-0.56,[255,95,190],1.25],[0,-0.36,[80,235,255],1.15]],desc:'핑크빛 ゆ 글자와 시안색 온천 마크가 빛나는 쇼와풍 입간판'},
+ neon_izakaya:{n:'이자카야 네온 사인탑',tab:'deco',img:'neon_izakaya',fp:1,sc:0.95,cost:2100,beauty:14,star:2,neon:1,light:[[0,-0.72,[255,85,130],1.25],[0,-0.42,[80,230,255],1.2]],desc:'온천 골목의 낭만을 더하는 알록달록 복고풍 네온 사인탑'},
+ neon_capy:{n:'카피바라 네온 간판',tab:'deco',img:'neon_capy',fp:1,sc:1.45,cost:3400,beauty:20,star:3,neon:1,light:[[0,-0.56,[255,175,90],1.3],[0,-0.34,[85,235,255],1.2]],desc:'유자를 얹고 온천욕을 즐기는 카피바라가 반짝이는 시그니처 네온'},
+ lantern:{n:'석등롱',tab:'deco',img:'lantern',fp:1,sc:1.25,cost:600,beauty:5,star:1,light:[[0,-0.55,[255,212,130],1.15]],desc:'밤이면 은은히 빛나요'},
  rocks:{n:'정원석',tab:'deco',img:'rocks',fp:1,sc:1.4,cost:400,beauty:4,star:1,desc:'이끼 낀 정원석'},
  shishi:{set:'trad',n:'시시오도시',tab:'theme',img:'shishi',fp:1,sc:1.3,cost:1800,beauty:9,star:1,sound:'shishi',desc:'딱! 대나무 소리가 정원에 울려요'},
  nodate:{set:'trad',n:'노다테 다과석',tab:'theme',img:'nodate',fp:2,sc:0.95,cost:5000,price:500,cap:3,dur:14,eff:{thirst:-40,fun:20},wage:30,star:2,appeal:8,desc:'붉은 양산 아래 말차 한 잔'},
@@ -117,7 +125,7 @@ function avgNet(){const h=S.fin.hist;if(!h.length)return 0;const a=h.slice(-24);
 // ===== 에셋 =====
 const TIERED=['rock','hinoki','sauna','milky','ramen','teishoku','izakaya','yuzu','gift','room','cave','foot','fall','fam','wine','dango','sake','tea','ice','shoot','massage','pingpong','nap'];
 const IMG={},VAR=new Proxy({},{get(t,k){if(typeof k!='string'||t[k]||!k.includes('~m'))return t[k];const src=t[k.replace('~m','')];if(!src)return undefined;return t[k]={base:src.base,sil:src.sil,rimL:src.rimR,rimR:src.rimL,m:1}}}); // 좌우반전은 그릴 때 변환으로 처리(캔버스 추가 생성 없음)
-const NAMES=[...TIERED.flatMap(n=>[1,2,3,4,5].flatMap(l=>[n+'_lv'+l])),'rock','hinoki','sauna','milky','ramen','teishoku','izakaya','yuzu','gift','room','cave','foot','fall','fam','wine','dango','sake','tea','ice','shoot','massage','pingpong','nap','ema','jizo','tanuki','iris','lanternpath','sakura','maple','pine','lantern','torii','bamboo','sandgarden','bridge','waterwheel','wisteria','rocks','shishi','nodate','pagoda','bamboofence','cafe','lamppost','olive','lounger','cedar','mushroom','fern','birdhouse','snowman','hydrangea','tsukimi','kadomatsu','cb1','cb2','cb3','cb4','cw1','cw2','cw3','cw4','gate'];
+const NAMES=[...TIERED.flatMap(n=>[1,2,3,4,5].flatMap(l=>[n+'_lv'+l])),'rock','hinoki','sauna','milky','ramen','teishoku','izakaya','yuzu','gift','room','cave','foot','fall','fam','wine','dango','sake','tea','ice','shoot','massage','pingpong','nap','ema','jizo','tanuki','iris','lanternpath','sakura','maple','pine','lantern','torii','bamboo','sandgarden','bridge','waterwheel','wisteria','rocks','shishi','nodate','pagoda','bamboofence','cafe','lamppost','olive','lounger','cedar','mushroom','fern','birdhouse','snowman','hydrangea','tsukimi','kadomatsu','cb1','cb2','cb3','cb4','cw1','cw2','cw3','cw4','gate','andon_lantern','takeakari','chochin_tower','kagaribi','floating_lanterns','neon_yu','neon_izakaya','neon_capy'];
 function loadImgs(){return Promise.all(NAMES.map(n=>new Promise(r=>{const i=new Image();i.onload=()=>{IMG[n]=i;r()};i.onerror=r;i.src='assets/'+n+'.png'})))}
 // 멀티 레이어 스프라이트: 마스크 경로 순서대로 픽셀을 잘라 레이어로 분리 (나머지 = ground)
 const roofY=(x,W,H)=>H*(0.294+0.144*x/W);
@@ -231,15 +239,15 @@ function canPlace(k,x,y){if(k=='gate')return !!gateSpot(x,y);const f=DEF[k].fp;f
 function clearPaths(k,x,y){const f=DEF[k].fp;S.objs=S.objs.filter(o=>!(DEF[o.k].isPath&&o.x>=x&&o.x<x+f&&o.y>=y&&o.y<y+f))}
 function starScore(){let s=S.rep*0.5,b=0;for(const o of S.objs){const d=DEF[o.k];s+=(d.appeal||0)*(1+0.35*(o.lv-1))*0.4;b+=(d.beauty||0)*bMul(d)}s+=Math.sqrt(b)*3+Object.keys(S.plots).length*4+setsDone().length*15;return s}
 const STAR_REQ=[0,0,[55,500,1],[105,1700,2],[190,5000,3],[320,9000,4]]; // [점수, 누적손님, 구역수]
-let _stC={k:''};function stars(){const ck=Math.floor(S.min/10)+'|'+S.objs.length+'|'+S.served+'|'+Object.keys(S.plots).length;if(_stC.k===ck)return _stC.v;_stC.k=ck;return _stC.v=stars_()}
+let _stC={k:''};function stars(){const ck=Math.floor(S.min/10)+'|'+S.objs.length+'|'+S.served+'|'+Object.keys(S.plots).length+'|'+Math.floor(S.rep||0);if(_stC.k===ck)return _stC.v;_stC.k=ck;return _stC.v=stars_()}
 function stars_(){const s=starScore(),pl=Object.keys(S.plots).length;let r=1;for(let i=2;i<=5;i++){const[q,sv,p]=STAR_REQ[i];if(s>=q&&S.served>=sv&&pl>=p)r=i;else break}return r}
 function nextStarInfo(){const r=stars();if(r>=5)return null;const[q,sv,p]=STAR_REQ[r+1];return{r:r+1,score:[Math.floor(starScore()),q],served:[S.served,sv],plots:[Object.keys(S.plots).length,p]}}
 function beautyAt(x,y){let b=0;for(const o of S.objs){const d=DEF[o.k];if(!d.beauty)continue;const dd=Math.hypot(o.x-x,o.y-y);if(dd<4)b+=d.beauty*bMul(d)*(1-dd/4)}return b}
 // ===== 시간/조명 =====
 const hour=()=>(S.min/60)%24,dayN=()=>Math.floor(S.min/1440)+1,season=()=>Math.floor((dayN()-1)/7)%4;
-const KEYS=[ // h, 하늘, 주변광(곱), 밝기, 따뜻함
- [0,'#1c2546',[92,102,160],0.0],[5,'#3a3f6e',[124,122,172],0.1],[6.5,'#f6cfa8',[255,232,212],0.62],[8.5,'#bfe3f0',[255,248,236],0.95],
- [12,'#cfeefa',[255,255,252],1],[16,'#f6e2b8',[255,240,218],0.9],[18,'#f4b07e',[255,222,192],0.62],[19.3,'#5f5486',[148,136,182],0.2],[21,'#1f2a50',[96,106,165],0.02],[24,'#1c2546',[92,102,160],0]];
+const KEYS=[ // h, 하늘, 주변광(곱), 밝기, 따뜻함 (밤에도 답답하지 않고 은은하고 따뜻하게 밝은 야경 톤)
+ [0,'#2b3968',[176,182,224],0.0],[5,'#4a5286',[188,186,226],0.16],[6.5,'#f6cfa8',[255,232,212],0.62],[8.5,'#bfe3f0',[255,248,236],0.95],
+ [12,'#cfeefa',[255,255,252],1],[16,'#f6e2b8',[255,240,218],0.9],[18,'#f4b07e',[255,222,192],0.62],[19.3,'#7265a0',[198,186,224],0.28],[21,'#303e70',[180,186,226],0.08],[24,'#2b3968',[176,182,224],0]];
 function lerp(a,b,t){return a+(b-a)*t}
 function hex(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]}
 function light(){const h=hour();let i=0;while(KEYS[i+1][0]<=h)i++;const a=KEYS[i],b=KEYS[i+1],t=(h-a[0])/(b[0]-a[0]);
@@ -372,7 +380,8 @@ function emit(dt){if(parts.length>(window.GFX_LOW?140:600))return;if(window.GFX_
  for(const o of S.objs){const d=DEF[o.k];const[cx_,cy_]=ctr(o);
   if(d.bath&&Math.random()<dt*(4+DEF[o.k].fp)){const a=Math.random()*6.28,r=Math.random()*d.fp*0.3;parts.push({k:'steam',x:cx_+Math.cos(a)*r,y:cy_+Math.sin(a)*r,h:0,vx:(Math.random()-0.5)*0.1,l:3+Math.random()*2,L:5,s:3+Math.random()*4})}
   if(o.k=='sauna'&&Math.random()<dt*1.5)parts.push({k:'steam',x:o.x+1.6,y:o.y+0.4,h:40,vx:0.05,l:3,L:3,s:3});
-  if(d.emit&&Math.random()<dt*2.2){parts.push({k:d.emit,x:o.x+0.5+(Math.random()-0.5)*4,y:o.y+0.5+(Math.random()-0.5)*4,h:30+Math.random()*25,vx:0,l:6,L:6,ph:Math.random()*6})}}
+  if(d.emit&&Math.random()<dt*2.2){parts.push({k:d.emit,x:o.x+0.5+(Math.random()-0.5)*4,y:o.y+0.5+(Math.random()-0.5)*4,h:30+Math.random()*25,vx:0,l:6,L:6,ph:Math.random()*6})}
+  if(d.fire&&Math.random()<dt*4.5){parts.push({k:'spark',x:cx_+(Math.random()-0.5)*0.28,y:cy_+(Math.random()-0.5)*0.28,h:12+Math.random()*6,vh:10+Math.random()*16,l:0.7+Math.random()*0.5,L:1.2})}}
  if(season()==3&&Math.random()<dt*6){const r=rng(Date.now()|0);parts.push({k:'snow',x:Math.random()*N,y:Math.random()*N,h:60,l:8,L:8,ph:Math.random()*6})}
 }
 function updParts(dt){for(const o of S.objs)if(o.sway)o.sway=Math.max(0,o.sway-dt*0.35);for(const p of parts){p.l-=dt;if(p.k=='spark'){p.h+=p.vh*dt;p.vh*=0.96;continue}if(p.k=='dust'){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=0.92;p.vy*=0.92;continue}if(p.k=='steam'){p.h+=dt*9;p.x+=(p.vx+(window.WIND||0)*0.12)*dt;p.y-=(window.WIND||0)*0.06*dt;p.s+=dt*2.5}else{if(p.h>0){p.h-=dt*(p.k=='snow'?6:8);p.ph+=dt*2;p.x+=Math.sin(p.ph)*dt*0.25+dt*0.12}else{p.h=0;p.l=Math.min(p.l,1.5)}}}
@@ -469,7 +478,7 @@ function render(t){
  // 따뜻한 햇살 그라디언트
  cx.globalCompositeOperation='screen';if(lt.sun>0.1){cx.drawImage(sunTex(sv.left,Math.round(lt.sun*24)/24,VW/VH),0,0,VW,VH)}
  // 점광원 (밤): 시설별 내장 조명 — 스프라이트 발광맵(등롱·창) + 바닥 빛웅덩이 + 탕 수중등
- if(lt.night>0.18)nightLights(t,lt,z);
+ if(lt.night>0.1)nightLights(t,lt,z);
  cx.globalCompositeOperation='source-over';
  BUS.emit('screen',t,lt);cx.globalCompositeOperation='source-over';cx.globalAlpha=1;
  drawText(t,lt);
@@ -489,27 +498,35 @@ const EMI={},LMI={};function emiOf(key){if(key in EMI)return EMI[key];const mir=
  // 번짐: 축소-확대 소프트 글로우 + 원본
  const s2=mk(Math.max(1,W>>2),Math.max(1,H>>2)),g2=s2.getContext('2d');g2.drawImage(im,0,0,s2.width,s2.height);g.imageSmoothingEnabled=true;g.globalAlpha=0.9;g.drawImage(s2,0,0,W,H);g.globalAlpha=1;g.drawImage(im,0,0);
  return EMI[key]={c,pts:L.map(([x,y,w])=>[mir?1-x:x,y,w])}}
-function nightLights(t,lt,z){const k0=Math.min(1,(lt.night-0.18)/0.5),k=k0*k0*(3-2*k0);cx.globalCompositeOperation='lighter';const low=window.GFX_LOW;
- for(const o of S.objs){const d=DEF[o.k];if(d.isPath||o===moving)continue;const G=objGeom(o);const[sx,sy]=toScreen(G.X,G.Y);if(sx<-G.W*z||sx>VW+G.W*z||sy<-20||sy-G.H*z>VH+40)continue;
-  const lv=o.lv||1,key=skey(o),ph=(o.x*7.1+o.y*3.3);
+function nightLights(t,lt,z){const k0=Math.min(1,(lt.night-0.1)/0.5),k=k0*k0*(3-2*k0);const low=window.GFX_LOW;
+ for(const o of S.objs){const d=DEF[o.k];if(d.isPath||o===moving)continue;const G=objGeom(o);const[sx,sy]=toScreen(G.X,G.Y);if(sx<-G.W*z-90||sx>VW+G.W*z+90||sy<-90||sy-G.H*z>VH+110)continue;
+  const lv=o.lv||1,key=skey(o),ph=(o.x*7.1+o.y*3.3),flip=o.rot&1;
   // 켜지는 순서를 시설마다 살짝 다르게 (해질녘에 하나씩 점등)
-  const on=Math.max(0,Math.min(1,(k-((ph*0.37)%1)*0.25)/0.75));if(on<=0)continue;
-  const fl=0.92+0.05*Math.sin(t/170+ph)+0.03*Math.sin(t/53+ph*3);
+  const on=Math.max(0,Math.min(1,(k-((ph*0.37)%1)*0.22)/0.78));if(on<=0)continue;
+  const fl=0.93+0.045*Math.sin(t/170+ph)+0.025*Math.sin(t/53+ph*3);
   const e=o.k=='gate'?null:emiOf(key);
-  if(e){const x0=sx-G.W/2*z,y0=sy-G.H*z;cx.globalAlpha=0.95*on*fl;if(e.m){cx.save();cx.translate(sx*2,0);cx.scale(-1,1)}cx.drawImage(e.c,x0,y0,G.W*z,G.H*z);if(e.m)cx.restore();
-   const nP=low?2:Math.min(e.pts.length,2+lv);for(let i=0;i<nP;i++){const[u,v]=e.pts[i];const X=x0+u*G.W*z,Y=y0+v*G.H*z,f2=fl+0.04*Math.sin(t/90+i*2.1+ph);
-    cx.globalAlpha=1;glow(X,Y,(10+lv*1.5)*z,`rgba(255,196,120,${0.55*on*f2})`);
-    if(!low){cx.save();cx.translate(X,sy-1*z);cx.scale(1,0.45);glow(0,0,(22+lv*3)*z,`rgba(255,170,90,${0.24*on*f2})`);cx.restore()}}}
-  if(d.light&&!e){for(const[lx,ly]of d.light){const[X,Y]=toScreen(G.X+lx*G.W,G.Y+ly*G.H);cx.globalAlpha=1;glow(X,Y,14*z,`rgba(255,214,140,${0.55*on*fl})`);glow(X,Y,4*z,`rgba(255,240,200,${0.8*on})`);
-   cx.save();cx.translate(X,sy+1*z);cx.scale(1,0.5);glow(0,0,30*z,`rgba(255,180,100,${0.22*on*fl})`);cx.restore()}}
+  if(e){const x0=sx-G.W/2*z,y0=sy-G.H*z;cx.globalCompositeOperation='lighter';cx.globalAlpha=Math.min(1,0.88*on*fl);if(e.m){cx.save();cx.translate(sx*2,0);cx.scale(-1,1)}cx.drawImage(e.c,x0,y0,G.W*z,G.H*z);if(e.m)cx.restore();
+   if(!d.light){cx.globalCompositeOperation='screen';const nP=low?1:Math.min(e.pts.length,2+Math.floor(lv/2));for(let i=0;i<nP;i++){const[u,v]=e.pts[i];const X=x0+u*G.W*z,Y=y0+v*G.H*z,f2=fl+0.04*Math.sin(t/90+i*2.1+ph);
+    cx.globalAlpha=1;glow(X,Y,(11+lv*1.4)*z,`rgba(255,202,124,${0.36*on*f2})`);
+    if(!low&&i<2){cx.save();cx.translate(X,sy-1*z);cx.scale(1,0.46);glow(0,0,(22+lv*2.5)*z,`rgba(255,180,100,${0.20*on*f2})`);cx.restore()}}}}
+  if(d.light){for(let i=0;i<d.light.length;i++){const pt=d.light[i],lx=flip?-pt[0]:pt[0],ly=pt[1],col=pt[2]||[255,212,134],rm=pt[3]||1.15;
+   const[X,Y]=toScreen(G.X+lx*G.W,G.Y+ly*G.H);
+   const f2=d.fire?(0.85+0.10*Math.sin(t/52+ph+i)+0.07*Math.cos(t/29+ph*2)):d.neon?(0.94+0.06*Math.sin(t/115+ph+i)):fl;
+   cx.globalCompositeOperation='screen';cx.globalAlpha=1;
+   glow(X,Y,16*rm*z,`rgba(${col[0]},${col[1]},${col[2]},${0.34*on*f2})`);
+   if(i===0||d.fp>1){cx.save();cx.translate(X,sy+1*z);cx.scale(1,0.48);glow(0,0,26*rm*z,`rgba(${col[0]},${col[1]},${col[2]},${0.22*on*f2})`);cx.restore()}
+   cx.globalCompositeOperation='lighter';
+   glow(X,Y,6.5*rm*z,`rgba(${col[0]},${col[1]},${col[2]},${0.35*on*f2})`);
+   if(!e)glow(X,Y,3.0*rm*z,`rgba(255,246,220,${0.65*on*f2})`)}}
   // 탕: 수중등 + 가장자리 등 (레벨에 따라 늘어남)
-  if(d.bath&&!d.inside){const W=wgeo(o);const[X,Y]=toScreen(W.cX,W.cY);cx.globalAlpha=1;cx.save();cx.translate(X,Y);cx.scale(1,W.ry/W.rx);
-    glow(0,0,W.rx*z*1.05,`rgba(120,220,210,${0.22*on*fl})`);glow(0,W.rx*0.25*z,W.rx*z*0.6,`rgba(255,206,140,${(0.16+0.05*lv)*on*fl})`);cx.restore();
-   const nE=low?0:Math.min(8,lv*2-1);for(let i=0;i<nE;i++){const a=Math.PI*(0.15+0.7*(i+0.5)/nE);const ex=X+Math.cos(a)*W.rx*z*0.98,ey=Y+Math.sin(a)*W.ry*z*0.98+1*z,f3=fl+0.06*Math.sin(t/120+i);
-    glow(ex,ey,3.2*z,`rgba(255,226,170,${0.6*on*f3})`);glow(ex,ey-W.ry*0.3*z,8*z,`rgba(255,190,120,${0.12*on*f3})`)}}
+  if(d.bath&&!d.inside){const W=wgeo(o);const[X,Y]=toScreen(W.cX,W.cY);cx.globalCompositeOperation='screen';cx.globalAlpha=1;cx.save();cx.translate(X,Y);cx.scale(1,W.ry/W.rx);
+    glow(0,0,W.rx*z*1.18,`rgba(120,225,218,${0.26*on*fl})`);glow(0,W.rx*0.22*z,W.rx*z*0.72,`rgba(255,212,146,${(0.18+0.04*lv)*on*fl})`);cx.restore();
+   cx.globalCompositeOperation='lighter';const nE=low?0:Math.min(8,lv*2-1);for(let i=0;i<nE;i++){const a=Math.PI*(0.15+0.7*(i+0.5)/nE);const ex=X+Math.cos(a)*W.rx*z*0.98,ey=Y+Math.sin(a)*W.ry*z*0.98+1*z,f3=fl+0.06*Math.sin(t/120+i);
+    glow(ex,ey,3.5*z,`rgba(255,232,180,${0.62*on*f3})`);glow(ex,ey-W.ry*0.3*z,8.5*z,`rgba(255,194,122,${0.15*on*f3})`)}}
   // 가게 앞 길가 등 (Lv2·Lv4에서 추가)
   if(d.price&&!d.bath&&!low){const n=lv>=4?2:lv>=2?1:0;for(let i=0;i<n;i++){const s_=i?1:-1;const X=sx+s_*G.W*0.46*z,Y=sy-2*z;cx.globalAlpha=1;
-    glow(X,Y-5*z,3*z,`rgba(255,236,190,${0.85*on*fl})`);glow(X,Y-5*z,10*z,`rgba(255,190,110,${0.3*on*fl})`);cx.save();cx.translate(X,Y);cx.scale(1,0.45);glow(0,0,16*z,`rgba(255,170,90,${0.2*on*fl})`);cx.restore()}}}
+    cx.globalCompositeOperation='lighter';glow(X,Y-5*z,3.2*z,`rgba(255,236,190,${0.75*on*fl})`);
+    cx.globalCompositeOperation='screen';glow(X,Y-5*z,11*z,`rgba(255,194,114,${0.28*on*fl})`);cx.save();cx.translate(X,Y);cx.scale(1,0.45);glow(0,0,18*z,`rgba(255,174,94,${0.20*on*fl})`);cx.restore()}}}
  cx.globalAlpha=1;BUS.emit('nightlight',t,lt,k,z)}
 function glow(X,Y,r,c){const[rgb,a]=parseC(c);const pa=cx.globalAlpha;cx.globalAlpha=pa*a;cx.drawImage(blob(rgb),X-r,Y-r,r*2,r*2);cx.globalAlpha=pa;return;const g=cx.createRadialGradient(X,Y,0,X,Y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=g;cx.fillRect(X-r,Y-r,r*2,r*2)}
 let FOREST=null;// ===== 원경: 계곡·숲·강 회화 배경 (화면 공간 1장, 줌/이동 시차, 시간대·계절 색조) =====
@@ -520,7 +537,7 @@ function drawBackdrop(lt){if(!BG.complete||!BG.naturalWidth)return;const iw=BG.n
  cx.imageSmoothingEnabled=true;cx.drawImage(BG,VW/2-w/2+px,VH*0.46-h/2+py,w,h);cx.imageSmoothingEnabled=false;
  const se=SEA_T[season()];if(se){cx.fillStyle=se;cx.fillRect(0,0,VW,VH)}
  cx.globalCompositeOperation='multiply';cx.fillStyle=`rgba(${lt.sky},0.32)`;cx.fillRect(0,0,VW,VH);cx.globalCompositeOperation='source-over';
- if(lt.night>0.05){cx.fillStyle=`rgba(16,24,48,${Math.min(0.4,lt.night*0.4)})`;cx.fillRect(0,0,VW,VH)}
+ if(lt.night>0.05){cx.fillStyle=`rgba(22,32,62,${Math.min(0.22,lt.night*0.22)})`;cx.fillRect(0,0,VW,VH)}
  const mg=cx.createLinearGradient(0,VH*0.15,0,VH*0.6);mg.addColorStop(0,'rgba(240,244,246,0)');mg.addColorStop(0.5,`rgba(235,240,244,${0.10+0.08*Math.sin(performance.now()/9000)})`);mg.addColorStop(1,'rgba(240,244,246,0)');cx.fillStyle=mg;cx.fillRect(0,0,VW,VH)}
 function drawForest(lt){if(!FOREST){const x0=-60*TW/2,y0=-160,W=(N+12)*TW,H=(N+8)*TH/2+200;const c=mk(W*2,H*2),g=c.getContext('2d');g.scale(2,2);g.translate(-x0,-y0);const _cx=cx;cx=g;drawForest_();cx=_cx;FOREST={c,x0,y0,W,H}}cx.drawImage(FOREST.c,FOREST.x0,FOREST.y0,FOREST.W,FOREST.H)}
 function drawForest_(){const r=rng(42);for(let i=0;i<160;i++){const side=i%2;const k=r()*N;const x=side?-1.5-r()*3:k,y=side?k:-1.5-r()*3;const[X,Y]=iso(x,y);
@@ -609,8 +626,62 @@ let tab='bath',speed=1;
 function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t.h);t.h=setTimeout(()=>t.style.display='none',2600)}
 function buildTabs(){$('tabs').innerHTML=TABS.map(([k,i,n])=>`<div class="tab ${k==tab?'on':''}" data-k="${k}"><span class="ic">${i}</span>${n}</div>`).join('');
  document.querySelectorAll('.tab').forEach(e=>e.onclick=()=>{tab=e.dataset.k;buildTabs();buildCards();$('tip').textContent=TIPS[tab]});buildCards()}
-function buildCards(){const st=stars();$('cards').innerHTML=Object.entries(DEF).filter(([k,d])=>d.tab==tab).map(([k,d])=>`${d.set&&SETS[d.set][2][0]==k?`<div class="sethd">${SETS[d.set][1]} ${SETS[d.set][0]} 세트 ${setsDone().includes(d.set)?'✅':`(${SETS[d.set][2].filter(i=>S.objs.some(o=>o.k==i)).length}/4)`}</div>`:''}<div class="card ${ghost==k?'sel':''} ${d.star>st?'lock':''}" data-k="${k}" data-need="${d.star}★ 필요" title="${d.desc}">
- ${d.img?`<img src="assets/${d.img}.png" style="${d.filter?'filter:'+d.filter:''}">`:`<div style="height:56px;display:flex;align-items:center;justify-content:center;font-size:30px">${d.ic||'🪨'}</div>`}<b>${d.n}</b><span class="p">${d.erase?'50% 환불':d.isPath?'¥'+fmt(d.cost)+'/칸':'¥'+fmt(d.cost)}</span></div>`).join('');
+const SUBCATS={
+ bath:[
+  ['bath_basic','기본·실내 온천탕','bath',['foot','hinoki','sauna','fam']],
+  ['bath_nature','자연·노천 온천탕','steam',['rock','cave','fall']],
+  ['bath_special','이색·특수 온천탕','sakura',['milky','wine']]
+ ],
+ food:[
+  ['food_snack','간식·노점·찻집','food',['dango','ice','tea']],
+  ['food_meal','식당·주점','lantern',['ramen','sake','teishoku','izakaya']]
+ ],
+ shop:[
+  ['shop_stall','매점·노점·기념품','gift',['milk','yuzu','shoot','gift']],
+  ['shop_rest','휴식·오락·숙박 시설','home',['pingpong','massage','room','nap']]
+ ],
+ deco:[
+  ['deco_light','일본 전통 조명','andon',['andon_lantern','takeakari','chochin_tower','lantern','bamboo','kagaribi','floating_lanterns','lanternpath']],
+  ['deco_neon','온천·레트로 네온 간판','neon',['neon_yu','neon_izakaya','neon_capy']],
+  ['deco_path','길·다리','bridge',['path_erase','path_gravel','path','path_wood','path_tatami','bridge']],
+  ['deco_garden','정원·수경 장식','pond',['rocks','iris','pond','sandgarden','wisteria','waterwheel']],
+  ['deco_statue','전통 조형물','gate',['jizo','ema','torii','tanuki']],
+  ['deco_tree','계절 나무','tree',['sakura','maple','pine']]
+ ],
+ theme:[
+  ['theme_trad','전통 세트','gate',['shishi','nodate','pagoda','bamboofence'],'trad'],
+  ['theme_modern','모던 세트','food',['cafe','lamppost','olive','lounger'],'modern'],
+  ['theme_forest','숲 세트','zen',['cedar','mushroom','fern','birdhouse'],'forest'],
+  ['theme_season','계절 세트','star',['snowman','hydrangea','tsukimi','kadomatsu'],'season']
+ ],
+ custom:[
+  ['custom_hang','현수막·노렌 장식','photo',['banner','noren']],
+  ['custom_board','액자·입간판 장식','scroll',['frame','sign']]
+ ]
+};
+function sortSubItems(items,st){
+ return items.slice().sort(([,a],[,b])=>{
+  const sa=a.star||1,sb=b.star||1,la=sa>st?1:0,lb=sb>st?1:0;
+  if(la!==lb)return la-lb;
+  if(sa!==sb)return sa-sb;
+  return(a.cost||0)-(b.cost||0);
+ });
+}
+function buildCards(){_stC.k='';const st=stars();
+ const card=([k,d])=>`<div class="card ${ghost==k?'sel':''} ${(d.star||1)>st?'lock':''}" data-k="${k}" data-need="${d.star}★ 필요" title="${d.desc}">${d.img?`<img src="assets/${d.img}.png" style="${d.filter?'filter:'+d.filter:''}">`:`<div style="height:56px;display:flex;align-items:center;justify-content:center;font-size:30px">${d.ic||'🪨'}</div>`}<b>${d.n}</b><span class="p">${d.erase?'50% 환불':d.isPath?'¥'+fmt(d.cost)+'/칸':'¥'+fmt(d.cost)}</span></div>`;
+ const done=setsDone(),subs=SUBCATS[tab]||[],seen=new Set();
+ const blocks=subs.map(([id,title,icKey,keys,sk])=>{
+  const raw=keys.filter(k=>DEF[k]).map(k=>{seen.add(k);return[k,DEF[k]]});
+  if(!raw.length)return'';
+  const sorted=sortSubItems(raw,st),openCnt=sorted.filter(([,d])=>(d.star||1)<=st).length;
+  const ico=window.IC?IC(icKey):'';
+  if(sk&&SETS[sk]){const has=done.includes(sk);const cnt=SETS[sk][2].filter(i=>S.objs.some(o=>o.k==i)).length;
+   return`<div class="sethd" data-sub="${id}">${ico}<b>${title}</b><span class="subcnt">${has?'✅ 완성!':`(${cnt}/4 · 3종 배치 시 평판+15)`}</span></div>`+sorted.map(card).join('')}
+  return`<div class="sethd" data-sub="${id}">${ico}<b>${title}</b><span class="subcnt">건설 가능 ${openCnt}/${sorted.length}</span></div>`+sorted.map(card).join('');
+ });
+ const rest=sortSubItems(Object.entries(DEF).filter(([k,d])=>d.tab==tab&&!seen.has(k)),st);
+ if(rest.length)blocks.push(`<div class="sethd" data-sub="etc">${window.IC?IC('star'):''}<b>기타</b><span class="subcnt">건설 가능 ${rest.filter(([,d])=>(d.star||1)<=st).length}/${rest.length}</span></div>`+rest.map(card).join(''));
+ $('cards').innerHTML=blocks.join('');if(window.ICFIX)ICFIX($('cards'));
  document.querySelectorAll('.card').forEach(e=>e.onclick=()=>{const k=e.dataset.k;if(moving)cancelMove();if(DEF[k].star>stars())return toast(`료칸 등급 ${DEF[k].star}★ 에서 해금돼요`);ghost=ghost==k?null:k;mode=null;$('tDel').classList.remove('on');buildCards();if(ghost)toast(DEF[ghost].isPath||DEF[ghost].erase?'드래그해서 칠하세요 · Shift+드래그 = 사각형 (Esc 취소)':'놓을 곳을 눌러주세요 (Esc 취소)')})}
 let lastStars=0;
 function hud(){const lt=light();$('yen').textContent=fmt(S.yen);const n=S.fin.hist.length?avgNet():(S.fin._h||0);$('ihr').textContent=(n>=0?'+':'')+fmt(n)+' ¥/시';
