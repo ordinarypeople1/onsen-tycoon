@@ -2,11 +2,11 @@
 // ===== 저장 어댑터 · 저장 코드 · 방문 링크 (game.js보다 먼저 로드) =====
 // 어댑터 인터페이스: { name, async load(slot)->obj|null, async save(slot,obj), async list()->[{slot,meta}], async remove(slot) }
 const SaveCodec={
- PFX:'YUZU1.',
+ PFX:'CAPY1.',
  async encode(obj){const json=JSON.stringify(obj);let bytes=new TextEncoder().encode(json);
   if(window.CompressionStream){const cs=new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw'));bytes=new Uint8Array(await new Response(cs).arrayBuffer());return this.PFX+'z.'+b64u(bytes)}
   return this.PFX+'j.'+b64u(bytes)},
- async decode(code){code=String(code).trim().replace(/\s+/g,'');if(!code.startsWith(this.PFX))throw new Error('형식이 달라요');const[kind,data]=[code.slice(6,7),code.slice(8)];let bytes=unb64u(data);
+ async decode(code){code=String(code).trim().replace(/\s+/g,'');if(!code.startsWith('CAPY1.')&&!code.startsWith('YUZU1.'))throw new Error('형식이 달라요');const[kind,data]=[code.slice(6,7),code.slice(8)];let bytes=unb64u(data);
   if(kind=='z'){if(!window.DecompressionStream)throw new Error('이 브라우저는 압축 해제를 지원하지 않아요');const ds=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));bytes=new Uint8Array(await new Response(ds).arrayBuffer())}
   const obj=JSON.parse(new TextDecoder().decode(bytes));if(!obj||obj.ver!==2||!Array.isArray(obj.objs)||!obj.plots)throw new Error('저장 데이터가 아니에요');return obj}};
 function b64u(u8){let s='';for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}

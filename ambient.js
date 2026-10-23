@@ -165,7 +165,7 @@ const AMB=(()=>{
  function setZen(on,quiet){zen=on;zT=0;document.body.classList.toggle('zen',on);if(on&&!quiet){zHint=document.createElement('div');zHint.id='zenHint';zHint.textContent='감상 모드 · 아무 곳이나 누르거나 Esc로 나가기';document.body.appendChild(zHint);setTimeout(()=>zHint&&zHint.classList.add('fade'),2500);window.SND&&SND.init&&SND.init()}else{zHint&&zHint.remove();zHint=null}}
  addEventListener('keydown',e=>{if(window.SHELL&&SHELL.inTitle)return;if(e.key=='Escape'&&zen){setZen(false);e.stopPropagation()}else if((e.key=='z'||e.key=='Z')&&!e.ctrlKey&&document.activeElement.tagName!='INPUT')setZen(!zen)},true);
  addEventListener('pointerdown',e=>{if(zen&&!document.body.classList.contains('titling')&&!e.target.closest('#zenBtn,#title,.ovl')){setZen(false);e.stopPropagation();e.preventDefault()}},true);
- const tb=document.getElementById('tools');if(tb){const b=document.createElement('button');b.className='tool';b.id='zenBtn';b.innerHTML='🍃<i>감상</i>';b.title='감상 모드 (Z)';b.onclick=e=>{e.stopPropagation();setZen(true)};tb.appendChild(b)}
+ const tb=document.getElementById('tools');if(tb){const b=document.createElement('button');b.className='tool';b.id='zenBtn';b.innerHTML='<i>감상</i>';b.title='감상 모드 (Z)';b.onclick=e=>{e.stopPropagation();setZen(true)};tb.appendChild(b)}
  return{tap,setZen,get zen(){return zen},flies,butts,birds,fx};
 })();
 window.AMB=AMB;

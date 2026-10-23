@@ -92,7 +92,7 @@ function fpOf(k,rot){const d=DEF[k];if(!d)return[1,1];const w=d.fp||1,h=d.fph||w
 const SETS={trad:['전통','⛩️',['shishi','nodate','pagoda','bamboofence']],modern:['모던','☕',['cafe','lamppost','olive','lounger']],forest:['숲','🌲',['cedar','mushroom','fern','birdhouse']],season:['계절','🍂',['snowman','hydrangea','tsukimi','kadomatsu']]};
 const setsDone=()=>Object.keys(SETS).filter(k=>SETS[k][2].every(i=>S.objs.some(o=>o.k==i)));
 const bMul=d=>d.sea!=null&&d.sea==season()?2:1;
-const TIPS={bath:'🍃 탕은 손님의 피로를 풀어주고 만족도를 높여요!',food:'🍜 배고픈 손님은 식당을 찾아가요. 가격은 시설을 눌러 조절!',shop:'🏮 목마른 손님은 매점으로. 밤엔 객실에 묵어가요.',deco:'🌸 장식은 주변 분위기를 바꾸고 아름다움을 더해요.',custom:'📷 사진을 올리면 픽셀 아트로 바꿔 장식을 만들어요. 저장 파일에 함께 보관돼요.',theme:'🎐 같은 테마 4종을 모두 놓으면 세트 보너스(평판 점수 +15)!'};
+const TIPS={bath:'탕은 손님의 피로를 풀어주고 만족도를 높여요.',food:'배고픈 손님은 식당을 찾아가요. 가격은 시설을 눌러 조절하세요.',shop:'목마른 손님은 매점으로 향하고, 밤에는 객실에 묵어가요.',deco:'장식은 주변 분위기를 바꾸고 료칸의 아름다움을 높여요.',custom:'사진을 올리면 픽셀 아트로 변환해 나만의 장식을 만들어요.',theme:'같은 테마 4종을 모두 배치하면 세트 보너스(평판 점수 +15)를 받아요.'};
 const SEASONS=['봄','여름','가을','겨울'],SEMO=['🌸','🌻','🍁','❄️'],STEMP=[16,27,14,-1];
 const NEEDK=['fatigue','hunger','thirst','fun'],NEEDN={fatigue:'피로',hunger:'배고픔',thirst:'목마름',fun:'재미'};
 // ===== 상태 =====
@@ -755,7 +755,7 @@ function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);
 // ===== UI =====
 let tab='bath',speed=1;
 function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t.h);t.h=setTimeout(()=>t.style.display='none',2600)}
-function buildTabs(){$('tabs').innerHTML=TABS.map(([k,i,n])=>`<div class="tab ${k==tab?'on':''}" data-k="${k}"><span class="ic">${i}</span>${n}</div>`).join('');
+function buildTabs(){$('tabs').innerHTML=TABS.map(([k,i,n])=>`<div class="tab ${k==tab?'on':''}" data-k="${k}">${n}</div>`).join('');
  document.querySelectorAll('.tab').forEach(e=>e.onclick=()=>{tab=e.dataset.k;buildTabs();buildCards();$('tip').textContent=TIPS[tab]});buildCards()}
 const SUBCATS={
  bath:[
@@ -800,27 +800,26 @@ function sortSubItems(items,st){
  });
 }
 function buildCards(){_stC.k='';const st=stars();
- const card=([k,d])=>{const fw=d.fp||1,fh=d.fph||fw,fpBadge=d.erase?'':`<span class="fpb">${fw}×${fh}</span>`,src=d.img?(TIERED.includes(d.img)?d.img+'_lv1':d.img):null;return`<div class="card ${ghost==k?'sel':''} ${(d.star||1)>st?'lock':''}" data-k="${k}" data-need="${d.star}★ 필요" title="${d.desc} (${fw}×${fh}칸)">${fpBadge}${src?`<img src="assets/${src}.png" style="${d.filter?'filter:'+d.filter:''}">`:`<div style="height:56px;display:flex;align-items:center;justify-content:center;font-size:30px">${d.ic||'🪨'}</div>`}<b>${d.n}</b><span class="p">${d.erase?'50% 환불':d.isPath?'¥'+fmt(d.cost)+'/칸':'¥'+fmt(d.cost)}</span></div>`};
+ const card=([k,d])=>{const fw=d.fp||1,fh=d.fph||fw,fpBadge=d.erase?'':`<span class="fpb">${fw}×${fh}</span>`,src=d.img?(TIERED.includes(d.img)?d.img+'_lv1':d.img):null;return`<div class="card ${ghost==k?'sel':''} ${(d.star||1)>st?'lock':''}" data-k="${k}" data-need="${d.star}★ 필요" title="${d.desc} (${fw}×${fh}칸)">${fpBadge}${src?`<img src="assets/${src}.png" style="${d.filter?'filter:'+d.filter:''}">`:`<div class="c-thumb" style="height:56px;display:flex;align-items:center;justify-content:center;font-size:30px">${d.ic||'🪨'}</div>`}<b>${d.n}</b><span class="p">${d.erase?'50% 환불':d.isPath?'¥'+fmt(d.cost)+'/칸':'¥'+fmt(d.cost)}</span></div>`};
  const done=setsDone(),subs=SUBCATS[tab]||[],seen=new Set();
  const blocks=subs.map(([id,title,icKey,keys,sk])=>{
   const raw=keys.filter(k=>DEF[k]).map(k=>{seen.add(k);return[k,DEF[k]]});
   if(!raw.length)return'';
   const sorted=sortSubItems(raw,st),openCnt=sorted.filter(([,d])=>(d.star||1)<=st).length;
-  const ico=window.IC?IC(icKey):'';
   if(sk&&SETS[sk]){const has=done.includes(sk);const cnt=SETS[sk][2].filter(i=>S.objs.some(o=>o.k==i)).length;
-   return`<div class="sethd" data-sub="${id}">${ico}<b>${title}</b><span class="subcnt">${has?'✅ 완성!':`(${cnt}/4 · 3종 배치 시 평판+15)`}</span></div>`+sorted.map(card).join('')}
-  return`<div class="sethd" data-sub="${id}">${ico}<b>${title}</b><span class="subcnt">건설 가능 ${openCnt}/${sorted.length}</span></div>`+sorted.map(card).join('');
+   return`<div class="sethd" data-sub="${id}"><b>${title}</b><span class="subcnt">${has?'세트 완성':`${cnt}/4 · 3종 배치 시 평판+15`}</span></div>`+sorted.map(card).join('')}
+  return`<div class="sethd" data-sub="${id}"><b>${title}</b><span class="subcnt">건설 가능 ${openCnt}/${sorted.length}</span></div>`+sorted.map(card).join('');
  });
  const rest=sortSubItems(Object.entries(DEF).filter(([k,d])=>d.tab==tab&&!seen.has(k)),st);
- if(rest.length)blocks.push(`<div class="sethd" data-sub="etc">${window.IC?IC('star'):''}<b>기타</b><span class="subcnt">건설 가능 ${rest.filter(([,d])=>(d.star||1)<=st).length}/${rest.length}</span></div>`+rest.map(card).join(''));
+ if(rest.length)blocks.push(`<div class="sethd" data-sub="etc"><b>기타</b><span class="subcnt">건설 가능 ${rest.filter(([,d])=>(d.star||1)<=st).length}/${rest.length}</span></div>`+rest.map(card).join(''));
  $('cards').innerHTML=blocks.join('');if(window.ICFIX)ICFIX($('cards'));
  document.querySelectorAll('.card').forEach(e=>e.onclick=()=>{const k=e.dataset.k;if(moving)cancelMove();if(DEF[k].star>stars())return toast(`료칸 등급 ${DEF[k].star}★ 에서 해금돼요`);ghost=ghost==k?null:k;mode=null;$('tDel').classList.remove('on');buildCards();if(ghost)toast(DEF[ghost].isPath||DEF[ghost].erase?'드래그해서 칠하세요 · Shift+드래그 = 사각형 (Esc 취소)':'놓을 곳을 눌러주세요 (Esc 취소)')})}
 let lastStars=0;
 function hud(){const lt=light();$('yen').textContent=fmt(S.yen);const n=S.fin.hist.length?avgNet():(S.fin._h||0);$('ihr').textContent=(n>=0?'+':'')+fmt(n)+' ¥/시';
  const h=hour(),m=Math.floor(S.min%60);$('time').textContent=`${h<12?'오전':'오후'} ${String(Math.floor(h%12)||12).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
- $('sun').textContent=h>=6&&h<18?(h>=16.5?'🌇':'☀️'):'🌙';$('dayn').textContent='Day '+dayN();$('season').textContent=SEASONS[season()]+' '+SEMO[season()];
+ $('dayn').textContent='Day '+dayN();$('season').textContent=SEASONS[season()];
  $('temp').textContent=`· ${STEMP[season()]+Math.round(Math.sin((h-9)/24*6.28)*4)}°C · 손님 ${guests.length}명`;
- const s=stars();$('stars').innerHTML='★'.repeat(s)+'<span style="color:#cdbb9c">'+'★'.repeat(5-s)+'</span>';if(s!=lastStars){if(lastStars&&s>lastStars)toast(`🎉 료칸 등급 ${s}★ 달성! 새 시설이 해금됐어요`);lastStars=s;buildCards()}
+ const s=stars();$('stars').innerHTML='★'.repeat(s)+'<span class="st-off">'+'★'.repeat(5-s)+'</span>';if(s!=lastStars){if(lastStars&&s>lastStars)toast(`🎉 료칸 등급 ${s}★ 달성! 새 시설이 해금됐어요`);lastStars=s;buildCards()}
  if(document.activeElement!==$('zs'))$('zs').value=cam.z;}
 function placeInfo_old(){const el=$('info'),q=$('quest');if(innerWidth>700){const r=q&&getComputedStyle(q).display!='none'&&q.offsetHeight?q.getBoundingClientRect():null;el.style.top=(r&&r.left<280?Math.round(r.bottom+8):70)+'px';el.style.maxHeight=`calc(100vh - ${parseInt(el.style.top)+150}px)`;el.style.overflow='auto'}else{el.style.top='';el.style.maxHeight=''}}
 // ===== 정확한 클릭 판정: 스프라이트 알파 + 풋프린트 + 여유 패딩, 깊이상 맨 위 우선 =====
@@ -840,13 +839,13 @@ function popPlace(){const el=$('info');if(!INFO_O||el.style.display=='none')retu
  if(y<64){y=by+10;below=true}if(y+h>VH-8)y=Math.max(64,VH-8-h);x=Math.max(8,Math.min(VW-w-8,x));el.style.left=x+'px';el.style.top=y+'px';el.classList.toggle('below',below);el.style.setProperty('--ax',Math.max(14,Math.min(w-14,ax-x))+'px')}
 BUS.on('frame',popPlace);
 function showInfo(o){const el=$('info');if(INFO_O!==o)POPSEC=null;INFO_O=o;el.classList.add('pop');el.style.right='auto';el.style.bottom='auto';el.style.maxHeight='';el.style.display='block';
- if(o.k=='gate'){el.innerHTML=`<div class="ph"><b>${IC('gate')} 대문</b><button class="px" id="iCl">${IC('close')}</button></div><div class="pdesc">손님이 드나드는 유일한 입구예요. 열린 땅 가장자리로 이동만 할 수 있어요.</div><div class="pacts"><button class="pa" id="iMove">${IC('move')}<i>이동</i></button><button class="pa" id="iRot">${IC('rotate')}<i>회전</i></button></div>`;$('iMove').onclick=()=>startMove(o);$('iRot').onclick=e=>{e.stopPropagation();rotateGate()};$('iCl').onclick=()=>hideInfo();requestAnimationFrame(popPlace);return}
+ if(o.k=='gate'){el.innerHTML=`<div class="ph"><b>대문</b><button class="px" id="iCl">✕</button></div><div class="pdesc">손님이 드나드는 유일한 입구예요. 열린 땅 가장자리로 이동만 할 수 있어요.</div><div class="pacts"><button class="pa" id="iMove"><i>이동</i></button><button class="pa" id="iRot"><i>회전</i></button></div>`;$('iMove').onclick=()=>startMove(o);$('iRot').onclick=e=>{e.stopPropagation();rotateGate()};$('iCl').onclick=()=>hideInfo();requestAnimationFrame(popPlace);return}
  const d=DEF[o.k];const up=Math.round(d.cost*Math.pow(1.7,o.lv));const users=guests.filter(g=>g.cur===o).length;
  const gauge=d.price?(()=>{const fr=fairPrice(o),r=o.price/fr;const [c,t]=r<0.9?["#5f9e5a","저렴 · 손님 만족 ↑"]:r<1.15?["#3f6aa0","적정가"]:r<1.4?["#c98a2c","조금 비쌈 · 만족 ↓"]:["#c0442e","너무 비쌈 · 손님이 거절해요"];const pos=Math.max(0,Math.min(100,(r-0.6)/1.0*100));return `<div class="pfb"><div class="pbar"><i style="left:${pos}%;background:${c}"></i></div><small style="color:${c}">${t}</small><small style="opacity:.7"> · 추천 ¥${fmt(Math.round(fr*1.1/10)*10)}${o.rej?` · 거절 ${o.rej}회`:""}</small></div>`})():'';
  const stars='◆'.repeat(o.lv)+'◇'.repeat(5-o.lv);
- el.innerHTML=`<div class="ph"><b>${d.n}</b><span class="lv" title="Lv.${o.lv}">${d.price?stars:''}</span><button class="px" id="iCl" aria-label="닫기">${IC('close')}</button></div>
- <div class="pq">${d.price?`<span>${IC('yen')}¥${fmt(o.price)}</span><span>${IC('guest')}${users}/${capOf(o)}</span>`:`<span>${IC('sakura')}아름다움 +${d.beauty}</span>`}</div>
- <div class="pacts"><button class="pa${POPSEC=='info'?' on':''}" data-s="info">${IC('scroll')}<i>정보</i></button>${o.lv<5&&d.price?`<button class="pa up" id="iUp">${IC('hammer')}<i>업그레이드<br><small>¥${fmt(up)}</small></i></button>`:''}<button class="pa" id="iMove">${IC('move')}<i>이동</i></button><button class="pa" id="iRot">${IC('rotate')}<i>회전</i></button>${d.price?`<button class="pa${POPSEC=='price'?' on':''}" data-s="price">${IC('yen')}<i>가격</i></button>`:''}<button class="pa del" id="iDel">${IC('demolish')}<i>철거</i></button></div>
+ el.innerHTML=`<div class="ph"><b>${d.n}</b><span class="lv" title="Lv.${o.lv}">${d.price?`Lv.${o.lv}`:''}</span><button class="px" id="iCl" aria-label="닫기">✕</button></div>
+ <div class="pq">${d.price?`<span>요금 ¥${fmt(o.price)}</span><span>이용 ${users}/${capOf(o)}</span>`:`<span>아름다움 +${d.beauty}</span>`}</div>
+ <div class="pacts"><button class="pa${POPSEC=='info'?' on':''}" data-s="info"><i>정보</i></button>${o.lv<5&&d.price?`<button class="pa up" id="iUp"><i>업그레이드<small>¥${fmt(up)}</small></i></button>`:''}<button class="pa" id="iMove"><i>이동</i></button><button class="pa" id="iRot"><i>회전</i></button>${d.price?`<button class="pa${POPSEC=='price'?' on':''}" data-s="price"><i>가격</i></button>`:''}<button class="pa del" id="iDel"><i>철거</i></button></div>
  <div class="psec" data-sec="info" ${POPSEC=='info'?'':'hidden'}><div class="pdesc">${d.desc}</div>${d.price?`<div class="row"><span>이용 중</span><b>${users}/${capOf(o)}</b></div><div class="row"><span>누적 이용</span><b>${o.uses||0}회</b></div><div class="row"><span>누적 매출</span><b>¥${fmt(o.earn||0)}</b></div><div class="row"><span>직원 급여</span><b>¥${fmt(d.wage*(1+0.5*(o.lv-1)))}/시</b></div>`:`<div class="row"><span>아름다움</span><b>+${d.beauty}</b></div>`}<div class="row"><span>철거 환급</span><b>¥${fmt(Math.floor(d.cost*0.4))}</b></div></div>
  ${d.price?`<div class="psec" data-sec="price" ${POPSEC=='price'?'':'hidden'}><div class="row"><span>이용 요금</span><b>¥${fmt(o.price)}</b></div>${gauge}<div class="prow"><button class="b g" data-p="-0.1">−10%</button><button class="b g" data-p="0.1">+10%</button><button class="b g" data-p="0">기본</button><button class="b g" data-p="rec">추천가</button></div></div>`:''}`;
  el.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{POPSEC=POPSEC==b.dataset.s?null:b.dataset.s;showInfo(o)});
@@ -857,7 +856,7 @@ function hideInfo(){$('info').style.display='none';INFO_O=null}
 function remove(o){if(window.READONLY)return;if(o.k=='gate')return toast('대문은 철거할 수 없어요. 이동만 가능해요');if(S.objs.length<=1)return;S.yen+=Math.floor(DEF[o.k].cost*0.4);guests.forEach(g=>{if(g.cur===o)finish(g);if(g.target===o)g.target=null});S.objs.splice(S.objs.indexOf(o),1);OCC=occ();groundDirty=true;$('info').style.display='none';save()}
 function modalFin(){const m=$('modal');const up=S.objs.filter(o=>!DEF[o.k].isPath&&!DEF[o.k].wage).length*4,wages=S.objs.reduce((a,o)=>a+(DEF[o.k].wage||0)*(1+0.5*(o.lv-1)),0);
  const rows=S.objs.filter(o=>DEF[o.k].price).sort((a,b)=>(b.earn||0)-(a.earn||0)).slice(0,8).map(o=>`<div class="row"><span>${DEF[o.k].n} Lv.${o.lv}</span><b>¥${fmt(o.earn||0)}</b></div>`).join('');
- m.innerHTML=`<h3>📊 재정</h3><div class="row"><span>보유 자금</span><b>¥${fmt(S.yen)}</b></div><div class="row"><span>평균 순이익</span><b>¥${fmt(avgNet())}/시</b></div><div class="row"><span>오늘 수입</span><b>¥${fmt(S.fin.inc)}</b></div><div class="row"><span>오늘 지출</span><b>¥${fmt(S.fin.exp)}</b></div>
+ m.innerHTML=`<h3>재정 현황</h3><div class="row"><span>보유 자금</span><b>¥${fmt(S.yen)}</b></div><div class="row"><span>평균 순이익</span><b>¥${fmt(avgNet())}/시</b></div><div class="row"><span>오늘 수입</span><b>¥${fmt(S.fin.inc)}</b></div><div class="row"><span>오늘 지출</span><b>¥${fmt(S.fin.exp)}</b></div>
  <div class="row"><span>직원 급여</span><b>¥${fmt(wages)}/시</b></div><div class="row"><span>시설 유지비</span><b>¥${fmt(up)}/시</b></div><h3 style="margin-top:10px">시설별 매출</h3>${rows}<div style="text-align:right"><button class="b" onclick="this.closest('.panel').style.display='none'">닫기</button></div>`;m.style.display='block'}
 function modalRank(){const m=$('modal');const st=stars(),sc=Math.floor(starScore()),pl=Object.keys(S.plots).length,sv=S.served||0,rep=Math.round(S.rep||0);
  let ap=0,bt=0;for(const o of S.objs){const d=DEF[o.k];if(!d)continue;ap+=(d.appeal||0)*(1+0.35*((o.lv||1)-1))*0.4;bt+=(d.beauty||0)*bMul(d)}
@@ -866,48 +865,48 @@ function modalRank(){const m=$('modal');const st=stars(),sc=Math.floor(starScore
   return`<div class="rk-req"><div class="row"><span>${label}</span><span><b>${fmt(cur)}${unit}</b> / ${fmt(req)}${unit} <span class="rk-badge ${ok?'ok':'go'}">${ok?'✓ 달성':`미달 (${fmt(req-cur)}${unit} 남음)`}</span></span></div><div class="bar"><i style="width:${pct}%;background:${ok?'#5fa855':color}"></i></div></div>`};
  let nextHtml='';
  if(st<5){const[rq,rsv,rpl]=STAR_REQ[st+1];
-  nextHtml=`<div class="rk-next"><div style="font-weight:800;font-size:14px;margin-bottom:4px">🎯 다음 등급 (${st+1}★ ${['','동네 온천','인기 온천','명소 료칸','전통 명문 료칸','전설의 유자 료칸'][st+1]}) 승급 조건</div>
+  nextHtml=`<div class="rk-next"><div style="font-weight:800;font-size:14px;margin-bottom:4px">다음 등급 (${st+1}★ ${['','동네 온천','인기 온천','명소 료칸','전통 명문 료칸','전설의 카피바라 료칸'][st+1]}) 승급 조건</div>
    ${reqRow('종합 명성 점수 (평판·매력·조경)',sc,rq,'점','#e0a92e')}
-   <div style="font-size:11px;color:#7a5a3a;margin:-2px 0 5px">↳ 현재 명성 구성: 평판(${rep}) <b>+${repPt}점</b> · 시설 매력 <b>+${apPt}점</b> · 조경 아름다움 <b>+${btPt}점</b> · 구역·세트 <b>+${plPt+setPt}점</b></div>
+   <div style="font-size:11px;color:var(--txt-sec);margin:-2px 0 5px">↳ 현재 명성 구성: 평판(${rep}) <b>+${repPt}점</b> · 시설 매력 <b>+${apPt}점</b> · 조경 아름다움 <b>+${btPt}점</b> · 구역·세트 <b>+${plPt+setPt}점</b></div>
    ${reqRow('누적 이용 손님 수',sv,rsv,'회','#5a8fd9')}
    ${reqRow('열린 구역 수 (확장 구역)',pl,rpl,'구역','#8a9a6a')}
   </div>`;
  }else{
-  nextHtml=`<div class="rk-next"><div style="font-weight:800;font-size:14px;color:#2f6b25">🎉 최고 등급 (5★ 전설의 유자 료칸) 달성 완료!</div><div style="font-size:12px;color:#5a4328;margin-top:3px">모든 시설과 장식이 해금되었어요. 명성 점수 <b>${fmt(sc)}점</b> · 누적 손님 <b>${fmt(sv)}회</b> · 열린 구역 <b>${pl}구역</b></div></div>`;
+  nextHtml=`<div class="rk-next"><div style="font-weight:800;font-size:14px;color:var(--jade)">최고 등급 (5★ 전설의 카피바라 료칸) 달성 완료!</div><div style="font-size:12px;color:var(--txt-sec);margin-top:3px">모든 시설과 장식이 해금되었어요. 명성 점수 <b>${fmt(sc)}점</b> · 누적 손님 <b>${fmt(sv)}회</b> · 열린 구역 <b>${pl}구역</b></div></div>`;
  }
- const rankNames=['','1★ 시작의 온천','2★ 인기 온천 료칸','3★ 명소 온천 료칸','4★ 전통 명문 료칸','5★ 전설의 유자 료칸'];
+ const rankNames=['','1★ 시작의 온천','2★ 인기 온천 료칸','3★ 명소 온천 료칸','4★ 전통 명문 료칸','5★ 전설의 카피바라 료칸'];
  const chip=([k,d])=>{const src=d.img?(TIERED.includes(d.img)?d.img+'_lv1':d.img):null;return`<span class="rk-chip">${src?`<img src="assets/${src}.png" alt="">`:`${d.ic||'🌸'}`}<span>${d.n}</span></span>`};
  const rankCards=[1,2,3,4,5].map(r=>{
   const done=r<=st,isNext=r===st+1;
   const[rq,rsv,rpl]=STAR_REQ[r]||[0,0,1];
   const cond=r===1?'기본 시작 등급 (초기 해금)':`조건: 명성 <b>${fmt(rq)}점</b> 이상 · 누적 손님 <b>${fmt(rsv)}회</b> 이상 · 열린 구역 <b>${rpl}곳</b> 이상`;
   const unlocks=Object.entries(DEF).filter(([k,d])=>d.tab&&!d.erase&&(d.star||1)===r);
-  const badge=done?`<span class="rk-badge ok">✓ 달성 완료</span>`:isNext?`<span class="rk-badge go">진행 중</span>`:`<span class="rk-badge lock">🔒 잠김</span>`;
+  const badge=done?`<span class="rk-badge ok">✓ 달성 완료</span>`:isNext?`<span class="rk-badge go">진행 중</span>`:`<span class="rk-badge lock">잠김</span>`;
   return`<div class="rk-box ${r===st?'cur':isNext?'next':done?'done':''}">
    <div class="rk-hd"><b>${rankNames[r]}</b>${badge}</div>
    <div class="rk-cond">${cond}</div>
-   <div class="rk-items">${unlocks.length?unlocks.map(chip).join(''):'<span style="font-size:11px;color:#7a5a3a">모든 상위 시설을 자유롭게 운영하고 최고 명성을 누려보세요!</span>'}</div>
+   <div class="rk-items">${unlocks.length?unlocks.map(chip).join(''):'<span style="font-size:11px;color:var(--txt-sec)">모든 상위 시설을 자유롭게 운영하고 최고 명성을 누려보세요!</span>'}</div>
   </div>`;
  }).join('');
- m.innerHTML=`<h3>⭐ 료칸 등급 & 레벨업 조건</h3>
+ m.innerHTML=`<h3>료칸 등급 · 승급 조건</h3>
   <div class="rk-cur">
-   <div><span style="font-size:12px;color:#7a5a3a">현재 료칸 등급</span><br><b class="stars">${'★'.repeat(st)}<span style="color:#cdbb9c">${'★'.repeat(5-st)}</span></b> <b>(${st}성 료칸)</b></div>
+   <div><span style="font-size:12px;color:var(--txt-sec)">현재 료칸 등급</span><br><b class="stars">${'★'.repeat(st)}<span style="color:rgba(255,255,255,0.2)">${'★'.repeat(5-st)}</span></b> <b>(${st}성 료칸)</b></div>
    <div style="text-align:right;font-size:12px">명성 점수 <b>${fmt(sc)}점</b> <small>(평판 ${rep})</small><br>누적 손님 <b>${fmt(sv)}회</b> · 구역 <b>${pl}곳</b></div>
   </div>
   ${nextHtml}
-  <h3 style="margin-top:8px;font-size:14px">📜 등급별 승급 조건 및 해금 시설 (1★ ~ 5★)</h3>
+  <h3 style="margin-top:12px;font-size:13px">등급별 승급 조건 및 해금 시설 (1★ ~ 5★)</h3>
   <div class="rk-list">${rankCards}</div>
-  <div style="font-size:11.5px;color:#6b4e32;margin-top:8px;background:#f6ead0;border:1px solid #d8bb8e;border-radius:6px;padding:6px 8px">
-   💡 <b>등급 올리는 법:</b> 다양한 온천탕·식당·상점을 짓고 업그레이드하면 <b>시설 매력</b>과 <b>누적 손님</b>이 빠르게 늘어나요. 적정 가격을 유지해 <b>평판</b>을 높이고, 벤치·조명·나무 장식과 테마 세트(4종)를 배치해 <b>명성 점수</b>를 올린 뒤, 잠긴 구역의 표지판을 눌러 <b>구역을 확장</b>하세요!
+  <div class="rk-tip">
+   <b>등급 올리는 법:</b> 다양한 온천탕·식당·상점을 짓고 업그레이드하면 <b>시설 매력</b>과 <b>누적 손님</b>이 빠르게 늘어나요. 적정 가격을 유지해 <b>평판</b>을 높이고, 벤치·조명·나무 장식과 테마 세트(4종)를 배치해 <b>명성 점수</b>를 올린 뒤, 잠긴 구역의 표지판을 눌러 <b>구역을 확장</b>하세요!
   </div>
   <div style="text-align:right;margin-top:6px"><button class="b" onclick="this.closest('.panel').style.display='none'">닫기</button></div>`;
  m.style.display='block';if(window.ICFIX)ICFIX(m)}
 window.modalRank=modalRank;
 function modalGuest(){const m=$('modal');const n=guests.length||1;const avg=k=>guests.reduce((s,g)=>s+g.need[k],0)/n;const hp=guests.reduce((s,g)=>s+g.happy,0)/n;
  const bar=(l,v,c)=>`<div class="row" style="border:0"><span>${l}</span><b>${Math.round(v)}</b></div><div class="bar"><i style="width:${v}%;background:${c}"></i></div>`;
- m.innerHTML=`<h3>🦫 손님 & 만족도</h3><div class="row"><span>현재 손님</span><b>${guests.length}명</b></div><div class="row"><span>누적 이용</span><b>${fmt(S.served)}회</b></div>${bar('평판',S.rep,'#e0a92e')}${bar('현재 손님 기분',guests.length?hp:0,'#7fbf6a')}
+ m.innerHTML=`<h3>손님 · 만족도</h3><div class="row"><span>현재 손님</span><b>${guests.length}명</b></div><div class="row"><span>누적 이용</span><b>${fmt(S.served)}회</b></div>${bar('평판',S.rep,'#e0a92e')}${bar('현재 손님 기분',guests.length?hp:0,'#7fbf6a')}
  <h3 style="margin-top:8px">평균 욕구 (높을수록 필요)</h3>${NEEDK.map(k=>bar(NEEDN[k],guests.length?avg(k):0,'#d98a5a')).join('')}
- <div style="font-size:12px;color:#7a5a3a">팁: 욕구에 맞는 시설이 없으면 기분이 떨어져요. 장식 근처를 걸으면 기분이 좋아져요.</div><div style="text-align:right"><button class="b" onclick="this.closest('.panel').style.display='none'">닫기</button></div>`;m.style.display='block'}
+ <div style="font-size:12px;color:var(--txt-sec)">팁: 욕구에 맞는 시설이 없으면 기분이 떨어져요. 장식 근처를 걸으면 기분이 좋아져요.</div><div style="text-align:right"><button class="b" onclick="this.closest('.panel').style.display='none'">닫기</button></div>`;m.style.display='block'}
 // ===== 입력 =====
 const ptrs=new Map();let drag=null,pinch=null,lp=null,lastTap={};
 function onTap(sx,sy){const[fx,fy]=toTile(sx,sy);const x=Math.floor(fx),y=Math.floor(fy);
@@ -940,7 +939,7 @@ function initInput(){
  $('zHome').onclick=()=>{const b=S.objs.find(o=>DEF[o.k].bath)||S.objs[0];homeAnim={t:0,from:{...cam},to:b}};
  $('tFin').onclick=modalFin;$('tGuest').onclick=modalGuest;if($('bRank'))$('bRank').onclick=modalRank;if($('stars'))$('stars').onclick=modalRank;
  $('tDel').onclick=()=>{mode=mode=='del'?null:'del';ghost=null;$('tDel').classList.toggle('on',mode=='del');buildCards();if(mode)toast('철거할 시설을 눌러주세요 (40% 환불)')};
- $('bSpeed').onclick=()=>{speed=speed==1?3:speed==3?10:1;$('bSpeed').textContent='▶ x'+speed};
+ $('bSpeed').onclick=()=>{speed=speed==1?3:speed==3?10:1;$('bSpeed').textContent=speed+'x'};
  $('bClose').onclick=()=>{$('build').classList.add('hide');$('build').style.display='none';$('bOpen').style.display='flex';$('tools').classList.add('low')};
  $('bOpen').onclick=()=>{$('build').classList.remove('hide');$('build').style.display='';$('bOpen').style.display='none';$('tools').classList.remove('low')};
 }
