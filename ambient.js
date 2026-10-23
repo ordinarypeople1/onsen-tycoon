@@ -43,7 +43,7 @@ const AMB=(()=>{
   const sg=ctx.createLinearGradient(0,-ry,0,-ry*0.4);sg.addColorStop(0,'rgba(10,25,25,0.45)');sg.addColorStop(1,'rgba(10,25,25,0)');ctx.fillStyle=sg;ctx.fillRect(-rx,-ry,rx*2,ry);
   ctx.restore()}
  function drawPond(o,t,lt,ghostA){const d=pondData(o);const[cX,cY]=iso(o.x+1.5,o.y+1.5);const rx=3*TW*0.4,ry=rx/2;
-  cx.save();cx.globalAlpha=ghostA||1;
+  cx.save();cx.globalAlpha=ghostA||1;if(o.rot&1){cx.translate(cX*2,0);cx.scale(-1,1)}
   cx.fillStyle='rgba(30,40,30,0.25)';cx.beginPath();cx.ellipse(cX,cY+1.5,rx+3,ry+2.5,0,0,6.283);cx.fill();
   // 캐시된 물 프레임
   const sc=cx.getTransform().a,FR=24,per=4800,fi=Math.floor((t%per)/per*FR);const lk=sc.toFixed(2)+'|'+Math.round(lt.sun*12)+'|'+Math.round(lt.night*12)+'|'+lt.sky.map(v=>v>>3).join(',');
@@ -71,7 +71,7 @@ const AMB=(()=>{
   if(ghostA)drawPondRim(o,ghostA);
   cx.restore()}
 
- window.drawPondRim=drawPondRim;function drawPondRim(o,ghostA){const d=pondData(o);const[cX,cY]=iso(o.x+1.5,o.y+1.5);const rx=3*TW*0.4,ry=rx/2;cx.save();cx.globalAlpha=ghostA||1;
+ window.drawPondRim=drawPondRim;function drawPondRim(o,ghostA){const d=pondData(o);const[cX,cY]=iso(o.x+1.5,o.y+1.5);const rx=3*TW*0.4,ry=rx/2;cx.save();cx.globalAlpha=ghostA||1;if(o.rot&1){cx.translate(cX*2,0);cx.scale(-1,1)}
   // 돌 테두리 + 이끼 (뒤→앞)
   const st=d.stones.slice().sort((a,b)=>Math.sin(a.a)-Math.sin(b.a));const SC=[['#8f8a80','#b4ad9f'],['#7d7a72','#a39e92'],['#9a9384','#c2baa8']];
   for(const s of st){const px=cX+Math.cos(s.a)*(rx+0.5),py=cY+Math.sin(s.a)*(ry+0.3);const w=3.2*s.s,h=2.2*s.s;const front=Math.sin(s.a)>0;
@@ -112,7 +112,7 @@ const AMB=(()=>{
    else{g.soak=0;if(!g.leaving&&R()<dt*0.01)fx.push({k:'yawn',g,l:1.4,L:1.4})}}
   if(fx.length>60)fx.splice(0,fx.length-60)}
  BUS.on('ground',(t,lt)=>{drawTufts(t,lt);for(const o of S.objs)if(DEF[o.k].pond)drawPond(o,t,lt);
-  if(ghost=='pond'&&hoverT)drawPond({x:hoverT[0],y:hoverT[1]},t,lt,0.6)});
+  if(ghost=='pond'&&hoverT)drawPond({x:hoverT[0],y:hoverT[1],rot:moving?moving.rot:ROT},t,lt,0.6)});
  BUS.on('over',(t,lt,sv)=>{
   // 나비
   for(const b of butts){const[X,Y]=iso(b.x,b.y);const fl=Math.abs(Math.sin(t/70+b.p));cx.fillStyle=b.c;cx.fillRect(X-1.6*fl,Y-b.h-0.8,1.6*fl,1.6);cx.fillRect(X,Y-b.h-0.8,1.6*fl,1.6);cx.fillStyle='#3a3026';cx.fillRect(X-0.3,Y-b.h-0.9,0.6,1.8);cx.fillStyle='rgba(30,30,20,0.18)';cx.fillRect(X-1,Y,2,0.7)}
