@@ -110,18 +110,7 @@ const AMB=(()=>{
    else{g.soak=0;if(!g.leaving&&R()<dt*0.01)fx.push({k:'yawn',g,l:1.4,L:1.4})}}
   if(fx.length>60)fx.splice(0,fx.length-60)}
  BUS.on('ground',(t,lt)=>{drawTufts(t,lt);
-  if(window._rivTiles&&!window.GFX_LOW){
-   const x0=-cam.x/cam.z-24,x1=(VW-cam.x)/cam.z+24,y0=-cam.y/cam.z-24,y1=(VH-cam.y)/cam.z+24;
-   for(let i=0;i<window._rivTiles.length;i++){const[rx,ry,brg]=window._rivTiles[i];if(brg)continue;
-    const[X,Y]=iso(rx+0.5,ry+0.5);if(X<x0||X>x1||Y<y0||Y>y1)continue;
-    const ph=t/520+rx*1.7+ry*2.3,v=Math.sin(ph);
-    if(v>0.45){
-     const dx=Math.sin(t/900+i)*4,dy=Math.cos(t/1100+i)*2;
-     cx.fillStyle=i%3==0?`rgba(244,254,204,${(v-0.4)*1.1*(0.4+0.6*lt.sun)})`:`rgba(164,248,240,${(v-0.4)*(0.45+0.55*lt.sun)})`;
-     cx.fillRect(X+dx-2,Y+dy,3.6,0.75);
-    }
-   }
-  }
+
   for(const o of S.objs)if(DEF[o.k].pond)drawPond(o,t,lt);
   if(ghost=='pond'&&hoverT)drawPond({x:hoverT[0],y:hoverT[1],rot:moving?moving.rot:ROT},t,lt,0.6)});
  BUS.on('over',(t,lt,sv)=>{
@@ -139,7 +128,7 @@ const AMB=(()=>{
    else if(e.k=='spark'){const[X,Y]=iso(e.x,e.y);const k=1-e.l/e.L;cx.fillStyle=`rgba(255,246,200,${a})`;for(let i=0;i<6;i++){const an=i/6*6.28+k;const r=4+k*9;cx.fillRect(X+Math.cos(an)*r-0.6,Y-e.h+Math.sin(an)*r*0.6-0.6,1.2,1.2)}}
    else if(e.k=='ring'){const[X,Y]=iso(e.x,e.y);const k=1-e.l/e.L;cx.strokeStyle=`rgba(255,255,255,${a*0.8})`;cx.lineWidth=0.7;cx.beginPath();cx.ellipse(X,Y,3+k*12,1.5+k*6,0,0,6.283);cx.stroke()}}
   // 구름 그림자
-  if(lt.sun>0.15&&!window.GFX_LOW){cx.save();cx.globalCompositeOperation='multiply';cx.globalAlpha=0.16*lt.sun;const T=t/1000;
+  if(lt.sun>0.15&&!window.GFX_LOW){cx.save();cx.globalCompositeOperation='multiply';cx.globalAlpha=0.10*lt.sun;const T=t/1000;
    for(let i=0;i<5;i++){const wx=((T*(6+wind*4)+i*380)%2200)-500,wy=-200+i*170+Math.sin(T/40+i)*60;const s=160+i%3*70;cx.drawImage(B_SH,wx-s,wy-s*0.5,s*2,s);cx.drawImage(B_SH,wx-s*0.3,wy-s*0.6,s*1.4,s*0.8)}cx.restore()}
  });
  BUS.on('screen',(t,lt)=>{const z=cam.z;
