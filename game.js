@@ -103,8 +103,24 @@ function fresh(){
  const plots={};plots[START_PLOT.join(',')]=1;
  const o=[];const b=(k,x,y)=>o.push({k,x,y,lv:1,price:DEF[k].price||0,uses:0,earn:0});
  b('rock',22,21);b('lantern',21,26);b('sakura',26,22);b('maple',18,22);b('rocks',20,21);b('lantern',25,26);for(let j=25;j<32;j++)b('path',24,j);for(let i=19;i<30;i++)if(i!=24)b('path',i,28);
- return {layout:16,yen:8000,min:8*60+40,plots,objs:o,fin:{inc:0,exp:0,hist:[]},rep:55,t:Date.now(),served:0,ver:2};
+ return {layout:16,ryokanName:"유자향 카피바라 료칸",yen:8000,min:8*60+40,plots,objs:o,fin:{inc:0,exp:0,hist:[]},rep:55,t:Date.now(),served:0,ver:2};
 }
+window.fresh=fresh;
+window.applyState=function(newS,ro){
+ window.READONLY=!!ro;
+ S=JSON.parse(JSON.stringify(newS));
+ S.objs=(S.objs||[]).filter(o=>o&&DEF[o.k]);
+ S.objs.forEach(o=>o.users=0);
+ if(!isFinite(S.yen))S.yen=8000;
+ migrateLayout();migrate();OCC=occ();ensureGate();OCC=occ();
+ groundDirty=true;ghost=null;moving=null;paint=null;hideInfo();
+ guests=[];parts=[];floats=[];bubbles=[];
+ for(let i=0;i<5;i++)spawn();guests.forEach((g,i)=>{g.x-=i*0.3});
+ const b=S.objs.find(o=>DEF[o.k].bath)||S.objs[0];
+ if(b){const[bfw,bfh]=fpOf(b.k,b.rot);focus(b.x+bfw/2,b.y+bfh/2,VW>820?5.2:3.6)}
+ buildTabs();buildCards();hud();
+ if(window.QX&&QX.render)QX.render();
+};
 function load(){
  if(window.VISIT_SAVE){S=window.VISIT_SAVE;window.READONLY=true;return}
  try{const raw=localStorage[SKEY];let d=null;try{d=JSON.parse(raw||'null')}catch(e){localStorage[SKEY+'_corrupt']=raw;setTimeout(()=>toast('저장 파일이 손상되어 백업 후 새로 시작했어요'),1500)}
@@ -124,7 +140,7 @@ function migrate(){for(const o of S.objs)o.rot=(o.rot|0)&1; // 겹치거나 잠�
  for(const o of sorted){if(o.k=='gate'){keep.push(o);for(const[x,y]of tilesOf(o))m[x+','+y]=1;continue}let ok=fits(o,o.x,o.y);if(!ok&&!DEF[o.k].isPath){let best=null;for(let r=1;r<10&&!best;r++)for(let dx=-r;dx<=r&&!best;dx++)for(let dy=-r;dy<=r;dy++)if(fits(o,o.x+dx,o.y+dy)){best=[o.x+dx,o.y+dy];break}
    if(best){o.x=best[0];o.y=best[1];ok=true;moved++}}
   if(ok){const[fw,fh]=fpOf(o.k,o.rot);for(let i=0;i<fw;i++)for(let j=0;j<fh;j++)m[(o.x+i)+','+(o.y+j)]=1;keep.push(o)}else{refund+=DEF[o.k].cost;S.yen+=DEF[o.k].cost}}
- S.objs=keep;if(moved||refund)setTimeout(()=>toast(`겹친 건물 정리: ${moved}개 이동${refund?`, ¥${fmt(refund)} 환불`:''}`),1200)}
+ S.objs=keep;if((moved||refund)&&!window.READONLY)setTimeout(()=>toast(`겹친 건물 정리: ${moved}개 이동${refund?`, ¥${fmt(refund)} 환불`:''}`),1200)}
 function save(){if(window.READONLY||!S)return;S.t=Date.now();try{localStorage[SKEY]=JSON.stringify(S);window.SAVE&&SAVE.mirror(S)}catch(e){if(!save._w){save._w=1;toast('저장 공간이 부족해요 (사진 장식을 줄여보세요)')}}}
 const fmt=n=>Math.floor(n).toLocaleString('ko-KR');
 function avgNet(){const h=S.fin.hist;if(!h.length)return 0;const a=h.slice(-24);return a.reduce((s,x)=>s+x,0)/a.length}
