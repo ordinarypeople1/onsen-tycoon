@@ -164,3 +164,27 @@ img.ic{width:16px;height:16px;image-rendering:pixelated;image-rendering:crisp-ed
 #info .prow{display:flex;gap:3px}#info .prow .b{flex:1;padding:4px 2px;white-space:nowrap}
 @media (pointer:coarse){#info .pa{min-height:58px}}
 @media (max-width:700px){#info.pop{min-width:200px;font-size:12px}}
+
+/* 료칸 등급 모달 */
+#bRank{cursor:pointer;position:relative;transition:transform .12s,filter .12s,box-shadow .12s}
+#bRank:hover{transform:translateY(-1px);filter:brightness(1.04)}
+#bRank:active{transform:translateY(1px)}
+.rk-cur{background:#fffaf0;border:2px solid var(--wood3);border-radius:7px;padding:8px 10px;margin:6px 0 8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.rk-cur .stars{font-size:18px}
+.rk-next{background:#fff7e4;border:2px solid var(--gold);border-radius:7px;padding:8px 10px;margin-bottom:8px}
+.rk-req{margin:5px 0}
+.rk-req .row{border-bottom:0;padding:1px 0;font-size:12.5px}
+.rk-badge{font:700 11px/1 Pretendard,sans-serif;padding:2px 6px;border-radius:10px;display:inline-block}
+.rk-badge.ok{background:#dff0d6;color:#2f6b25;border:1px solid #8ec479}
+.rk-badge.go{background:#fff0cf;color:#9a5b13;border:1px solid #e0b25b}
+.rk-badge.lock{background:#ece3d2;color:#7a6852;border:1px solid #c9b99e}
+.rk-list{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.rk-box{background:#fffaf0;border:1.5px solid var(--washi2);border-radius:6px;padding:7px 9px}
+.rk-box.cur{border-color:var(--indigo);background:#f5f8fc}
+.rk-box.next{border-color:var(--gold);background:#fffbf0}
+.rk-box.done{opacity:0.92}
+.rk-hd{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:3px;font-size:13px}
+.rk-cond{font-size:11.5px;color:#6b4e32;margin-bottom:5px}
+.rk-items{display:flex;flex-wrap:wrap;gap:4px}
+.rk-chip{display:inline-flex;align-items:center;gap:3px;background:var(--washi);border:1px solid var(--wood3);border-radius:4px;padding:2px 5px;font-size:11px;color:var(--ink)}
+.rk-chip img{width:16px;height:16px;object-fit:contain;image-rendering:pixelated}
