@@ -15,65 +15,65 @@ const DEF={
  fall:{n:'폭포탕',tab:'bath',img:'fall',fp:4,sc:1,cost:22000,price:1400,cap:6,dur:30,eff:{fatigue:-85,fun:25},wage:110,star:4,bath:1,water:'#86e0e6',appeal:20,desc:'쏟아지는 폭포 아래 노천탕'},
  fam:{n:'가족탕',tab:'bath',inside:1,img:'fam',fp:2,sc:1,cost:12000,price:1600,cap:4,dur:26,eff:{fatigue:-60,fun:20},wage:70,star:3,appeal:10,light:[[0.1,-0.5]],desc:'가족끼리 오붓한 전세 욕탕'},
  wine:{n:'와인탕',tab:'bath',img:'wine',fp:2,sc:1,cost:18000,price:1500,cap:3,dur:24,eff:{fatigue:-60,fun:30},wage:90,star:4,bath:1,water:'#8a1f3a',appeal:14,desc:'포도향 가득 레드 와인탕'},
- dango:{n:'당고 노점',tab:'food',img:'dango',fp:1,sc:1.3,cost:2000,price:300,cap:2,dur:8,eff:{hunger:-30,fun:10},wage:15,star:1,appeal:4,light:[[0.2,-0.4]],desc:'달콤한 미타라시 당고'},
+ dango:{n:'당고 노점',tab:'food',img:'dango',fp:2,fph:1,sc:0.96,cost:2000,price:300,cap:2,dur:8,eff:{hunger:-30,fun:10},wage:15,star:1,appeal:4,light:[[0.2,-0.4]],desc:'달콤한 미타라시 당고'},
  sake:{n:'사케 바',tab:'food',img:'sake',fp:2,sc:1,cost:9000,price:1000,cap:3,dur:16,eff:{hunger:-20,fun:40},wage:60,star:2,appeal:8,light:[[0.15,-0.5],[-0.2,-0.4]],night:1,desc:'온천 후 한 잔의 사케'},
  tea:{n:'찻집',tab:'food',img:'tea',fp:2,sc:1,cost:6000,price:600,cap:3,dur:18,eff:{hunger:-25,fun:20},wage:40,star:2,appeal:9,light:[[0.1,-0.45]],desc:'말차와 화과자가 있는 찻집'},
- ice:{n:'빙수 가게',tab:'food',img:'ice',fp:1,sc:1.3,cost:3500,price:450,cap:2,dur:10,eff:{hunger:-25,fun:18},wage:25,star:2,appeal:6,desc:'목욕 후 시원한 빙수'},
+ ice:{n:'빙수 가게',tab:'food',img:'ice',fp:2,fph:1,sc:0.96,cost:3500,price:450,cap:2,dur:10,eff:{hunger:-25,fun:18},wage:25,star:2,appeal:6,desc:'목욕 후 시원한 빙수'},
  ramen:{n:'라멘집',tab:'food',img:'ramen',fp:2,sc:1,cost:4000,price:900,cap:3,dur:15,eff:{hunger:-70,fun:5},wage:45,star:1,appeal:6,light:[[0.15,-0.55],[0.28,-0.3]],desc:'유자 시오 라멘이 명물'},
  teishoku:{n:'정식당',tab:'food',img:'teishoku',fp:2,sc:1,cost:9000,price:1600,cap:4,dur:20,eff:{hunger:-90,fun:10},wage:80,star:2,appeal:8,light:[[0.3,-0.35]],desc:'오늘의 유자 연어 정식'},
  izakaya:{n:'이자카야',tab:'food',img:'izakaya',fp:2,sc:1,cost:16000,price:2200,cap:5,dur:25,eff:{hunger:-50,thirst:-50,fun:40},wage:120,star:3,appeal:10,night:1,light:[[-0.1,-0.6],[0.1,-0.6],[0.3,-0.6]],desc:'밤에 북적이는 선술집'},
  milk:{n:'우유 매점',tab:'shop',img:'yuzu',filter:'saturate(0.35) brightness(1.12)',fp:2,sc:1,cost:1500,price:250,cap:3,dur:8,eff:{thirst:-70},wage:20,star:1,appeal:4,desc:'목욕 후엔 역시 커피우유'},
  yuzu:{n:'유자차 매점',tab:'shop',img:'yuzu',fp:2,sc:1,cost:2500,price:350,cap:3,dur:8,eff:{thirst:-60,fun:8},wage:25,star:1,appeal:6,desc:'따끈한 유자차 한 잔'},
  gift:{n:'기념품 가게',tab:'shop',img:'gift',fp:2,sc:1,cost:6000,price:1500,cap:3,dur:12,eff:{fun:-0,joy:30},wage:50,star:2,appeal:7,fun:1,light:[[0.2,-0.4]],desc:'카피바라 인형이 인기'},
- shoot:{n:'사격 노점',tab:'shop',img:'shoot',fp:1,sc:1.3,cost:3000,price:400,cap:2,dur:10,eff:{fun:45},wage:20,star:1,appeal:6,light:[[0.25,-0.45]],desc:'코르크 총으로 경품을 노려라!'},
+ shoot:{n:'사격 노점',tab:'shop',img:'shoot',fp:2,fph:1,sc:0.96,cost:3000,price:400,cap:2,dur:10,eff:{fun:45},wage:20,star:1,appeal:6,light:[[0.25,-0.45]],desc:'코르크 총으로 경품을 노려라!'},
  massage:{n:'마사지실',tab:'shop',inside:1,img:'massage',fp:2,sc:1,cost:8000,price:1200,cap:2,dur:20,eff:{fatigue:-75,fun:10},wage:70,star:2,appeal:8,light:[[-0.15,-0.45]],desc:'뭉친 어깨를 꾹꾹'},
  pingpong:{n:'탁구장',tab:'shop',img:'pingpong',fp:2,sc:1,cost:5000,price:300,cap:2,dur:14,eff:{fun:50,fatigue:10},wage:25,star:2,appeal:7,light:[[-0.15,-0.45]],desc:'온천 하면 역시 탁구!'},
  nap:{n:'수면실',tab:'shop',inside:1,img:'nap',fp:2,sc:1,cost:10000,price:800,cap:4,dur:30,eff:{fatigue:-90},wage:50,star:3,appeal:8,light:[[-0.15,-0.45]],desc:'뜨끈하게 몸 지지고 한숨 자기'},
  room:{n:'객실 별채',tab:'shop',img:'room',fp:3,sc:1,cost:12000,price:6000,cap:4,dur:0,eff:{fatigue:-100},wage:90,star:2,appeal:10,stay:1,light:[[-0.2,-0.3],[0.25,-0.3],[0,-0.55]],desc:'밤에 묵어가는 손님용 객실'},
- sakura:{tree:1,n:'벚꽃나무',tab:'deco',img:'sakura',fp:1,sc:2.3,cost:1200,beauty:8,star:1,emit:'petal',desc:'꽃잎이 흩날려요'},
- maple:{tree:1,n:'단풍나무',tab:'deco',img:'maple',fp:1,sc:2.3,cost:1200,beauty:8,star:1,emit:'leaf',desc:'붉은 잎이 떨어져요'},
- pine:{tree:1,n:'눈 내린 소나무',tab:'deco',img:'pine',fp:1,sc:2.0,cost:2000,beauty:10,star:2,emit:'snow',desc:'주변에 눈이 내려요'},
- torii:{n:'토리이',tab:'deco',img:'torii',fp:1,sc:1.6,cost:2200,beauty:9,star:1,desc:'붉은 토리이, 신성한 입구'},
- bamboo:{n:'대나무 숲 석등',tab:'deco',img:'bamboo',fp:1,sc:1.7,cost:1800,beauty:8,star:1,light:[[0,-0.45]],desc:'바람에 사각이는 대숲'},
+ sakura:{tree:1,n:'벚꽃나무',tab:'deco',img:'sakura',fp:2,sc:1.12,cost:1200,beauty:8,star:1,emit:'petal',desc:'꽃잎이 흩날려요'},
+ maple:{tree:1,n:'단풍나무',tab:'deco',img:'maple',fp:2,sc:1.12,cost:1200,beauty:8,star:1,emit:'leaf',desc:'붉은 잎이 떨어져요'},
+ pine:{tree:1,n:'눈 내린 소나무',tab:'deco',img:'pine',fp:2,sc:1.02,cost:2000,beauty:10,star:2,emit:'snow',desc:'주변에 눈이 내려요'},
+ torii:{n:'토리이',tab:'deco',img:'torii',fp:2,fph:1,sc:1.05,cost:2200,beauty:9,star:1,desc:'붉은 토리이, 신성한 입구'},
+ bamboo:{n:'대나무 숲 석등',tab:'deco',img:'bamboo',fp:2,fph:1,sc:1.1,cost:1800,beauty:8,star:1,light:[[0,-0.45]],desc:'바람에 사각이는 대숲'},
  sandgarden:{n:'모래 정원',tab:'deco',img:'sandgarden',fp:2,sc:1,cost:4000,beauty:15,star:2,desc:'갈퀴로 다듬은 고요한 가레산스이'},
- bridge:{n:'붉은 아치 다리',tab:'deco',img:'bridge',fp:2,walk:1,sc:1,cost:5000,beauty:16,star:2,desc:'작은 개울 위 다이코바시'},
+ bridge:{n:'붉은 아치 다리',tab:'deco',img:'bridge',fp:2,fph:1,sc:1.18,walk:1,sc:1,cost:5000,beauty:16,star:2,desc:'작은 개울 위 다이코바시'},
  waterwheel:{n:'물레방아',tab:'deco',img:'waterwheel',fp:2,sc:1,cost:6000,beauty:18,star:3,desc:'졸졸 물소리와 함께 도는 물레방아'},
  wisteria:{n:'등나무 정자',tab:'deco',img:'wisteria',fp:2,sc:1.05,cost:4500,beauty:16,star:2,desc:'보랏빛 등꽃 아래 돌벤치'},
- ema:{n:'에마 걸이',tab:'deco',img:'ema',fp:1,sc:1.3,cost:1500,beauty:7,star:1,desc:'소원을 적은 나무패'},
- jizo:{n:'지장보살',tab:'deco',img:'jizo',fp:1,sc:0.95,cost:1200,beauty:6,star:1,desc:'빨간 모자의 지장님'},
- tanuki:{n:'너구리 상',tab:'deco',img:'tanuki',fp:1,sc:0.95,cost:1400,beauty:7,star:2,desc:'복을 부르는 너구리'},
- iris:{n:'붓꽃 화단',tab:'deco',img:'iris',fp:1,sc:1.3,cost:800,beauty:6,star:1,desc:'보랏빛 붓꽃이 한가득'},
- lanternpath:{n:'등롱 길',tab:'deco',img:'lanternpath',fp:1,sc:1.35,cost:1600,beauty:7,star:2,walk:1,light:[[-0.32,-0.4],[0.35,-0.55]],desc:'두 개의 석등이 밝히는 돌길'},
- andon_lantern:{n:'전통 행등 (안돈)',tab:'deco',img:'andon_lantern',fp:1,sc:1.2,cost:450,beauty:6,star:1,light:[[0,-0.52,[255,210,120],1.15]],desc:'한지 너머로 따뜻한 호박빛이 번지는 목조 전통 행등'},
- takeakari:{n:'대나무 통 조명 (타케아카리)',tab:'deco',img:'takeakari',fp:1,sc:1.25,cost:680,beauty:8,star:1,light:[[0,-0.50,[255,218,115],1.25]],desc:'정교하게 타공된 대나무 통 사이로 황금빛 문양이 피어나요'},
- chochin_tower:{n:'축제 제등 기둥 (야구라 제등)',tab:'deco',img:'chochin_tower',fp:1,sc:1.5,cost:1100,beauty:11,star:1,light:[[0,-0.68,[255,150,90],1.35],[0,-0.42,[255,208,118],1.25]],desc:'붉고 따뜻한 제등이 층층이 매달려 밤거리를 환히 밝혀요'},
- kagaribi:{n:'화톳불 화로대 (카가리비)',tab:'deco',img:'kagaribi',fp:1,sc:1.3,cost:1650,beauty:13,star:2,fire:1,light:[[0,-0.62,[255,155,60],1.4]],desc:'무쇠 삼각 화로 위에서 장작불과 불티가 타오르는 전통 화톳불'},
- floating_lanterns:{n:'유등 수반 (토로나가시)',tab:'deco',img:'floating_lanterns',fp:2,sc:1.1,cost:2600,beauty:18,star:2,light:[[-0.18,-0.50,[255,212,118],1.2],[0.18,-0.46,[255,195,105],1.2]],desc:'잔잔한 수반 위에 등불이 둥실 떠다니며 수면을 수놓아요'},
- neon_yu:{n:"온천 'ゆ' 네온 입간판",tab:'deco',img:'neon_yu',fp:1,sc:1.3,cost:950,beauty:9,star:1,neon:1,light:[[0,-0.56,[255,95,190],1.25],[0,-0.36,[80,235,255],1.15]],desc:'핑크빛 ゆ 글자와 시안색 온천 마크가 빛나는 쇼와풍 입간판'},
- neon_izakaya:{n:'이자카야 네온 사인탑',tab:'deco',img:'neon_izakaya',fp:1,sc:0.95,cost:2100,beauty:14,star:2,neon:1,light:[[0,-0.72,[255,85,130],1.25],[0,-0.42,[80,230,255],1.2]],desc:'온천 골목의 낭만을 더하는 알록달록 복고풍 네온 사인탑'},
- neon_capy:{n:'카피바라 네온 간판',tab:'deco',img:'neon_capy',fp:1,sc:1.45,cost:3400,beauty:20,star:3,neon:1,light:[[0,-0.56,[255,175,90],1.3],[0,-0.34,[85,235,255],1.2]],desc:'유자를 얹고 온천욕을 즐기는 카피바라가 반짝이는 시그니처 네온'},
- lantern:{n:'석등롱',tab:'deco',img:'lantern',fp:1,sc:1.25,cost:600,beauty:5,star:1,light:[[0,-0.55,[255,212,130],1.15]],desc:'밤이면 은은히 빛나요'},
- rocks:{n:'정원석',tab:'deco',img:'rocks',fp:1,sc:1.4,cost:400,beauty:4,star:1,desc:'이끼 낀 정원석'},
- shishi:{set:'trad',n:'시시오도시',tab:'theme',img:'shishi',fp:1,sc:1.3,cost:1800,beauty:9,star:1,sound:'shishi',desc:'딱! 대나무 소리가 정원에 울려요'},
+ ema:{n:'에마 걸이',tab:'deco',img:'ema',fp:1,fph:2,sc:0.95,cost:1500,beauty:7,star:1,desc:'소원을 적은 나무패'},
+ jizo:{n:'지장보살',tab:'deco',img:'jizo',fp:1,sc:0.88,cost:1200,beauty:6,star:1,desc:'빨간 모자의 지장님'},
+ tanuki:{n:'너구리 상',tab:'deco',img:'tanuki',fp:1,sc:0.92,cost:1400,beauty:7,star:2,desc:'복을 부르는 너구리'},
+ iris:{n:'붓꽃 화단',tab:'deco',img:'iris',fp:2,sc:0.92,cost:800,beauty:6,star:1,desc:'보랏빛 붓꽃이 한가득'},
+ lanternpath:{n:'등롱 길',tab:'deco',img:'lanternpath',fp:1,fph:2,sc:0.98,cost:1600,beauty:7,star:2,walk:1,light:[[-0.32,-0.4],[0.35,-0.55]],desc:'두 개의 석등이 밝히는 돌길'},
+ andon_lantern:{n:'전통 행등 (안돈)',tab:'deco',img:'andon_lantern',fp:1,sc:0.95,cost:450,beauty:6,star:1,light:[[0,-0.52,[255,210,120],1.15]],desc:'한지 너머로 따뜻한 호박빛이 번지는 목조 전통 행등'},
+ takeakari:{n:'대나무 통 조명 (타케아카리)',tab:'deco',img:'takeakari',fp:1,sc:0.96,cost:680,beauty:8,star:1,light:[[0,-0.50,[255,218,115],1.25]],desc:'정교하게 타공된 대나무 통 사이로 황금빛 문양이 피어나요'},
+ chochin_tower:{n:'축제 제등 기둥 (야구라 제등)',tab:'deco',img:'chochin_tower',fp:2,fph:1,sc:1.0,cost:1100,beauty:11,star:1,light:[[0,-0.68,[255,150,90],1.35],[0,-0.42,[255,208,118],1.25]],desc:'붉고 따뜻한 제등이 층층이 매달려 밤거리를 환히 밝혀요'},
+ kagaribi:{n:'화톳불 화로대 (카가리비)',tab:'deco',img:'kagaribi',fp:1,sc:1.02,cost:1650,beauty:13,star:2,fire:1,light:[[0,-0.62,[255,155,60],1.4]],desc:'무쇠 삼각 화로 위에서 장작불과 불티가 타오르는 전통 화톳불'},
+ floating_lanterns:{n:'유등 수반 (토로나가시)',tab:'deco',img:'floating_lanterns',fp:2,sc:1.05,cost:2600,beauty:18,star:2,light:[[-0.18,-0.50,[255,212,118],1.2],[0.18,-0.46,[255,195,105],1.2]],desc:'잔잔한 수반 위에 등불이 둥실 떠다니며 수면을 수놓아요'},
+ neon_yu:{n:"온천 'ゆ' 네온 입간판",tab:'deco',img:'neon_yu',fp:2,fph:1,sc:0.95,cost:950,beauty:9,star:1,neon:1,light:[[0,-0.56,[255,95,190],1.25],[0,-0.36,[80,235,255],1.15]],desc:'핑크빛 ゆ 글자와 시안색 온천 마크가 빛나는 쇼와풍 입간판'},
+ neon_izakaya:{n:'이자카야 네온 사인탑',tab:'deco',img:'neon_izakaya',fp:1,sc:1.02,cost:2100,beauty:14,star:2,neon:1,light:[[0,-0.72,[255,85,130],1.25],[0,-0.42,[80,230,255],1.2]],desc:'온천 골목의 낭만을 더하는 알록달록 복고풍 네온 사인탑'},
+ neon_capy:{n:'카피바라 네온 간판',tab:'deco',img:'neon_capy',fp:2,fph:1,sc:1.0,cost:3400,beauty:20,star:3,neon:1,light:[[0,-0.56,[255,175,90],1.3],[0,-0.34,[85,235,255],1.2]],desc:'유자를 얹고 온천욕을 즐기는 카피바라가 반짝이는 시그니처 네온'},
+ lantern:{n:'석등롱',tab:'deco',img:'lantern',fp:1,sc:0.95,cost:600,beauty:5,star:1,light:[[0,-0.55,[255,212,130],1.15]],desc:'밤이면 은은히 빛나요'},
+ rocks:{n:'정원석',tab:'deco',img:'rocks',fp:2,sc:0.92,cost:400,beauty:4,star:1,desc:'이끼 낀 정원석'},
+ shishi:{set:'trad',n:'시시오도시',tab:'theme',img:'shishi',fp:1,sc:0.95,cost:1800,beauty:9,star:1,sound:'shishi',desc:'딱! 대나무 소리가 정원에 울려요'},
  nodate:{set:'trad',n:'노다테 다과석',tab:'theme',img:'nodate',fp:2,sc:0.95,cost:5000,price:500,cap:3,dur:14,eff:{thirst:-40,fun:20},wage:30,star:2,appeal:8,desc:'붉은 양산 아래 말차 한 잔'},
- pagoda:{set:'trad',n:'석탑',tab:'theme',img:'pagoda',fp:1,sc:1.3,cost:2400,beauty:10,star:2,light:[[0,-0.62]],desc:'이끼 낀 오층 석탑'},
- bamboofence:{set:'trad',n:'대나무 울타리',tab:'theme',img:'bamboofence',fp:1,sc:1.3,cost:300,beauty:3,star:1,desc:'정갈하게 엮은 대나무'},
- cafe:{set:'modern',n:'카페 스탠드',tab:'theme',img:'cafe',fp:2,sc:0.9,cost:8000,price:700,cap:3,dur:9,eff:{thirst:-60,fun:12},wage:45,star:2,appeal:9,light:[[0.0,-0.45]],desc:'갓 내린 유자 라테'},
- lamppost:{set:'modern',n:'모던 가로등',tab:'theme',img:'lamppost',fp:1,sc:0.55,cost:900,beauty:4,star:2,light:[[0.28,-0.9]],desc:'따뜻한 전구색 가로등'},
- olive:{set:'modern',tree:1,n:'올리브 화분',tab:'theme',img:'olive',fp:1,sc:1.3,cost:1500,beauty:7,star:2,desc:'은빛 잎이 바람에 살랑'},
- lounger:{set:'modern',n:'선베드',tab:'theme',img:'lounger',fp:1,sc:1.45,cost:1200,beauty:6,star:3,desc:'탕 옆에서 낮잠 한숨'},
- cedar:{set:'forest',tree:1,n:'신목 삼나무',tab:'theme',img:'cedar',fp:1,sc:2.1,cost:3500,beauty:14,star:2,desc:'금줄을 두른 오래된 삼나무'},
- mushroom:{set:'forest',n:'숲 버섯',tab:'theme',img:'mushroom',fp:1,sc:1.25,cost:500,beauty:5,star:1,desc:'밤이면 반딧불이 모여요'},
- fern:{set:'forest',tree:1,n:'고사리 덤불',tab:'theme',img:'fern',fp:1,sc:1.35,cost:400,beauty:4,star:1,desc:'촉촉한 숲의 초록'},
- birdhouse:{set:'forest',n:'새집',tab:'theme',img:'birdhouse',fp:1,sc:0.85,cost:800,beauty:5,star:2,desc:'참새가 놀러 와요'},
- snowman:{set:'season',sea:3,n:'눈사람',tab:'theme',img:'snowman',fp:1,sc:1.15,cost:700,beauty:5,star:2,desc:'겨울엔 아름다움 두 배'},
- hydrangea:{set:'season',sea:1,tree:1,n:'수국',tab:'theme',img:'hydrangea',fp:1,sc:1.4,cost:900,beauty:6,star:2,desc:'여름엔 아름다움 두 배'},
+ pagoda:{set:'trad',n:'석탑',tab:'theme',img:'pagoda',fp:1,sc:1.15,cost:2400,beauty:10,star:2,light:[[0,-0.62]],desc:'이끼 낀 오층 석탑'},
+ bamboofence:{set:'trad',n:'대나무 울타리',tab:'theme',img:'bamboofence',fp:2,fph:1,sc:0.95,cost:300,beauty:3,star:1,desc:'정갈하게 엮은 대나무'},
+ cafe:{set:'modern',n:'카페 스탠드',tab:'theme',img:'cafe',fp:2,sc:0.95,cost:8000,price:700,cap:3,dur:9,eff:{thirst:-60,fun:12},wage:45,star:2,appeal:9,light:[[0.0,-0.45]],desc:'갓 내린 유자 라테'},
+ lamppost:{set:'modern',n:'모던 가로등',tab:'theme',img:'lamppost',fp:1,sc:1.08,cost:900,beauty:4,star:2,light:[[0.28,-0.9]],desc:'따뜻한 전구색 가로등'},
+ olive:{set:'modern',tree:1,n:'올리브 화분',tab:'theme',img:'olive',fp:1,sc:1.02,cost:1500,beauty:7,star:2,desc:'은빛 잎이 바람에 살랑'},
+ lounger:{set:'modern',n:'선베드',tab:'theme',img:'lounger',fp:1,fph:2,sc:0.98,cost:1200,beauty:6,star:3,desc:'탕 옆에서 낮잠 한숨'},
+ cedar:{set:'forest',tree:1,n:'신목 삼나무',tab:'theme',img:'cedar',fp:2,sc:1.05,cost:3500,beauty:14,star:2,desc:'금줄을 두른 오래된 삼나무'},
+ mushroom:{set:'forest',n:'숲 버섯',tab:'theme',img:'mushroom',fp:1,sc:0.92,cost:500,beauty:5,star:1,desc:'밤이면 반딧불이 모여요'},
+ fern:{set:'forest',tree:1,n:'고사리 덤불',tab:'theme',img:'fern',fp:2,fph:1,sc:0.95,cost:400,beauty:4,star:1,desc:'촉촉한 숲의 초록'},
+ birdhouse:{set:'forest',n:'새집',tab:'theme',img:'birdhouse',fp:1,sc:0.95,cost:800,beauty:5,star:2,desc:'참새가 놀러 와요'},
+ snowman:{set:'season',sea:3,n:'눈사람',tab:'theme',img:'snowman',fp:1,sc:0.95,cost:700,beauty:5,star:2,desc:'겨울엔 아름다움 두 배'},
+ hydrangea:{set:'season',sea:1,tree:1,n:'수국',tab:'theme',img:'hydrangea',fp:2,fph:1,sc:0.98,cost:900,beauty:6,star:2,desc:'여름엔 아름다움 두 배'},
  tsukimi:{set:'season',sea:2,n:'달맞이 상',tab:'theme',img:'tsukimi',fp:1,sc:0.95,cost:1100,beauty:6,star:3,desc:'가을엔 아름다움 두 배'},
- kadomatsu:{set:'season',sea:0,n:'카도마츠',tab:'theme',img:'kadomatsu',fp:1,sc:0.95,cost:1300,beauty:6,star:3,desc:'봄(새해)엔 아름다움 두 배'},
- banner:{photo:'banner',flutter:1,n:'사진 노보리 깃발',tab:'custom',img:null,ic:'🎏',fp:1,sc:0.75,cost:800,beauty:6,star:1,desc:'내 사진으로 만든 픽셀 깃발'},
+ kadomatsu:{set:'season',sea:0,n:'카도마츠',tab:'theme',img:'kadomatsu',fp:1,sc:0.98,cost:1300,beauty:6,star:3,desc:'봄(새해)엔 아름다움 두 배'},
+ banner:{photo:'banner',flutter:1,n:'사진 노보리 깃발',tab:'custom',img:null,ic:'🎏',fp:1,sc:1.05,cost:800,beauty:6,star:1,desc:'내 사진으로 만든 픽셀 깃발'},
  frame:{photo:'frame',n:'사진 액자 이젤',tab:'custom',img:null,ic:'🖼️',fp:1,sc:0.95,cost:1000,beauty:7,star:1,desc:'내 사진을 픽셀 그림으로'},
- noren:{photo:'noren',flutter:1,n:'사진 노렌 문틀',tab:'custom',img:null,ic:'🎐',fp:1,sc:1.25,cost:1500,beauty:8,star:1,desc:'바람에 살랑이는 내 사진 노렌'},
- sign:{photo:'sign',n:'사진 간판',tab:'custom',img:null,ic:'🪧',fp:1,sc:1.1,cost:1200,beauty:7,star:1,desc:'료칸 앞 나만의 간판'},
+ noren:{photo:'noren',flutter:1,n:'사진 노렌 문틀',tab:'custom',img:null,ic:'🎐',fp:2,fph:1,sc:0.92,cost:1500,beauty:8,star:1,desc:'바람에 살랑이는 내 사진 노렌'},
+ sign:{photo:'sign',n:'사진 간판',tab:'custom',img:null,ic:'🪧',fp:2,fph:1,sc:0.85,cost:1200,beauty:7,star:1,desc:'료칸 앞 나만의 간판'},
  gate:{n:'대문',img:'gate',fp:1,cost:0,star:9,walk:1,gate:1,light:[[-0.33,-0.42],[0.22,-0.3]],desc:'손님이 드나드는 유일한 입구'},
  path:{n:'돌길',tab:'deco',img:null,ic:'🪨',fp:1,cost:50,beauty:1,star:1,isPath:1,desc:'드래그해서 칠하세요'},
  path_wood:{n:'나무 데크길',tab:'deco',img:null,ic:'🪵',fp:1,cost:80,beauty:2,star:1,isPath:1,desc:'따뜻한 나무 데크'},
@@ -83,6 +83,7 @@ const DEF={
  path_erase:{n:'길 지우기',tab:'deco',img:null,ic:'🧽',fp:1,cost:0,star:1,erase:1,desc:'드래그해서 길 제거 (50% 환불)'},
 };
 const TABS=[['bath','♨️','탕'],['food','🍜','음식'],['shop','🏮','상점'],['deco','🌸','장식'],['theme','🎐','테마'],['custom','📷','사진']];
+function fpOf(k,rot){const d=DEF[k];if(!d)return[1,1];const w=d.fp||1,h=d.fph||w;return(rot&1)?[h,w]:[w,h]}window.fpOf=fpOf;
 const SETS={trad:['전통','⛩️',['shishi','nodate','pagoda','bamboofence']],modern:['모던','☕',['cafe','lamppost','olive','lounger']],forest:['숲','🌲',['cedar','mushroom','fern','birdhouse']],season:['계절','🍂',['snowman','hydrangea','tsukimi','kadomatsu']]};
 const setsDone=()=>Object.keys(SETS).filter(k=>SETS[k][2].every(i=>S.objs.some(o=>o.k==i)));
 const bMul=d=>d.sea!=null&&d.sea==season()?2:1;
@@ -96,7 +97,7 @@ window.READONLY=false;
 function fresh(){
  const plots={};plots[START_PLOT.join(',')]=1;
  const o=[];const b=(k,x,y)=>o.push({k,x,y,lv:1,price:DEF[k].price||0,uses:0,earn:0});
- b('rock',22,21);b('lantern',21,26);b('sakura',26,22);b('rocks',21,21);b('lantern',25,26);for(let j=25;j<32;j++)b('path',24,j);for(let i=19;i<30;i++)if(i!=24)b('path',i,28);
+ b('rock',22,21);b('lantern',21,26);b('sakura',26,22);b('rocks',20,21);b('lantern',25,26);for(let j=25;j<32;j++)b('path',24,j);for(let i=19;i<30;i++)if(i!=24)b('path',i,28);
  return {layout:16,yen:8000,min:8*60+40,plots,objs:o,fin:{inc:0,exp:0,hist:[]},rep:55,t:Date.now(),served:0,ver:2};
 }
 function load(){
@@ -113,11 +114,11 @@ function migrateLayout(){if(S.layout==16)return;const old=Object.keys(S.plots).l
  for(const k in S.plots)if(k!='1,1')ref+=12000;S.plots={'1,1':1};S.yen+=ref;
  for(const o of S.objs){o.x=o.x-8+20;o.y=o.y-8+20}S.layout=16;if(ref)setTimeout(()=>toast(`구역이 16×16으로 커졌어요! 추가 구역 비용 ¥${fmt(ref)} 환불`),2000)}
 function migrate(){for(const o of S.objs)o.rot=(o.rot|0)&1; // 겹치거나 잠긴 땅의 건물 → 재배치 또는 환불
- const keep=[],m={};let moved=0,refund=0;const fits=(o,x,y)=>{const f=DEF[o.k].fp;for(let i=0;i<f;i++)for(let j=0;j<f;j++){if(!tileOpen(x+i,y+j)||m[(x+i)+','+(y+j)])return false}return true};
- const sorted=S.objs.filter(o=>DEF[o.k]).sort((a,b)=>(DEF[b.k].bath?1:0)-(DEF[a.k].bath?1:0)||DEF[b.k].fp-DEF[a.k].fp);
+ const keep=[],m={};let moved=0,refund=0;const fits=(o,x,y)=>{const[fw,fh]=fpOf(o.k,o.rot);for(let i=0;i<fw;i++)for(let j=0;j<fh;j++){if(!tileOpen(x+i,y+j)||m[(x+i)+','+(y+j)])return false}return true};
+ const sorted=S.objs.filter(o=>DEF[o.k]).sort((a,b)=>(DEF[b.k].bath?1:0)-(DEF[a.k].bath?1:0)||(DEF[b.k].fp*(DEF[b.k].fph||DEF[b.k].fp))-(DEF[a.k].fp*(DEF[a.k].fph||DEF[a.k].fp)));
  for(const o of sorted){if(o.k=='gate'){keep.push(o);for(const[x,y]of tilesOf(o))m[x+','+y]=1;continue}let ok=fits(o,o.x,o.y);if(!ok&&!DEF[o.k].isPath){let best=null;for(let r=1;r<10&&!best;r++)for(let dx=-r;dx<=r&&!best;dx++)for(let dy=-r;dy<=r;dy++)if(fits(o,o.x+dx,o.y+dy)){best=[o.x+dx,o.y+dy];break}
    if(best){o.x=best[0];o.y=best[1];ok=true;moved++}}
-  if(ok){const f=DEF[o.k].fp;for(let i=0;i<f;i++)for(let j=0;j<f;j++)m[(o.x+i)+','+(o.y+j)]=1;keep.push(o)}else{refund+=DEF[o.k].cost;S.yen+=DEF[o.k].cost}}
+  if(ok){const[fw,fh]=fpOf(o.k,o.rot);for(let i=0;i<fw;i++)for(let j=0;j<fh;j++)m[(o.x+i)+','+(o.y+j)]=1;keep.push(o)}else{refund+=DEF[o.k].cost;S.yen+=DEF[o.k].cost}}
  S.objs=keep;if(moved||refund)setTimeout(()=>toast(`겹친 건물 정리: ${moved}개 이동${refund?`, ¥${fmt(refund)} 환불`:''}`),1200)}
 function save(){if(window.READONLY||!S)return;S.t=Date.now();try{localStorage[SKEY]=JSON.stringify(S);window.SAVE&&SAVE.mirror(S)}catch(e){if(!save._w){save._w=1;toast('저장 공간이 부족해요 (사진 장식을 줄여보세요)')}}}
 const fmt=n=>Math.floor(n).toLocaleString('ko-KR');
@@ -168,7 +169,7 @@ function rng(s){return()=>{s=(s*16807)%2147483647;return s/2147483647}}
 function buildGround(){
  const W=N*TW+8,H=N*TH+40;ground=mk(W*2,H*2);const g=ground.getContext('2d');g.scale(2,2);const ox=N*TW/2+4;
  const pathMap={};S.objs.forEach(o=>{if(DEF[o.k].isPath)pathMap[o.x+','+o.y]=o.k});
- const near=new Set();for(const o of S.objs){if(DEF[o.k].fp>=2)for(let x=o.x-1;x<=o.x+DEF[o.k].fp;x++)for(let y=o.y-1;y<=o.y+DEF[o.k].fp;y++)near.add(x+','+y)}
+ const near=new Set();for(const o of S.objs){const d=DEF[o.k],[fw,fh]=fpOf(o.k,o.rot);if(fw*fh>=4&&!d.tree&&o.k!='rocks'&&o.k!='iris'&&o.k!='floating_lanterns')for(let x=o.x-1;x<=o.x+fw;x++)for(let y=o.y-1;y<=o.y+fh;y++)near.add(x+','+y)}
  // 절벽 옆면
  if(0){g.fillStyle='#8a6a48';g.beginPath();g.moveTo(ox-N*TW/2,N*TH/2);g.lineTo(ox,N*TH);g.lineTo(ox+N*TW/2,N*TH/2);g.lineTo(ox+N*TW/2,N*TH/2+14);g.lineTo(ox,N*TH+14);g.lineTo(ox-N*TW/2,N*TH/2+14);g.fill();
  g.fillStyle='#6d5238';g.beginPath();g.moveTo(ox,N*TH);g.lineTo(ox+N*TW/2,N*TH/2);g.lineTo(ox+N*TW/2,N*TH/2+14);g.lineTo(ox,N*TH+14);g.fill()}
@@ -210,7 +211,7 @@ const occ=()=>{const m={};for(const o of S.objs){if(o===moving)continue;for(cons
 const tierOf=lv=>Math.max(1,Math.min(5,lv|0));
 function skey(o){if(o.k=='gate')return o.dir=='y'?'gate_f':'gate';if(DEF[o.k].photo){const pk='pic_'+o.k+'_'+(o.pic||'');return VAR[pk]?pk:o.k}const d=DEF[o.k];const b=o.k=='milk'?'milk':d.img;const k=b+'_lv'+tierOf((o.lv||1)-(o.build&&o.build.t<0.9?1:0));let r=(d.price&&VAR[k])?k:(o.k=='milk'?'milk':o.k);return (o.rot&1)?r+'~m':r}
 const gTiles=(x,y,dir)=>dir=='x'?[[x,y],[x+1,y],[x+2,y]]:[[x,y],[x,y+1],[x,y+2]];
-function tilesOf(o){if(o.k=='gate')return gTiles(o.x,o.y,o.dir);const f=DEF[o.k].fp,t=[];for(let i=0;i<f;i++)for(let j=0;j<f;j++)t.push([o.x+i,o.y+j]);return t}
+function tilesOf(o){if(o.k=='gate')return gTiles(o.x,o.y,o.dir);const[fw,fh]=fpOf(o.k,o.rot),t=[];for(let i=0;i<fw;i++)for(let j=0;j<fh;j++)t.push([o.x+i,o.y+j]);return t}
 function gateOut(x,y,dir){const t=gTiles(x,y,dir);const cand=dir=='x'?[[0,1],[0,-1]]:[[1,0],[-1,0]];for(const[a,b]of cand)if(t.every(([u,v])=>!tileOpen(u+a,v+b)))return[a,b];return null}
 function gateValid(x,y,dir){const t=gTiles(x,y,dir);if(!t.every(([u,v])=>tileOpen(u,v)&&(!OCC[u+','+v]||DEF[OCC[u+','+v].k].isPath)))return false;return !!gateOut(x,y,dir)}
 function gateSpot(hx,hy){let best=null,bd=1e9;for(let dx=-5;dx<=5;dx++)for(let dy=-5;dy<=5;dy++)for(const dir of['x','y']){const x=hx+dx,y=hy+dy;if(!gateValid(x,y,dir))continue;const m=gTiles(x,y,dir)[1];const d=Math.hypot(m[0]-hx,m[1]-hy);if(d<bd){bd=d;best={x,y,dir}}}return best}
@@ -219,7 +220,7 @@ function gateInfo(){const g=gateObj();if(!g)return null;const t=gTiles(g.x,g.y,g
 function ensureGate(){if(gateObj())return;OCC=occ();let sp=null,bd=1e9;for(let x=0;x<N;x++)for(let y=0;y<N;y++)for(const dir of['x','y'])if(gateValid(x,y,dir)){const m=gTiles(x,y,dir)[1];const d=Math.hypot(m[0]-24,m[1]-31.5)+(dir=='y'?0.5:0);if(d<bd){bd=d;sp={x,y,dir}}}
  if(!sp)return;placeGate(sp);const gi=gateInfo(),b=S.objs.find(o=>DEF[o.k].bath);OCC=occ();if(b){const d=doorTile(b);const p=d&&findPath(gi.m[0],gi.m[1],d[0],d[1]);if(p)for(const[px,py]of p){const x=px|0,y=py|0;if(!OCC[x+','+y])S.objs.push({k:'path',x,y,lv:1,price:0,uses:0,earn:0})}}OCC=occ();groundDirty=true}
 function placeGate(sp){const t=gTiles(sp.x,sp.y,sp.dir);const set=new Set(t.map(p=>p.join(',')));S.objs=S.objs.filter(o=>!(DEF[o.k].isPath&&set.has(o.x+','+o.y)));let g=gateObj();if(!g){g={k:'gate',lv:1,price:0,uses:0,earn:0};S.objs.push(g)}g.x=sp.x;g.y=sp.y;g.dir=sp.dir}
-let OCC={};let ROT=0;function rotateObj(o){if(!o||o.k=='gate'||DEF[o.k].isPath)return;const old=(o.rot|0)&1;try{o.rot=old^1;OCC=occ();if(!moving&&!window.__dbg.reachOK()){o.rot=old;OCC=occ();toast('그 방향으론 손님이 들어갈 수 없어요');return}groundDirty=true;guests.forEach(g=>{if(g.cur===o&&g.inBath){const[a,b]=bathSlot(o,g.slot||0);g.x=a;g.y=b}if(g.target===o&&g.st=='walk'){g.target=null;g.path=[]}});save()}catch(e){console.warn('rotate failed',e);o.rot=old;try{OCC=occ()}catch(_){}groundDirty=true;toast('회전하지 못했어요')}}
+let OCC={};let ROT=0;function rotateObj(o){if(!o||o.k=="gate"||DEF[o.k].isPath)return;const old=(o.rot|0)&1,ox=o.x,oy=o.y;try{const next=old^1,[fw0,fh0]=fpOf(o.k,old),[fw1,fh1]=fpOf(o.k,next);o.rot=next;if(fw0!==fh0&&!moving){const prevM=moving;moving=o;OCC=occ();let placed=canPlace(o.k,ox,oy,next);if(!placed){for(const[dx,dy]of[[0,0],[-1,0],[0,-1],[1,0],[0,1],[-1,-1],[1,-1],[-1,1],[1,1]])if(canPlace(o.k,ox+dx,oy+dy,next)){o.x=ox+dx;o.y=oy+dy;placed=true;break}}moving=prevM;if(!placed){o.rot=old;o.x=ox;o.y=oy;OCC=occ();toast("회전할 공간이 부족해요");return}clearPaths(o.k,o.x,o.y,next)}OCC=occ();if(!moving&&!window.__dbg.reachOK()){o.rot=old;o.x=ox;o.y=oy;OCC=occ();toast("그 방향으론 손님이 들어갈 수 없어요");return}groundDirty=true;guests.forEach(g=>{if(g.cur===o&&g.inBath){const[a,b]=bathSlot(o,g.slot||0);g.x=a;g.y=b}if(g.target===o&&g.st=="walk"){g.target=null;g.path=[]}});if(INFO_O===o)showInfo(o);save()}catch(e){console.warn("rotate failed",e);o.rot=old;o.x=ox;o.y=oy;try{OCC=occ()}catch(_){}groundDirty=true;toast("회전하지 못했어요")}}
 window.rotateObj=rotateObj;
 function rotateGate(){const g=gateObj();if(!g)return;const cur=gateOut(g.x,g.y,g.dir);const key=d=>d[0]+','+d[1];const order=['0,1','1,0','0,-1','-1,0'];const gm=gTiles(g.x,g.y,g.dir)[1];const save_=[g.x,g.y,g.dir];
  S.objs.splice(S.objs.indexOf(g),1);OCC=occ();let best=null;
@@ -231,12 +232,12 @@ window.rotateGate=rotateGate;setTimeout(()=>{const gb=document.getElementById('g
 function startMove(o){if(window.READONLY)return;clearTimeout(infoT);if(moving)cancelMove();hideInfo();mode=null;
  guests.forEach(g=>{if(g.cur===o)finish(g);if(g.target===o){g.target=null;g.path=[]}});
  moving=o;o._from=[o.x,o.y,o.dir];ghost=o.k;OCC=occ();groundDirty=true;$('moveBar').style.display='flex';toast('놓을 곳을 눌러주세요 (Esc·우클릭 취소)')}
-function dropMove(x,y){const o=moving;if(o.k=='gate'){const sp=gateSpot(x,y);if(!sp){toast('대문은 열린 땅의 가장자리에만 놓을 수 있어요');return}endMove();placeGate(sp);OCC=occ();groundDirty=true;guests.forEach(g=>{if(g.st=='walk'){g.target=null;g.path=[]}});save();return}if(!canPlace(o.k,x,y)){toast('여기엔 놓을 수 없어요');return}clearPaths(o.k,x,y);o.x=x;o.y=y;endMove();anims['o'+S.objs.indexOf(o)]={t:0};
- for(let i=0;i<8;i++)parts.push({k:'steam',x:x+DEF[o.k].fp/2+(Math.random()-0.5)*DEF[o.k].fp,y:y+DEF[o.k].fp/2,h:0,vx:0,l:1,L:1,s:2});save()}
+function dropMove(x,y){const o=moving;if(o.k=='gate'){const sp=gateSpot(x,y);if(!sp){toast('대문은 열린 땅의 가장자리에만 놓을 수 있어요');return}endMove();placeGate(sp);OCC=occ();groundDirty=true;guests.forEach(g=>{if(g.st=='walk'){g.target=null;g.path=[]}});save();return}if(!canPlace(o.k,x,y,o.rot)){toast('여기엔 놓을 수 없어요');return}clearPaths(o.k,x,y,o.rot);o.x=x;o.y=y;endMove();anims['o'+S.objs.indexOf(o)]={t:0};
+ const[fw,fh]=fpOf(o.k,o.rot);for(let i=0;i<8;i++)parts.push({k:'steam',x:x+fw/2+(Math.random()-0.5)*fw,y:y+fh/2,h:0,vx:0,l:1,L:1,s:2});save()}
 function cancelMove(){if(!moving)return;moving.x=moving._from[0];moving.y=moving._from[1];if(moving._from[2])moving.dir=moving._from[2];endMove()}
 function endMove(){if(moving)delete moving._from;moving=null;ghost=null;OCC=occ();groundDirty=true;$('moveBar').style.display='none';guests.forEach(g=>{if(g.st=='walk'&&g.target){const t=g.target;g.target=null;g.path=[]}});buildCards()}
-function canPlace(k,x,y){if(k=='gate')return !!gateSpot(x,y);const f=DEF[k].fp;for(let i=0;i<f;i++)for(let j=0;j<f;j++){const o=OCC[(x+i)+','+(y+j)];if(!tileOpen(x+i,y+j)||(o&&!(DEF[o.k].isPath&&!DEF[k].isPath)))return false}return true}
-function clearPaths(k,x,y){const f=DEF[k].fp;S.objs=S.objs.filter(o=>!(DEF[o.k].isPath&&o.x>=x&&o.x<x+f&&o.y>=y&&o.y<y+f))}
+function canPlace(k,x,y,rot){if(k=='gate')return !!gateSpot(x,y);const r=rot!==undefined?rot:(moving?moving.rot:ROT),[fw,fh]=fpOf(k,r);for(let i=0;i<fw;i++)for(let j=0;j<fh;j++){const o=OCC[(x+i)+','+(y+j)];if(!tileOpen(x+i,y+j)||(o&&!(DEF[o.k].isPath&&!DEF[k].isPath)))return false}return true}
+function clearPaths(k,x,y,rot){const r=rot!==undefined?rot:(moving?moving.rot:ROT),[fw,fh]=fpOf(k,r);S.objs=S.objs.filter(o=>!(DEF[o.k].isPath&&o.x>=x&&o.x<x+fw&&o.y>=y&&o.y<y+fh))}
 function starScore(){let s=S.rep*0.5,b=0;for(const o of S.objs){const d=DEF[o.k];s+=(d.appeal||0)*(1+0.35*(o.lv-1))*0.4;b+=(d.beauty||0)*bMul(d)}s+=Math.sqrt(b)*3+Object.keys(S.plots).length*4+setsDone().length*15;return s}
 const STAR_REQ=[0,0,[55,500,1],[105,1700,2],[190,5000,3],[320,9000,4]]; // [점수, 누적손님, 구역수]
 let _stC={k:''};function stars(){const ck=Math.floor(S.min/10)+'|'+S.objs.length+'|'+S.served+'|'+Object.keys(S.plots).length+'|'+Math.floor(S.rep||0);if(_stC.k===ck)return _stC.v;_stC.k=ck;return _stC.v=stars_()}
@@ -281,13 +282,13 @@ function pickTarget(g){
  return null}
 function pickBy(g,list,nk){list.sort((a,b)=>(dist(g,a)+a.price/300)-(dist(g,b)+b.price/300));const o=list[0];
  if(Math.random()<0.25)think(g,THOUGHT.want[nk]||'');return o}
-const ctr=o=>{const f=DEF[o.k].fp;return[o.x+f/2,o.y+f/2]};
+const ctr=o=>{const[fw,fh]=fpOf(o.k,o.rot);return[o.x+fw/2,o.y+fh/2]};
 const dist=(g,o)=>{const[a,b]=ctr(o);return Math.hypot(a-g.x,b-g.y)};
 function think(g,t){if(!t)return;(window.__thinks=window.__thinks||{})[t]=(window.__thinks[t]||0)+1;bubbles=bubbles.filter(b=>b.g!==g);if(bubbles.length>=4)return;bubbles.push({g,t,l:3.2})}
 function walkable(x,y){if(!tileOpen(x,y))return false;const o=OCC[x+','+y];return !o||!!DEF[o.k].walk||!!DEF[o.k].isPath||DEF[o.k].fp==1&&!!DEF[o.k].isPath}
 function fairPrice(o){return DEF[o.k].price*(1+o.lv*0.12)}
-function doorTile(o){const f=DEF[o.k].fp;const sides=[[o.x+(f>>1),o.y+f],[o.x+f,o.y+(f>>1)],[o.x+(f>>1),o.y-1],[o.x-1,o.y+(f>>1)]];const r=(o.rot|0)&1;const c=[sides[r],sides[(r+1)&3],sides[(r+3)&3],sides[(r+2)&3]];for(let i=0;i<f;i++)c.push([o.x+i,o.y+f],[o.x+f,o.y+i],[o.x-1,o.y+i],[o.x+i,o.y-1]);return c.find(([x,y])=>walkable(x,y))}
-function door(o){const d=doorTile(o)||[o.x,o.y+DEF[o.k].fp];return[d[0]+0.5,d[1]+0.5]}
+function doorTile(o){const[fw,fh]=fpOf(o.k,o.rot);const sides=[[o.x+(fw>>1),o.y+fh],[o.x+fw,o.y+(fh>>1)],[o.x+(fw>>1),o.y-1],[o.x-1,o.y+(fh>>1)]];const r=(o.rot|0)&1;const c=[sides[r],sides[(r+1)&3],sides[(r+3)&3],sides[(r+2)&3]];for(let i=0;i<fw;i++)c.push([o.x+i,o.y+fh],[o.x+i,o.y-1]);for(let j=0;j<fh;j++)c.push([o.x+fw,o.y+j],[o.x-1,o.y+j]);return c.find(([x,y])=>walkable(x,y))}
+function door(o){const[,fh]=fpOf(o.k,o.rot);const d=doorTile(o)||[o.x,o.y+fh];return[d[0]+0.5,d[1]+0.5]}
 function findPath(sx,sy,ex,ey){sx|=0;sy|=0;ex|=0;ey|=0;if(sx==ex&&sy==ey)return[];
  const K=(x,y)=>y*N+x,open=[[0,sx,sy]],g={},from={};g[K(sx,sy)]=0;let it=0;
  while(open.length&&it++<9000){let bi=0;for(let i=1;i<open.length;i++)if(open[i][0]<open[bi][0])bi=i;const[,x,y]=open.splice(bi,1)[0];
@@ -351,15 +352,15 @@ function leave(g){if(!g.leaving)BUS.emit('leave',g);g.leaving=true;g.target=null
 const toScreenT=(x,y)=>{const[a,b]=iso(x,y);return toScreen(a,b)};
 let SHK=0,SHKo=[0,0];
 function stepBuild(dt){cam.x-=SHKo[0];cam.y-=SHKo[1];SHKo=[0,0];
- for(const o of S.objs){const b=o.build;if(!b)continue;const p=b.t;b.t+=dt/2.0;const f=DEF[o.k].fp,c=ctr(o);
+ for(const o of S.objs){const b=o.build;if(!b)continue;const p=b.t;b.t+=dt/2.0;const[fw,fh]=fpOf(o.k,o.rot),f=Math.max(fw,fh),c=ctr(o);
   for(const hk of[0.12,0.3,0.48,0.66])if(p<hk&&b.t>=hk){try{SND.hammer()}catch(e){}for(let i=0;i<10;i++)parts.push({k:'dust',x:c[0]+(Math.random()-0.5)*f,y:c[1]+(Math.random()-0.5)*f,h:Math.random()*4,vh:3+Math.random()*6,l:0.9});SHK=Math.max(SHK,0.35)}
   if(p<0.9&&b.t>=0.9){anims['o'+S.objs.indexOf(o)]={t:0};upFx(o);BUS.emit('upgrade',o);SHK=1;groundDirty=true}
   if(b.t>=1.6)delete o.build}
  if(SHK>0.01){const a=SHK*SHK*3*cam.z/3;SHKo=[(Math.random()-0.5)*a,(Math.random()-0.5)*a];cam.x+=SHKo[0];cam.y+=SHKo[1];SHK*=Math.pow(0.02,dt)}else SHK=0}
-function drawBuild(t){for(const o of S.objs){const b=o.build;if(!b)continue;const f=DEF[o.k].fp,G=objGeom(o);const T=b.t;
+function drawBuild(t){for(const o of S.objs){const b=o.build;if(!b)continue;const[fw,fh]=fpOf(o.k,o.rot),G=objGeom(o);const T=b.t;
   // 비계: 0~0.9 동안 기둥이 솟고 가로대가 걸림, 0.9 이후 빠르게 내려가며 사라짐
   const up=Math.min(1,T/0.55),dn=T>0.9?Math.min(1,(T-0.9)/0.35):0;const H=G.H*0.92*up*(1-dn),al=1-dn;if(al<=0)continue;
-  const cs=[[o.x,o.y+f],[o.x+f,o.y+f],[o.x+f,o.y],[o.x,o.y]].map(([x,y])=>iso(x,y));
+  const cs=[[o.x,o.y+fh],[o.x+fw,o.y+fh],[o.x+fw,o.y],[o.x,o.y]].map(([x,y])=>iso(x,y));
   cx.save();cx.globalAlpha=al;cx.lineCap='square';
   const pole=(X,Y,back)=>{cx.strokeStyle=back?'#6b4a2c':'#8a6238';cx.lineWidth=1.6;cx.beginPath();cx.moveTo(X,Y);cx.lineTo(X,Y-H);cx.stroke();cx.strokeStyle='#c49a62';cx.lineWidth=0.5;cx.beginPath();cx.moveTo(X-0.5,Y);cx.lineTo(X-0.5,Y-H);cx.stroke()};
   pole(cs[3][0],cs[3][1],1);pole(cs[2][0],cs[2][1],1);
@@ -373,7 +374,7 @@ function drawBuild(t){for(const o of S.objs){const b=o.build;if(!b)continue;cons
   // 공개 순간: 빛 폭발
   if(T>0.86&&T<1.3){const k=1-Math.abs(T-0.95)/0.35;cx.save();cx.globalCompositeOperation='lighter';cx.globalAlpha=Math.max(0,k);glow(G.X,G.Y-G.H*0.45,G.W*0.9,'rgba(255,230,170,0.9)');
    cx.strokeStyle=`rgba(255,240,200,${Math.max(0,k)*0.7})`;cx.lineWidth=1;cx.beginPath();for(let i=0;i<12;i++){const a=i/12*6.283+t/900,r0=G.W*0.2,r1=G.W*(0.45+0.4*(T-0.86));cx.moveTo(G.X+Math.cos(a)*r0,G.Y-G.H*0.45+Math.sin(a)*r0*0.6);cx.lineTo(G.X+Math.cos(a)*r1,G.Y-G.H*0.45+Math.sin(a)*r1*0.6)}cx.stroke();cx.restore()}}}
-function upFx(o){const f=DEF[o.k].fp,c=ctr(o);for(let i=0;i<70;i++){const a=Math.random()*6.28,r=Math.random()*f*0.6;parts.push({k:'spark',x:c[0]+Math.cos(a)*r,y:c[1]+Math.sin(a)*r,h:Math.random()*10,vh:12+Math.random()*25,l:1.2+Math.random(),L:2})}
+function upFx(o){const[fw,fh]=fpOf(o.k,o.rot),f=Math.max(fw,fh),c=ctr(o);for(let i=0;i<70;i++){const a=Math.random()*6.28,r=Math.random()*f*0.6;parts.push({k:'spark',x:c[0]+Math.cos(a)*r,y:c[1]+Math.sin(a)*r,h:Math.random()*10,vh:12+Math.random()*25,l:1.2+Math.random(),L:2})}
  for(let i=0;i<24;i++){const a=i/24*6.28;parts.push({k:'dust',x:c[0],y:c[1],vx:Math.cos(a)*f*0.9,vy:Math.sin(a)*f*0.9,h:1,l:0.9,L:0.9})}}
 // ===== 파티클 =====
 function emit(dt){if(parts.length>(window.GFX_LOW?140:600))return;if(window.GFX_LOW)dt*=0.5;
@@ -404,7 +405,7 @@ let BLOB={},_bN=0;function blob(rgb){if(BLOB[rgb])return BLOB[rgb];if(++_bN>300)
 let _gc={},_gcN=0;function parseC(c){let v=_gc[c];if(v)return v;if(++_gcN>3000){_gc={};_gcN=0}const m=c.match(/rgba?\(([^)]+)\)/);const p=m[1].split(',').map(x=>x.trim());v=_gc[c]=[p.slice(0,3).join(','),p[3]!=null?+p[3]:1];return v}
 function ao(X,Y,rx,ry,a){const pa=cx.globalAlpha;cx.globalAlpha=pa*a;cx.drawImage(blob('40,30,20'),X-rx,Y-ry,rx*2,ry*2);cx.globalAlpha=pa;return;const g=cx.createRadialGradient(X,Y,0,X,Y,rx);g.addColorStop(0,`rgba(40,30,20,${a})`);g.addColorStop(1,'rgba(40,30,20,0)');cx.save();cx.translate(X,Y);cx.scale(1,ry/rx);cx.translate(-X,-Y);cx.fillStyle=g;cx.fillRect(X-rx,Y-rx,rx*2,rx*2);cx.restore()}
 function objGeom(o){if(o.k=='gate'){const w=o.dir=='x'?3:1,h=o.dir=='x'?1:3;const[cX,cY]=iso(o.x+w/2,o.y+h/2);const sY=iso(o.x+w,o.y+h)[1];const W=(w+h)*TW/2*1.05;const v=VAR[skey(o)];const H=v?W*v.base.height/v.base.width:W;return{X:cX,Y:sY+1,cY,W,H}}
- const d=DEF[o.k],f=d.fp;const[cX,cY]=iso(o.x+f/2,o.y+f/2);const sY=iso(o.x+f,o.y+f)[1];const W=f*TW*(d.sc||1);const v=VAR[skey(o)];const H=v?W*v.base.height/v.base.width:W;return{X:cX,Y:sY+(f==1?-1:0.5),cY,W,H}}
+ const d=DEF[o.k],[fw,fh]=fpOf(o.k,o.rot);const[cX,cY]=iso(o.x+fw/2,o.y+fh/2);const sY=iso(o.x+fw,o.y+fh)[1];const W=(fw+fh)*TW/2*(d.sc||1);const v=VAR[skey(o)];const H=v?W*v.base.height/v.base.width:W;return{X:cX,Y:sY+(fw==1&&fh==1?-1:0.5),cY,W,H}}
 function render(t){
  const lt=light(),sv=sunVec(),z=cam.z;
  cx.setTransform(DPR,0,0,DPR,0,0);cx.imageSmoothingEnabled=false;
@@ -448,7 +449,7 @@ function render(t){
  for(const it of list){
   if(it.part=='pondrim'){if(window.drawPondRim)drawPondRim(it.o);continue}if(it.part){const o=it.o,G=objGeom(o);drawSprite(skey(o)+'_'+it.part,o,G.X,G.Y,G.W,lt,sv,1)}
   else if(it.o){const o=it.o,d=DEF[o.k],G=objGeom(o);const an=anims['o'+S.objs.indexOf(o)];const pop=an?Math.min(1,an.t*3):1;
-   const Wp=G.W*(0.7+0.3*easeOut(pop));const fade=hidden.has(o)&&!d.bath&&d.fp>1&&!window.READONLY&&!document.body.classList.contains('zen');const sw_=(d.tree||d.flutter)?(Math.sin(t/1100+o.x*1.7+o.y)*0.018+(window.WIND||0)*0.025+(o.sway||0)*Math.sin(t/110)*0.25):0;if(sw_){cx.save();cx.translate(G.X,G.Y);cx.transform(1,0,-sw_,1,0,0);cx.translate(-G.X,-G.Y)}drawSprite(skey(o),o,G.X,G.Y,Wp,lt,sv,pop*(fade?0.5:1));if(sw_)cx.restore();
+   const Wp=G.W*(0.7+0.3*easeOut(pop));const fade=hidden.has(o)&&!d.bath&&(d.fp>1||(d.fph||1)>1)&&!window.READONLY&&!document.body.classList.contains('zen');const sw_=(d.tree||d.flutter)?(Math.sin(t/1100+o.x*1.7+o.y)*0.018+(window.WIND||0)*0.025+(o.sway||0)*Math.sin(t/110)*0.25):0;if(sw_){cx.save();cx.translate(G.X,G.Y);cx.transform(1,0,-sw_,1,0,0);cx.translate(-G.X,-G.Y)}drawSprite(skey(o),o,G.X,G.Y,Wp,lt,sv,pop*(fade?0.5:1));if(sw_)cx.restore();
    if(d.bath){drawWater(o,G,t,lt);cx.save();bathClip(o);guests.filter(g=>g.inBath&&g.cur===o).sort((a,b)=>a.x+a.y-b.x-b.y).forEach(g=>drawGuest(g,t,lt,sv));cx.restore();const ov=skey(o)+'_over';if(VAR[ov]&&guests.some(g=>g.inBath&&g.cur===o))drawSprite(ov,o,G.X,G.Y,Wp,lt,sv,pop)}
    if(o.lv>1){for(let i=0;i<o.lv-1;i++){cx.fillStyle='#f6cf5a';cx.fillRect(G.X-8+i*4,G.Y+1,3,3)}}}
   else drawGuest(it.g,t,lt,sv);}
@@ -470,9 +471,11 @@ function render(t){
     cx.fillStyle=gr;cx.beginPath();cx.moveTo(ox-50+sv.kx*10,G.cY-100);cx.lineTo(ox-38+sv.kx*10,G.cY-100);cx.lineTo(ox+8,G.cY+4);cx.lineTo(ox-4,G.cY+4);cx.fill()}}cx.restore()}
  // 고스트
  if(ghost=='gate'&&hoverT){const sp=gateSpot(hoverT[0],hoverT[1]);const t=sp?gTiles(sp.x,sp.y,sp.dir):[hoverT];cx.fillStyle=sp?'rgba(140,230,140,0.5)':'rgba(240,110,100,0.5)';for(const[x,y]of t){const[X,Y]=iso(x,y);cx.beginPath();cx.moveTo(X,Y);cx.lineTo(X+16,Y+8);cx.lineTo(X,Y+16);cx.lineTo(X-16,Y+8);cx.fill()}if(sp){const o={k:'gate',...sp};const G=objGeom(o);drawSprite(skey(o),o,G.X,G.Y,G.W,lt,sv,0.65)}}
- else if(ghost&&hoverT){const ok=canPlace(ghost,hoverT[0],hoverT[1]);const f=DEF[ghost].fp;cx.fillStyle=ok?'rgba(140,230,140,0.45)':'rgba(240,110,100,0.45)';
-  for(let i=0;i<f;i++)for(let j=0;j<f;j++){const[X,Y]=iso(hoverT[0]+i,hoverT[1]+j);cx.beginPath();cx.moveTo(X,Y);cx.lineTo(X+16,Y+8);cx.lineTo(X,Y+16);cx.lineTo(X-16,Y+8);cx.fill()}
-  if(DEF[ghost].img||VAR[ghost]){const o={k:ghost,x:hoverT[0],y:hoverT[1],lv:moving?moving.lv:1,rot:moving?moving.rot:ROT};const G=objGeom(o);drawSprite(skey(o),o,G.X,G.Y,G.W,lt,sv,0.65)}}
+ else if(ghost&&hoverT){const r=moving?moving.rot:ROT;const ok=canPlace(ghost,hoverT[0],hoverT[1],r);const[fw,fh]=fpOf(ghost,r);cx.fillStyle=ok?'rgba(140,230,140,0.45)':'rgba(240,110,100,0.45)';
+  for(let i=0;i<fw;i++)for(let j=0;j<fh;j++){const[X,Y]=iso(hoverT[0]+i,hoverT[1]+j);cx.beginPath();cx.moveTo(X,Y);cx.lineTo(X+16,Y+8);cx.lineTo(X,Y+16);cx.lineTo(X-16,Y+8);cx.fill()}
+  const[p0,p1,p2,p3]=[[hoverT[0],hoverT[1]],[hoverT[0]+fw,hoverT[1]],[hoverT[0]+fw,hoverT[1]+fh],[hoverT[0],hoverT[1]+fh]].map(([x,y])=>iso(x,y));
+  cx.strokeStyle=ok?'rgba(210,255,195,0.95)':'rgba(255,165,155,0.95)';cx.lineWidth=1.2;cx.beginPath();cx.moveTo(...p0);cx.lineTo(...p1);cx.lineTo(...p2);cx.lineTo(...p3);cx.closePath();cx.stroke();
+  if(DEF[ghost].img||VAR[ghost]){const o={k:ghost,x:hoverT[0],y:hoverT[1],lv:moving?moving.lv:1,rot:r};const G=objGeom(o);drawSprite(skey(o),o,G.X,G.Y,G.W,lt,sv,0.65)}}
  // 조명: 주변광 곱하기
  cx.setTransform(DPR,0,0,DPR,0,0);if(Math.min(...lt.amb)<250){cx.globalCompositeOperation='multiply';cx.fillStyle=`rgb(${lt.amb})`;cx.fillRect(0,0,VW,VH)}
  // 따뜻한 햇살 그라디언트
@@ -499,34 +502,45 @@ const EMI={},LMI={};function emiOf(key){if(key in EMI)return EMI[key];const mir=
  const s2=mk(Math.max(1,W>>2),Math.max(1,H>>2)),g2=s2.getContext('2d');g2.drawImage(im,0,0,s2.width,s2.height);g.imageSmoothingEnabled=true;g.globalAlpha=0.9;g.drawImage(s2,0,0,W,H);g.globalAlpha=1;g.drawImage(im,0,0);
  return EMI[key]={c,pts:L.map(([x,y,w])=>[mir?1-x:x,y,w])}}
 function nightLights(t,lt,z){const k0=Math.min(1,(lt.night-0.1)/0.5),k=k0*k0*(3-2*k0);const low=window.GFX_LOW;
- for(const o of S.objs){const d=DEF[o.k];if(d.isPath||o===moving)continue;const G=objGeom(o);const[sx,sy]=toScreen(G.X,G.Y);if(sx<-G.W*z-90||sx>VW+G.W*z+90||sy<-90||sy-G.H*z>VH+110)continue;
-  const lv=o.lv||1,key=skey(o),ph=(o.x*7.1+o.y*3.3),flip=o.rot&1;
+ for(const o of S.objs){const d=DEF[o.k];if(d.isPath||o===moving)continue;const G=objGeom(o);const[sx,sy]=toScreen(G.X,G.Y);const[gx,gy]=toScreen(G.X,G.cY);if(sx<-G.W*z-180||sx>VW+G.W*z+180||sy<-180||sy-G.H*z>VH+180)continue;
+  const lv=o.lv||1,key=skey(o),ph=(o.x*7.1+o.y*3.3),flip=o.rot&1,[fw,fh]=fpOf(o.k,o.rot);
   // 켜지는 순서를 시설마다 살짝 다르게 (해질녘에 하나씩 점등)
   const on=Math.max(0,Math.min(1,(k-((ph*0.37)%1)*0.22)/0.78));if(on<=0)continue;
   const fl=0.93+0.045*Math.sin(t/170+ph)+0.025*Math.sin(t/53+ph*3);
   const e=o.k=='gate'?null:emiOf(key);
   if(e){const x0=sx-G.W/2*z,y0=sy-G.H*z;cx.globalCompositeOperation='lighter';cx.globalAlpha=Math.min(1,0.88*on*fl);if(e.m){cx.save();cx.translate(sx*2,0);cx.scale(-1,1)}cx.drawImage(e.c,x0,y0,G.W*z,G.H*z);if(e.m)cx.restore();
-   if(!d.light){cx.globalCompositeOperation='screen';const nP=low?1:Math.min(e.pts.length,2+Math.floor(lv/2));for(let i=0;i<nP;i++){const[u,v]=e.pts[i];const X=x0+u*G.W*z,Y=y0+v*G.H*z,f2=fl+0.04*Math.sin(t/90+i*2.1+ph);
-    cx.globalAlpha=1;glow(X,Y,(11+lv*1.4)*z,`rgba(255,202,124,${0.36*on*f2})`);
-    if(!low&&i<2){cx.save();cx.translate(X,sy-1*z);cx.scale(1,0.46);glow(0,0,(22+lv*2.5)*z,`rgba(255,180,100,${0.20*on*f2})`);cx.restore()}}}}
-  if(d.light){for(let i=0;i<d.light.length;i++){const pt=d.light[i],lx=flip?-pt[0]:pt[0],ly=pt[1],col=pt[2]||[255,212,134],rm=pt[3]||1.15;
-   const[X,Y]=toScreen(G.X+lx*G.W,G.Y+ly*G.H);
-   const f2=d.fire?(0.85+0.10*Math.sin(t/52+ph+i)+0.07*Math.cos(t/29+ph*2)):d.neon?(0.94+0.06*Math.sin(t/115+ph+i)):fl;
+   if(!d.light){cx.globalCompositeOperation='screen';cx.globalAlpha=1;
+    if(!low){cx.save();cx.translate(gx,gy+2*z);cx.scale(1,0.50);glow(0,0,(54+Math.max(fw,fh)*14+lv*4)*z,`rgba(255,192,110,${0.28*on*fl})`);cx.restore()}
+    const nP=low?1:Math.min(e.pts.length,2+Math.floor(lv/2));for(let i=0;i<nP;i++){const[u,v]=e.pts[i];const X=x0+u*G.W*z,Y=y0+v*G.H*z,f2=fl+0.04*Math.sin(t/90+i*2.1+ph);
+     cx.globalAlpha=1;glow(X,Y,(18+lv*2)*z,`rgba(255,202,124,${0.38*on*f2})`);
+     if(!low&&i<2){cx.save();cx.translate(X,sy-1*z);cx.scale(1,0.48);glow(0,0,(38+lv*3.5)*z,`rgba(255,184,102,${0.26*on*f2})`);cx.restore()}}}}
+  if(d.light){
+   // 조명 주변 바닥 타일(2.5~4.5칸 반경)까지 넓고 따뜻하게 퍼지는 지면 조명 풀
+   const pt0=d.light[0],col0=pt0[2]||[255,208,128],rm0=Math.max(...d.light.map(p=>p[3]||1.15)),span=Math.max(fw,fh);
+   const f0=d.fire?(0.85+0.10*Math.sin(t/52+ph)+0.07*Math.cos(t/29+ph*2)):d.neon?(0.94+0.06*Math.sin(t/115+ph)):fl;
    cx.globalCompositeOperation='screen';cx.globalAlpha=1;
-   glow(X,Y,16*rm*z,`rgba(${col[0]},${col[1]},${col[2]},${0.34*on*f2})`);
-   if(i===0||d.fp>1){cx.save();cx.translate(X,sy+1*z);cx.scale(1,0.48);glow(0,0,26*rm*z,`rgba(${col[0]},${col[1]},${col[2]},${0.22*on*f2})`);cx.restore()}
-   cx.globalCompositeOperation='lighter';
-   glow(X,Y,6.5*rm*z,`rgba(${col[0]},${col[1]},${col[2]},${0.35*on*f2})`);
-   if(!e)glow(X,Y,3.0*rm*z,`rgba(255,246,220,${0.65*on*f2})`)}}
+   cx.save();cx.translate(gx,gy+2*z);cx.scale(1,0.52);
+   glow(0,0,(74*rm0+(span-1)*18)*z,`rgba(${col0[0]},${col0[1]},${col0[2]},${0.38*on*f0})`);
+   glow(0,0,(42*rm0+(span-1)*10)*z,`rgba(255,226,162,${0.28*on*f0})`);
+   cx.restore();
+   for(let i=0;i<d.light.length;i++){const pt=d.light[i],lx=flip?-pt[0]:pt[0],ly=pt[1],col=pt[2]||[255,212,134],rm=pt[3]||1.15;
+    const[X,Y]=toScreen(G.X+lx*G.W,G.Y+ly*G.H);
+    const f2=d.fire?(0.85+0.10*Math.sin(t/52+ph+i)+0.07*Math.cos(t/29+ph*2)):d.neon?(0.94+0.06*Math.sin(t/115+ph+i)):fl;
+    cx.globalCompositeOperation='screen';cx.globalAlpha=1;
+    glow(X,Y,34*rm*z,`rgba(${col[0]},${col[1]},${col[2]},${0.36*on*f2})`);
+    if(i===0||span>1||d.light.length<=3){cx.save();cx.translate(X,sy+1*z);cx.scale(1,0.50);glow(0,0,54*rm*z,`rgba(${col[0]},${col[1]},${col[2]},${0.30*on*f2})`);cx.restore()}
+    cx.globalCompositeOperation='lighter';
+    glow(X,Y,10*rm*z,`rgba(${col[0]},${col[1]},${col[2]},${0.42*on*f2})`);
+    if(!e)glow(X,Y,3.6*rm*z,`rgba(255,246,220,${0.70*on*f2})`)}}
   // 탕: 수중등 + 가장자리 등 (레벨에 따라 늘어남)
   if(d.bath&&!d.inside){const W=wgeo(o);const[X,Y]=toScreen(W.cX,W.cY);cx.globalCompositeOperation='screen';cx.globalAlpha=1;cx.save();cx.translate(X,Y);cx.scale(1,W.ry/W.rx);
-    glow(0,0,W.rx*z*1.18,`rgba(120,225,218,${0.26*on*fl})`);glow(0,W.rx*0.22*z,W.rx*z*0.72,`rgba(255,212,146,${(0.18+0.04*lv)*on*fl})`);cx.restore();
+    glow(0,0,W.rx*z*1.45,`rgba(120,225,218,${0.32*on*fl})`);glow(0,W.rx*0.22*z,W.rx*z*0.95,`rgba(255,212,146,${(0.24+0.04*lv)*on*fl})`);cx.restore();
    cx.globalCompositeOperation='lighter';const nE=low?0:Math.min(8,lv*2-1);for(let i=0;i<nE;i++){const a=Math.PI*(0.15+0.7*(i+0.5)/nE);const ex=X+Math.cos(a)*W.rx*z*0.98,ey=Y+Math.sin(a)*W.ry*z*0.98+1*z,f3=fl+0.06*Math.sin(t/120+i);
-    glow(ex,ey,3.5*z,`rgba(255,232,180,${0.62*on*f3})`);glow(ex,ey-W.ry*0.3*z,8.5*z,`rgba(255,194,122,${0.15*on*f3})`)}}
+    glow(ex,ey,4.2*z,`rgba(255,232,180,${0.65*on*f3})`);glow(ex,ey-W.ry*0.3*z,14*z,`rgba(255,194,122,${0.22*on*f3})`)}}
   // 가게 앞 길가 등 (Lv2·Lv4에서 추가)
   if(d.price&&!d.bath&&!low){const n=lv>=4?2:lv>=2?1:0;for(let i=0;i<n;i++){const s_=i?1:-1;const X=sx+s_*G.W*0.46*z,Y=sy-2*z;cx.globalAlpha=1;
-    cx.globalCompositeOperation='lighter';glow(X,Y-5*z,3.2*z,`rgba(255,236,190,${0.75*on*fl})`);
-    cx.globalCompositeOperation='screen';glow(X,Y-5*z,11*z,`rgba(255,194,114,${0.28*on*fl})`);cx.save();cx.translate(X,Y);cx.scale(1,0.45);glow(0,0,18*z,`rgba(255,174,94,${0.20*on*fl})`);cx.restore()}}}
+    cx.globalCompositeOperation='lighter';glow(X,Y-5*z,3.8*z,`rgba(255,236,190,${0.78*on*fl})`);
+    cx.globalCompositeOperation='screen';glow(X,Y-5*z,22*z,`rgba(255,194,114,${0.32*on*fl})`);cx.save();cx.translate(X,Y);cx.scale(1,0.48);glow(0,0,38*z,`rgba(255,178,98,${0.28*on*fl})`);cx.restore()}}}
  cx.globalAlpha=1;BUS.emit('nightlight',t,lt,k,z)}
 function glow(X,Y,r,c){const[rgb,a]=parseC(c);const pa=cx.globalAlpha;cx.globalAlpha=pa*a;cx.drawImage(blob(rgb),X-r,Y-r,r*2,r*2);cx.globalAlpha=pa;return;const g=cx.createRadialGradient(X,Y,0,X,Y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=g;cx.fillRect(X-r,Y-r,r*2,r*2)}
 let FOREST=null;// ===== 원경: 계곡·숲·강 회화 배경 (화면 공간 1장, 줌/이동 시차, 시간대·계절 색조) =====
@@ -668,7 +682,7 @@ function sortSubItems(items,st){
  });
 }
 function buildCards(){_stC.k='';const st=stars();
- const card=([k,d])=>`<div class="card ${ghost==k?'sel':''} ${(d.star||1)>st?'lock':''}" data-k="${k}" data-need="${d.star}★ 필요" title="${d.desc}">${d.img?`<img src="assets/${d.img}.png" style="${d.filter?'filter:'+d.filter:''}">`:`<div style="height:56px;display:flex;align-items:center;justify-content:center;font-size:30px">${d.ic||'🪨'}</div>`}<b>${d.n}</b><span class="p">${d.erase?'50% 환불':d.isPath?'¥'+fmt(d.cost)+'/칸':'¥'+fmt(d.cost)}</span></div>`;
+ const card=([k,d])=>{const fw=d.fp||1,fh=d.fph||fw,fpBadge=d.erase?'':`<span class="fpb">${fw}×${fh}</span>`;return`<div class="card ${ghost==k?'sel':''} ${(d.star||1)>st?'lock':''}" data-k="${k}" data-need="${d.star}★ 필요" title="${d.desc} (${fw}×${fh}칸)">${fpBadge}${d.img?`<img src="assets/${d.img}.png" style="${d.filter?'filter:'+d.filter:''}">`:`<div style="height:56px;display:flex;align-items:center;justify-content:center;font-size:30px">${d.ic||'🪨'}</div>`}<b>${d.n}</b><span class="p">${d.erase?'50% 환불':d.isPath?'¥'+fmt(d.cost)+'/칸':'¥'+fmt(d.cost)}</span></div>`};
  const done=setsDone(),subs=SUBCATS[tab]||[],seen=new Set();
  const blocks=subs.map(([id,title,icKey,keys,sk])=>{
   const raw=keys.filter(k=>DEF[k]).map(k=>{seen.add(k);return[k,DEF[k]]});
@@ -739,20 +753,20 @@ function onTap(sx,sy){const[fx,fy]=toTile(sx,sy);const x=Math.floor(fx),y=Math.f
  if(!ghost&&!moving&&window.AMB&&AMB.tap(fx,fy,sx,sy))return;
  if(ghost){if(!canPlace(ghost,x,y))return toast(tileOpen(x,y)?'여기엔 지을 수 없어요':'잠긴 구역이에요. 표지판을 눌러 열어주세요');const d=DEF[ghost];if(S.yen<d.cost)return toast('엔이 부족해요');
   S.yen-=d.cost;S.fin.exp+=d.cost;S.objs.push({k:ghost,x,y,lv:1,rot:DEF[ghost].isPath?0:ROT,price:d.price||0,uses:0,earn:0});anims['o'+(S.objs.length-1)]={t:0};OCC=occ();groundDirty=true;
-  for(let i=0;i<10;i++)parts.push({k:'steam',x:x+d.fp/2+(Math.random()-0.5)*d.fp,y:y+d.fp/2+(Math.random()-0.5)*d.fp,h:0,vx:0,l:1,L:1,s:2});if(ghost=='path'){}else if(!ev.shift){ghost=null;buildCards()}save();return}
+  const[fw,fh]=fpOf(ghost,ROT);for(let i=0;i<10;i++)parts.push({k:'steam',x:x+fw/2+(Math.random()-0.5)*fw,y:y+fh/2+(Math.random()-0.5)*fh,h:0,vx:0,l:1,L:1,s:2});if(ghost=='path'){}else if(!ev.shift){ghost=null;buildCards()}save();return}
  const o=pickObj(sx,sy);if(o&&!DEF[o.k].isPath){if(mode=='del'){remove(o);return}clearTimeout(infoT);infoT=setTimeout(()=>{if(!moving)showInfo(o)},230)}else hideInfo()}
 function unlock(s){const k=s.px+','+s.py;if(S.yen<s.price)return toast(`구역 확장에 ¥${fmt(s.price)} 필요해요`);S.yen-=s.price;S.fin.exp+=s.price;S.plots[k]=1;BUS.emit('unlock',k);anims['p'+k]={t:0};toast('🎉 새 구역이 열렸어요!');
  for(let i=0;i<40;i++)parts.push({k:'petal',x:s.px*PS+Math.random()*PS,y:s.py*PS+Math.random()*PS,h:20+Math.random()*30,l:3,L:3,ph:Math.random()*6});save()}
 const ev={shift:false};
 function initInput(){
  cv.addEventListener('pointerdown',e=>{if(ghost&&DEF[ghost].fp==1&&(DEF[ghost].isPath||DEF[ghost].erase)&&e.button!=2){const[a,b]=toTile(e.clientX,e.clientY);paint={x0:a|0,y0:b|0,x1:a|0,y1:b|0,area:e.shiftKey};return}ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});clearTimeout(lp);if(e.pointerType!='mouse'&&!moving&&!ghost){const sx=e.clientX,sy=e.clientY;lp=setTimeout(()=>{if(drag&&!drag.m&&ptrs.size==1){const o=pickObj(sx,sy);if(o&&!DEF[o.k].isPath){drag.lp=true;startMove(o)}}},550)}ev.shift=e.shiftKey;if(ptrs.size==1)drag={x:e.clientX,y:e.clientY,cx:cam.x,cy:cam.y,m:false};else{const p=[...ptrs.values()];pinch={d:Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y),z:cam.z};drag=null}});
- cv.addEventListener('pointermove',e=>{if(e.pointerType=='mouse'&&!ptrs.size){const h=ghost||moving?null:pickObj(e.clientX,e.clientY);window.HOVER=h&&!DEF[h.k].isPath?h:null;cv.style.cursor=window.HOVER?'pointer':''}const[a,b]=toTile(e.clientX,e.clientY);if(paint){paint.x1=a|0;paint.y1=b|0;paint.area=paint.area||e.shiftKey;paintCursor=[e.clientX,e.clientY]}hoverT=[Math.floor(a-(ghost?DEF[ghost].fp/2-0.5:0)),Math.floor(b-(ghost?DEF[ghost].fp/2-0.5:0))];if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ cv.addEventListener('pointermove',e=>{if(e.pointerType=='mouse'&&!ptrs.size){const h=ghost||moving?null:pickObj(e.clientX,e.clientY);window.HOVER=h&&!DEF[h.k].isPath?h:null;cv.style.cursor=window.HOVER?'pointer':''}const[a,b]=toTile(e.clientX,e.clientY);if(paint){paint.x1=a|0;paint.y1=b|0;paint.area=paint.area||e.shiftKey;paintCursor=[e.clientX,e.clientY]}const[gfw,gfh]=ghost?fpOf(ghost,moving?moving.rot:ROT):[1,1];hoverT=[Math.floor(a-(ghost?gfw/2-0.5:0)),Math.floor(b-(ghost?gfh/2-0.5:0))];if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(pinch&&ptrs.size==2){const p=[...ptrs.values()];zoomAt((p[0].x+p[1].x)/2,(p[0].y+p[1].y)/2,pinch.z*Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y)/pinch.d);cam.tz=cam.z}
   else if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>6){drag.m=true;clearTimeout(lp)}if(drag.m){cam.x=drag.cx+dx;cam.y=drag.cy+dy}}});
  cv.addEventListener('pointerup',e=>{clearTimeout(lp);if(paint){applyPaint();paint=null;return}if(drag&&drag.lp){ptrs.delete(e.pointerId);drag=null;return}
   if(drag&&!drag.m&&!moving&&!ghost&&mode!='del'){const now=performance.now();const o=pickObj(e.clientX,e.clientY);
    if(o&&lastTap.o===o&&now-lastTap.t<400){lastTap={};ptrs.delete(e.pointerId);drag=null;startMove(o);return}lastTap={o,t:now}}
-  if(drag&&!drag.m&&ptrs.size==1){if(ghost){const[a,b]=toTile(e.clientX,e.clientY);hoverT=[Math.floor(a-(DEF[ghost].fp/2-0.5)),Math.floor(b-(DEF[ghost].fp/2-0.5))];placeAt()}else onTap(e.clientX,e.clientY)}ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;drag=null});
+  if(drag&&!drag.m&&ptrs.size==1){if(ghost){const[a,b]=toTile(e.clientX,e.clientY),[gfw,gfh]=fpOf(ghost,moving?moving.rot:ROT);hoverT=[Math.floor(a-(gfw/2-0.5)),Math.floor(b-(gfh/2-0.5))];placeAt()}else onTap(e.clientX,e.clientY)}ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;drag=null});
  cv.addEventListener('pointercancel',e=>{ptrs.delete(e.pointerId);drag=null;pinch=null});
  cv.addEventListener('wheel',e=>{e.preventDefault();zoomTarget=[e.clientX,e.clientY];cam.tz=Math.max(zmin(),Math.min(8,cam.tz*(e.deltaY<0?1.15:1/1.15)))},{passive:false});
  cv.addEventListener('contextmenu',e=>{e.preventDefault();if(moving)return cancelMove();ghost=null;buildCards()});
@@ -782,7 +796,7 @@ function applyPaint(){const k=ghost,{t,cost}=paintPlan();if(!t.length)return;if(
 function placeAt(){const[x,y]=hoverT;const[sx,sy]=toScreenT(x+0.5,y+0.5);onTapPlace(x,y)}
 function onTapPlace(x,y){if(window.READONLY)return;if(moving)return dropMove(x,y);if(!canPlace(ghost,x,y))return toast(tileOpen(x,y)?'여기엔 지을 수 없어요':'잠긴 구역이에요. 표지판을 눌러 열어주세요');const d=DEF[ghost];if(S.yen<d.cost)return toast('엔이 부족해요');
  S.yen-=d.cost;S.fin.exp+=d.cost;clearPaths(ghost,x,y);S.objs.push({k:ghost,x,y,lv:1,rot:DEF[ghost].isPath?0:ROT,price:d.price||0,uses:0,earn:0});BUS.emit('build',S.objs[S.objs.length-1]);anims['o'+(S.objs.length-1)]={t:0};OCC=occ();groundDirty=true;
- for(let i=0;i<10;i++)parts.push({k:'steam',x:x+d.fp/2+(Math.random()-0.5)*d.fp,y:y+d.fp/2+(Math.random()-0.5)*d.fp,h:0,vx:0,l:1,L:1,s:2});
+ const[fw,fh]=fpOf(ghost,ROT);for(let i=0;i<10;i++)parts.push({k:'steam',x:x+fw/2+(Math.random()-0.5)*fw,y:y+fh/2+(Math.random()-0.5)*fh,h:0,vx:0,l:1,L:1,s:2});
  if(ghost!='path'&&!ev.shift){ghost=null;buildCards()}save()}
 let zoomTarget=null,homeAnim=null;
 // ===== 루프 =====
@@ -807,8 +821,8 @@ let _ferr=0,_pb=8;function frame(now){_pb=8;try{frame_(now)}catch(e){if(_ferr++<
 function frame_(now){warnAcc+=1;if(warnAcc%90==1)checkReach();const dt=Math.min(0.1,(now-last)/1000||0);last=now;
  if(!paused&&!window.READONLY)for(let i=0;i<speed;i++)step(dt);else if(window.READONLY&&!paused)step(dt);
  if(Math.abs(cam.tz-cam.z)>0.001){const z=cam.z+(cam.tz-cam.z)*Math.min(1,dt*10);const p=zoomTarget||[VW/2,VH/2];zoomAt(p[0],p[1],z)}
- if(homeAnim){homeAnim.t+=dt/0.9;const k=easeOut(Math.min(1,homeAnim.t));const f=homeAnim.to.k?DEF[homeAnim.to.k].fp:1;const save_=cam.z;
-  const z=lerp(homeAnim.from.z,VW>820?5.2:3.6,k);cam.z=z;cam.tz=z;const[wx,wy]=iso(homeAnim.to.x+f/2,homeAnim.to.y+f/2);const tx_=VW*(VW>820?0.42:0.5)-wx*z,ty_=VH*(VW>820?0.5:0.33)-wy*z;
+ if(homeAnim){homeAnim.t+=dt/0.9;const k=easeOut(Math.min(1,homeAnim.t));const[fw,fh]=homeAnim.to.k?fpOf(homeAnim.to.k,homeAnim.to.rot):[1,1];const save_=cam.z;
+  const z=lerp(homeAnim.from.z,VW>820?5.2:3.6,k);cam.z=z;cam.tz=z;const[wx,wy]=iso(homeAnim.to.x+fw/2,homeAnim.to.y+fh/2);const tx_=VW*(VW>820?0.42:0.5)-wx*z,ty_=VH*(VW>820?0.5:0.33)-wy*z;
   cam.x=lerp(homeAnim.from.x,tx_,k);cam.y=lerp(homeAnim.from.y,ty_,k);if(homeAnim.t>=1)homeAnim=null}
  stepBuild(dt);BUS.emit('frame',dt,now);if(!window.__norender&&(!window.GFX_LOW||!window.FPS30||(frameN++&1)==0)){render(now);hud()}saveAcc+=dt;if(saveAcc>5){saveAcc=0;save()}}
 async function boot(){resize();addEventListener('resize',resize);if(window.VISIT_PROMISE){try{window.VISIT_SAVE=await window.VISIT_PROMISE}catch(e){window.VISIT_SAVE=null;setTimeout(()=>toast('방문 링크가 올바르지 않아요'),1200)}}load();S.objs.forEach(o=>o.users=0);migrateLayout();migrate();OCC=occ();ensureGate();OCC=occ();
@@ -819,7 +833,7 @@ async function boot(){resize();addEventListener('resize',resize);if(window.VISIT
  for(const l of[1,3,5]){}for(const l of[1,2,3,4,5])if(IMG['yuzu_lv'+l])variants('milk_lv'+l,IMG['yuzu_lv'+l],DEF.milk.filter);
  // 기존 이름 매핑
  DEF.milk.img='milk';
- const b=S.objs.find(o=>DEF[o.k].bath)||S.objs[0];focus(b.x+DEF[b.k].fp/2,b.y+DEF[b.k].fp/2,VW>820?5.2:3.6);
+ const b=S.objs.find(o=>DEF[o.k].bath)||S.objs[0];const[bfw,bfh]=fpOf(b.k,b.rot);focus(b.x+bfw/2,b.y+bfh/2,VW>820?5.2:3.6);
  for(let i=0;i<5;i++)spawn();guests.forEach((g,i)=>{g.x-=i*0.3});
  buildTabs();initInput();window.__ready=true;requestAnimationFrame(t=>{last=t;frame(t)})}
 // 시설 표시용 키 매핑 (milk는 yuzu 이미지에 필터)

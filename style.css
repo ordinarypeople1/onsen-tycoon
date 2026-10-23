@@ -135,6 +135,9 @@ body.visit #build,body.visit #bOpen,body.visit #tDel,body.visit #quest,body.visi
 img.ic{width:16px;height:16px;image-rendering:pixelated;image-rendering:crisp-edges;vertical-align:-3px;display:inline-block;flex:none}
 @media (min-resolution:1.5dppx){img.ic{width:16px;height:16px}}
 .tool img.ic,.tab img.ic{width:32px;height:32px;display:block;margin:0 auto 1px}
+.card img.ic{width:48px;height:48px;display:block;margin:4px auto}
+.bk .ph img.ic{width:32px;height:32px}
+.card .fpb{position:absolute;top:3px;left:3px;font:700 9.5px/1 Pretendard,sans-serif;color:#5a3b22;background:rgba(247,239,220,0.92);border:1px solid rgba(160,104,58,0.45);border-radius:4px;padding:1.5px 3.5px;pointer-events:none;z-index:1}
 #bOpen img.ic,.bh img.ic,#top img.ic,.mb img.ic{width:16px;height:16px}
 .box,.tool,.panel,#build,#quest,.ovl .menu{background:var(--washi);background-image:linear-gradient(rgba(255,255,255,.35),rgba(0,0,0,0) 40%),repeating-linear-gradient(90deg,rgba(120,90,50,.025) 0 2px,transparent 2px 5px);border:2px solid var(--wood);box-shadow:0 0 0 1px var(--wood3) inset,0 3px 0 var(--ink);color:var(--ink)}
 .box{border-radius:6px}.panel,#build,#quest{border-radius:8px}
