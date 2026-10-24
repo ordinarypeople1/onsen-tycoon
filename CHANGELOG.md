@@ -1,5 +1,10 @@
 # CHANGELOG — 카피바라 온센 료칸 타이쿤
  
+## v4.1 — 로딩 최적화
+- 스프라이트 PNG 291개를 팔레트(인덱스) PNG로 무손실 재저장: 픽셀 완전 일치 검증, assets PNG 11.4MB → 4.1MB
+- 폰트: 2MB 전체 Pretendard 대신 공식 동적 서브셋(`assets/fonts/pretendard.css`, unicode-range 92조각) 사용. 부팅 시 `assets/fonts/glyphs.js`에 모은 사용 글자의 조각만 선로딩 → 약 650KB. 화면 문구를 바꾸면 `python3 tools/font_glyphs.py` 재실행
+- 저장소 정리: 스크린샷(`shots/`, `shot_*.png`, `play_*.png`)·시뮬 결과(`sim*.json`)·`__pycache__` 제거 및 `.gitignore` 등록, 개발 스크립트는 `tools/dev/`, 이미지 처리 스크립트(`cut.py`·`cut2.py`·`key.py`)는 `tools/`로 이동 — 모두 레포 루트에서 실행 (예: `node tools/dev/shot3.js`, `python3 tools/key.py …`)
+
 ## v4.0
 - 탕 좌석 재설계: 스프라이트에서 수면 영역 자동 검출(`tools/water.py` → `assets/water.js`), 탕·레벨별 좌석표(뒤→앞), 앞쪽 테두리 기준 클리핑으로 몸이 물에 잠겨 보임, 정원은 좌석 수로 제한(히노키 2·바위 8·유백 12). 사우나는 실내 이용(손님 숨김)
 - 클릭 판정: 스프라이트 알파 마스크 + 풋프린트 + 여유 패딩(모바일 12px), 깊이상 맨 위 우선, 마우스 호버 외곽선
