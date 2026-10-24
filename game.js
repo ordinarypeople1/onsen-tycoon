@@ -343,8 +343,8 @@ function beautyAt(x,y){let b=0;for(const o of S.objs){const d=DEF[o.k];if(!d.bea
 // ===== 시간/조명 =====
 const hour=()=>(S.min/60)%24,dayN=()=>Math.floor(S.min/1440)+1,season=()=>Math.floor((dayN()-1)/7)%4;
 const KEYS=[ // h, 하늘, 주변광(곱), 밝기 (뿌연 느낌 없이 맑고 선명한 채도 + 인디고 야경)
- [0,'#242d58',[172,182,232],0.0],[5,'#3e467c',[190,192,234],0.18],[6.5,'#f4ba8e',[255,240,224],0.68],[8.2,'#48bed4',[255,254,250],0.96],
- [12,'#38b8ce',[255,255,255],1],[16,'#58c4d4',[255,250,240],0.94],[18,'#f29b68',[255,228,204],0.65],[19.3,'#5e508e',[196,190,232],0.28],[21,'#283364',[176,184,232],0.08],[24,'#242d58',[172,182,232],0]];
+ [0,'#141a3a',[96,110,172],0.0],[5,'#283062',[124,132,188],0.18],[6.5,'#f4ba8e',[255,240,224],0.68],[8.2,'#48bed4',[255,254,250],0.96],
+ [12,'#38b8ce',[255,255,255],1],[16,'#58c4d4',[255,250,240],0.94],[18,'#f29b68',[255,228,204],0.65],[19.3,'#4e4482',[180,172,222],0.28],[21,'#1a2350',[108,120,178],0.08],[24,'#141a3a',[96,110,172],0]];
 function lerp(a,b,t){return a+(b-a)*t}
 function hex(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]}
 function light(){const h=hour();let i=0;while(KEYS[i+1][0]<=h)i++;const a=KEYS[i],b=KEYS[i+1],t=(h-a[0])/(b[0]-a[0]);
@@ -605,14 +605,14 @@ const EMI={},LMI={};let _emiS=null;function emiOf(key){if(key in EMI)return EMI[
  // 번짐: 공용 스크래치 캔버스 축소-확대 소프트 글로우 + 원본
  const sw=Math.max(1,W>>2),sh=Math.max(1,H>>2),s2=_emiS||(_emiS=mk(sw,sh));s2.width=sw;s2.height=sh;const g2=s2.getContext('2d');g2.drawImage(im,0,0,sw,sh);g.imageSmoothingEnabled=true;g.globalAlpha=0.5;g.drawImage(s2,0,0,W,H);g.globalAlpha=1;g.drawImage(im,0,0,W,H);delete LMI[bk];
  return EMI[key]={c,pts:L.map(([x,y,w])=>[x,y,w])}}
-function nightLights(t,lt,z){const k0=Math.min(1,(lt.night-0.1)/0.5),k=k0*k0*(3-2*k0);const low=window.GFX_LOW;
+function nightLights(t,lt,z){const k0=Math.min(1,(lt.night-0.1)/0.5),k=k0*k0*(3-2*k0);const low=window.GFX_LOW;GLK.k=k;
  for(const o of S.objs){const d=DEF[o.k];if(d.isPath||o===moving)continue;const G=objGeom(o);const[sx,sy]=toScreen(G.X,G.Y);const[gx,gy]=toScreen(G.X,G.cY);if(sx<-G.W*z-180||sx>VW+G.W*z+180||sy<-180||sy-G.H*z>VH+180)continue;
   const lv=o.lv||1,key=skey(o),ph=(o.x*7.1+o.y*3.3),flip=o.rot&1,[fw,fh]=fpOf(o.k,o.rot);
   // 켜지는 순서를 시설마다 살짝 다르게 (해질녘에 하나씩 점등)
   const on=Math.max(0,Math.min(1,(k-((ph*0.37)%1)*0.22)/0.78));if(on<=0)continue;
   const fl=0.93+0.045*Math.sin(t/170+ph)+0.025*Math.sin(t/53+ph*3);
   const e=o.k=='gate'?null:emiOf(key);
-  if(e){const x0=sx-G.W/2*z,y0=sy-G.H*z;cx.globalCompositeOperation='lighter';cx.globalAlpha=Math.min(1,0.78*on*fl);if(e.m){cx.save();cx.translate(sx*2,0);cx.scale(-1,1)}cx.drawImage(e.c,x0,y0,G.W*z,G.H*z);if(e.m)cx.restore();
+  if(e){const x0=sx-G.W/2*z,y0=sy-G.H*z;cx.globalCompositeOperation='lighter';cx.globalAlpha=Math.min(1,(0.78+0.2*k)*on*fl);if(e.m){cx.save();cx.translate(sx*2,0);cx.scale(-1,1)}cx.drawImage(e.c,x0,y0,G.W*z,G.H*z);if(e.m)cx.restore();
    if(!d.light){cx.globalCompositeOperation='screen';cx.globalAlpha=1;
     if(!low){cx.save();cx.translate(gx,gy+2*z);cx.scale(1,0.50);glow(0,0,(44+Math.max(fw,fh)*12+lv*3)*z,`rgba(255,192,110,${0.15*on*fl})`);cx.restore()}
     const nP=low?1:Math.min(e.pts.length,2+Math.floor(lv/2));for(let i=0;i<nP;i++){const[u,v]=e.pts[i];const X=x0+u*G.W*z,Y=y0+v*G.H*z,f2=fl+0.04*Math.sin(t/90+i*2.1+ph);
@@ -645,8 +645,9 @@ function nightLights(t,lt,z){const k0=Math.min(1,(lt.night-0.1)/0.5),k=k0*k0*(3-
   if(d.price&&!d.bath&&!low){const n=lv>=4?2:lv>=2?1:0;for(let i=0;i<n;i++){const s_=i?1:-1;const X=sx+s_*G.W*0.46*z,Y=sy-2*z;cx.globalAlpha=1;
     cx.globalCompositeOperation='lighter';glow(X,Y-5*z,3.5*z,`rgba(255,236,190,${0.68*on*fl})`);
     cx.globalCompositeOperation='screen';glow(X,Y-5*z,18*z,`rgba(255,194,114,${0.18*on*fl})`);cx.save();cx.translate(X,Y);cx.scale(1,0.48);glow(0,0,30*z,`rgba(255,178,98,${0.15*on*fl})`);cx.restore()}}}
- cx.globalAlpha=1;BUS.emit('nightlight',t,lt,k,z)}
-function glow(X,Y,r,c){const[rgb,a]=parseC(c);const pa=cx.globalAlpha;cx.globalAlpha=pa*a;cx.drawImage(blob(rgb),X-r,Y-r,r*2,r*2);cx.globalAlpha=pa;return;const g=cx.createRadialGradient(X,Y,0,X,Y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=g;cx.fillRect(X-r,Y-r,r*2,r*2)}
+ cx.globalAlpha=1;BUS.emit('nightlight',t,lt,k,z);GLK.k=0}
+const GLK={k:0}; // 밤 조명 패스 보정(k=밤 정도): 화면을 뿌옇게 하는 넓은 번짐은 줄이고, 조명 주변 빛웅덩이·불빛 중심은 키움
+function glow(X,Y,r,c){const[rgb,a]=parseC(c);const pa=cx.globalAlpha;let f=1;if(GLK.k){const op=cx.globalCompositeOperation,rz=r/Math.max(0.5,cam.z);f=op=='lighter'?1+0.5*GLK.k:op=='screen'?(rz>48?1-0.45*GLK.k:1+0.3*GLK.k):1}cx.globalAlpha=Math.min(1,pa*a*f);cx.drawImage(blob(rgb),X-r,Y-r,r*2,r*2);cx.globalAlpha=pa;return;const g=cx.createRadialGradient(X,Y,0,X,Y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=g;cx.fillRect(X-r,Y-r,r*2,r*2)}
 let FOREST=null;// ===== 원경: 계곡·숲·강 회화 배경 (화면 공간 1장, 줌/이동 시차, 시간대·계절 색조) =====
 const BG=new Image();BG.src='assets/bg/valley.jpg';const SEA_T=['rgba(255,190,210,0.10)',null,'rgba(230,120,40,0.16)','rgba(235,242,255,0.38)'];
 function drawBackdrop(lt){if(!BG.complete||!BG.naturalWidth)return;const iw=BG.naturalWidth,ih=BG.naturalHeight;
@@ -655,7 +656,7 @@ function drawBackdrop(lt){if(!BG.complete||!BG.naturalWidth)return;const iw=BG.n
  cx.imageSmoothingEnabled=true;cx.drawImage(BG,VW/2-w/2+px,VH*0.46-h/2+py,w,h);cx.imageSmoothingEnabled=false;
  const se=SEA_T[season()];if(se){cx.fillStyle=se;cx.fillRect(0,0,VW,VH)}
  cx.globalCompositeOperation='multiply';cx.fillStyle=`rgba(${lt.sky},0.32)`;cx.fillRect(0,0,VW,VH);cx.globalCompositeOperation='source-over';
- if(lt.night>0.05){cx.fillStyle=`rgba(22,32,62,${Math.min(0.22,lt.night*0.22)})`;cx.fillRect(0,0,VW,VH)}
+ if(lt.night>0.05){cx.fillStyle=`rgba(12,18,44,${Math.min(0.38,lt.night*0.38)})`;cx.fillRect(0,0,VW,VH)}
 }
 function drawForest(lt){if(!FOREST){const x0=-60*TW/2,y0=-160,W=(N+12)*TW,H=(N+8)*TH/2+200;const c=mk(W,H),g=c.getContext('2d');g.translate(-x0,-y0);const _cx=cx;cx=g;drawForest_();cx=_cx;FOREST={c,x0,y0,W,H}}cx.drawImage(FOREST.c,FOREST.x0,FOREST.y0,FOREST.W,FOREST.H)}
 function drawForest_(){const r=rng(42);for(let i=0;i<180;i++){const side=i%2;const k=r()*N;const x=side?-1.5-r()*3.5:k,y=side?k:-1.5-r()*3.5;const[X,Y]=iso(x,y);const h=18+r()*18;const aut=r()<0.42;
