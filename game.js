@@ -1007,7 +1007,7 @@ function frame_(now){warnAcc+=1;if(warnAcc%90==1)checkReach();const dt=Math.min(
   cam.x=lerp(homeAnim.from.x,tx_,k);cam.y=lerp(homeAnim.from.y,ty_,k);if(homeAnim.t>=1)homeAnim=null}
  stepBuild(dt);BUS.emit('frame',dt,now);if(!window.__norender&&(!window.GFX_LOW||!window.FPS30||(frameN++&1)==0)){render(now);hud()}saveAcc+=dt;if(saveAcc>5){saveAcc=0;save()}}
 async function boot(){resize();addEventListener('resize',resize);if(window.VISIT_PROMISE){try{window.VISIT_SAVE=await window.VISIT_PROMISE}catch(e){window.VISIT_SAVE=null;setTimeout(()=>toast('방문 링크가 올바르지 않아요'),1200)}}load();S.objs.forEach(o=>o.users=0);migrateLayout();migrate();OCC=occ();ensureGate();OCC=occ();
- await Promise.all([loadImgs(),document.fonts.load('700 14px Pretendard'),document.fonts.ready]);
+ await Promise.all([loadImgs(),Promise.race([Promise.all([document.fonts.load('700 14px Pretendard',window.FONT_GLYPHS||'가'),document.fonts.ready]).catch(e=>console.warn('[font]',e)),new Promise(r=>setTimeout(r,4000))])]); // 폰트 조각 일부가 실패하거나 느려도 시스템 폰트로 시작
  if(IMG.gate){variants('gate',IMG.gate);const flip=src=>{const c=mk(src.width,src.height),g=c.getContext('2d');g.translate(c.width,0);g.scale(-1,1);g.drawImage(src,0,0);return c};const gf=flip(IMG.gate);variants('gate_f',gf);gf.width=gf.height=0;
   const L=splitLayers(IMG.gate,GATE_MASKS);for(const n in L){variants('gate_'+n,L[n]);const fn=flip(L[n]);variants('gate_f_'+n,fn);fn.width=fn.height=0;L[n].width=L[n].height=0}}
  for(const k in OVER){if(!IMG[k])continue;const L=splitLayers(IMG[k],[['over',(g,W,H)=>g.rect(0,0,W,H*OVER[k])]]);variants(k+'_over',L.over);for(const n in L)L[n].width=L[n].height=0}

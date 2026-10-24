@@ -1,3 +1,12 @@
 node_modules/
-trailer.webm
-trailer_preview.gif
+__pycache__/
+*.pyc
+
+# 개발 산출물: 스크린샷·시뮬 결과·트레일러 (사이트에 배포되지 않도록)
+/shots/
+/shot_*.png
+/play_*.png
+/feedback_*.png
+/sim*.json
+/trailer.webm
+/trailer_preview.gif
