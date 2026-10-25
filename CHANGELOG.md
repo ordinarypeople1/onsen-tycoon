@@ -1,5 +1,10 @@
 # CHANGELOG — 카피바라 온센 료칸 타이쿤
  
+## v4.24 — 앱스토어 준비
+- iOS 출시용 GitHub Actions 추가: 수동 실행 → 빌드·자동 서명·App Store Connect(TestFlight) 업로드 (App Store Connect API 키 Secrets 필요)
+- iOS: iPhone 전용으로 설정(iPad 스크린샷 불필요), 수출 규정 암호화 항목 자동 처리(ITSAppUsesNonExemptEncryption = NO)
+- Android 앱 이름을 기기 언어별로: 한국어 카피바라 온센 / 일본어 カピバラ温泉 / 번체 중국어 水豚溫泉 / 그 외 Capybara Onsen
+
 ## v4.23 — 영어·일본어·번체 중국어
 - 영어(English)·일본어(日本語)·번체 중국어(繁體中文) 추가. 기기 언어에 맞춰 자동 선택(한국어·일본어·중국어 외에는 영어), 설정 > 언어에서 변경(바꾸면 다시 불러옴)
 - 번역 구조: 코드의 한국어 문구를 L('원문') / L`원문 ${값}`으로 감싸고, 한국어 원문을 키로 tools/i18n/strings.json에서 번역. `node tools/i18n_build.js`로 assets/i18n/*.js 생성·누락 검사

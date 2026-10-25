@@ -1,0 +1,70 @@
+name: iOS 출시용 빌드 (App Store Connect 업로드)
+
+# Actions 탭에서 수동 실행 → 빌드·서명 후 App Store Connect(TestFlight)에 자동 업로드
+# 필요한 Secrets:
+#   IOS_TEAM_ID        Apple 개발자 Team ID (10자리)
+#   ASC_KEY_ID         App Store Connect API 키 ID
+#   ASC_ISSUER_ID      App Store Connect API Issuer ID
+#   ASC_KEY_P8_B64     API 키 파일(.p8)을 base64로 인코딩한 값
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: '버전 이름 (예: 1.0.0)'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  ios:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: 웹 파일 모으기 + 동기화
+        run: |
+          npm ci
+          npm run build:www
+          npx cap sync ios
+      - name: API 키 준비
+        run: |
+          mkdir -p $RUNNER_TEMP/keys
+          echo "${{ secrets.ASC_KEY_P8_B64 }}" | tr -d ' \r\n' | base64 --decode > $RUNNER_TEMP/keys/AuthKey.p8
+          test -s $RUNNER_TEMP/keys/AuthKey.p8 || { echo "::error::ASC_KEY_P8_B64 secret이 비어 있어요"; exit 1; }
+      - name: 아카이브 (자동 서명)
+        env:
+          TEAM: ${{ secrets.IOS_TEAM_ID }}
+        run: |
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath $RUNNER_TEMP/App.xcarchive \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath $RUNNER_TEMP/keys/AuthKey.p8 \
+            -authenticationKeyID ${{ secrets.ASC_KEY_ID }} \
+            -authenticationKeyIssuerID ${{ secrets.ASC_ISSUER_ID }} \
+            DEVELOPMENT_TEAM=$TEAM CODE_SIGN_STYLE=Automatic \
+            MARKETING_VERSION=${{ inputs.version_name }} CURRENT_PROJECT_VERSION=${{ github.run_number }} \
+            archive > $RUNNER_TEMP/archive.log 2>&1 || { grep -E "error:|ERROR" $RUNNER_TEMP/archive.log | head -8 | while read -r l; do echo "::error::$l"; done; tail -20 $RUNNER_TEMP/archive.log; exit 1; }
+      - name: App Store Connect 업로드
+        env:
+          TEAM: ${{ secrets.IOS_TEAM_ID }}
+        run: |
+          cat > $RUNNER_TEMP/export.plist <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>$TEAM</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive -archivePath $RUNNER_TEMP/App.xcarchive \
+            -exportOptionsPlist $RUNNER_TEMP/export.plist -exportPath $RUNNER_TEMP/export \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath $RUNNER_TEMP/keys/AuthKey.p8 \
+            -authenticationKeyID ${{ secrets.ASC_KEY_ID }} \
+            -authenticationKeyIssuerID ${{ secrets.ASC_ISSUER_ID }} > $RUNNER_TEMP/export.log 2>&1 || { grep -E "error:|ERROR" $RUNNER_TEMP/export.log | head -8 | while read -r l; do echo "::error::$l"; done; tail -20 $RUNNER_TEMP/export.log; exit 1; }
+          echo "::notice::App Store Connect 업로드 완료 — 처리 후 TestFlight에 나타납니다 (빌드 ${{ github.run_number }})"
