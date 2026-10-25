@@ -42,29 +42,29 @@ const PHOTO=(()=>{
  function placeholders(){for(const k of Object.keys(SIZE)){const[w,h]=SIZE[k];const c=mk(w,h),g=c.getContext('2d');for(let y=0;y<h;y++)for(let x=0;x<w;x++){g.fillStyle=((x>>2)+(y>>2))%2?'#f6e7cf':'#e8c49a';g.fillRect(x,y,1,1)}g.fillStyle='#f0c64a';g.beginPath();g.arc(w/2,h/2,Math.min(w,h)/3,0,6.3);g.fill();g.fillStyle='#5f7a4a';g.fillRect(w/2-1,h/2-Math.min(w,h)/3-2,2,2);const cp=compose(k,c);variants(k,cp);cp.width=cp.height=0;c.width=c.height=0}}
  // ---- 업로드 UI ----
  let pending=null;
- function open(kind,target){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=()=>{const f=inp.files[0];if(!f)return;if(f.size>15e6)return toast('사진이 너무 커요 (15MB 이하)');const url=URL.createObjectURL(f);const im=new Image();im.onload=()=>editor(kind,im,target);im.onerror=()=>toast('이미지를 읽지 못했어요');im.src=url};inp.click()}
+ function open(kind,target){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=()=>{const f=inp.files[0];if(!f)return;if(f.size>15e6)return toast(L('사진이 너무 커요 (15MB 이하)'));const url=URL.createObjectURL(f);const im=new Image();im.onload=()=>editor(kind,im,target);im.onerror=()=>toast(L('이미지를 읽지 못했어요'));im.src=url};inp.click()}
  function editor(kind,im,target){const[w,h]=SIZE[kind];const opt={colors:12,pal:'mix',dither:'fs',ds:0.6,contrast:0.1,sat:0.1};
-  const m=$('modal');m.style.display='block';m.innerHTML=`<h3>픽셀 장식 만들기 <small>(${DEF[kind].n})</small></h3>
+  const m=$('modal');m.style.display='block';m.innerHTML=L`<h3>픽셀 장식 만들기 <small>(${DEF[kind].n})</small></h3>
    <div class="pxw"><div><canvas id="pxPrev"></canvas><div class="lab">픽셀 결과 ${w}×${h}</div></div><div><canvas id="pxFull"></canvas><div class="lab">장식 미리보기</div></div></div>
    <div class="row"><span>색 수</span><input type="range" id="pxC" min="4" max="24" value="12"><b id="pxCv">12</b></div>
    <div class="row"><span>팔레트</span><select id="pxP"><option value="mix" selected>사진+료칸 혼합</option><option value="auto">사진 그대로</option><option value="onsen">료칸 24색</option></select></div>
    <div class="row"><span>디더링</span><select id="pxD"><option value="fs" selected>오차 확산</option><option value="bayer">격자(바이어)</option><option value="none">없음</option></select></div>
    <div class="row"><span>디더 강도</span><input type="range" id="pxS" min="0" max="1" step="0.05" value="0.6"></div>
    <div class="row"><span>대비</span><input type="range" id="pxK" min="-0.3" max="0.6" step="0.05" value="0.1"></div>
-   <div style="margin-top:8px;text-align:right"><button class="b g" id="pxX">취소</button><button class="b" id="pxOk">${target?'바꾸기':'만들고 배치하기'}</button></div>`;
+   <div style="margin-top:8px;text-align:right"><button class="b g" id="pxX">취소</button><button class="b" id="pxOk">${target?L('바꾸기'):L('만들고 배치하기')}</button></div>`;
   let out=null;const draw=()=>{out=pixelize(im,w,h,opt);const pv=$('pxPrev');pv.width=w*6;pv.height=h*6;const pg=pv.getContext('2d');pg.imageSmoothingEnabled=false;pg.drawImage(out,0,0,w*6,h*6);
    const fr=compose(kind,out);const fv=$('pxFull');fv.width=fr.width*3;fv.height=fr.height*3;const fg=fv.getContext('2d');fg.imageSmoothingEnabled=false;fg.drawImage(fr,0,0,fr.width*3,fr.height*3)};
   let tm=0;const later=()=>{clearTimeout(tm);tm=setTimeout(draw,60)};
   $('pxC').oninput=e=>{opt.colors=+e.target.value;$('pxCv').textContent=opt.colors;later()};$('pxP').onchange=e=>{opt.pal=e.target.value;later()};$('pxD').onchange=e=>{opt.dither=e.target.value;later()};$('pxS').oninput=e=>{opt.ds=+e.target.value;later()};$('pxK').oninput=e=>{opt.contrast=+e.target.value;later()};
   $('pxX').onclick=()=>{m.style.display='none'};
   $('pxOk').onclick=async()=>{const id=Date.now().toString(36)+Math.random().toString(36).slice(2,5);pics()[id]={kind,w,h,d:out.toDataURL('image/png')};await register(id);m.style.display='none';
-   if(target){const old=target.pic;target.pic=id;gc(old);save();toast('사진을 바꿨어요 ✨')}else{pending={kind,id};ghost=kind;buildCards();toast('놓을 곳을 눌러주세요 (Esc 취소)')}};
+   if(target){const old=target.pic;target.pic=id;gc(old);save();toast(L('사진을 바꿨어요 ✨'))}else{pending={kind,id};ghost=kind;buildCards();toast(L('놓을 곳을 눌러주세요 (Esc 취소)'))}};
   draw()}
  function gc(id){if(!id)return;if(!S.objs.some(o=>o.pic===id))delete pics()[id]}
  // 건설 카드 가로채기: 사진 장식 카드는 먼저 업로드
- document.addEventListener('click',e=>{const c=e.target.closest('.card');if(!c)return;const k=c.dataset.k;if(!DEF[k]||!DEF[k].photo)return;e.stopImmediatePropagation();e.preventDefault();if(S.yen<DEF[k].cost)return toast('엔이 부족해요');if(window.READONLY)return;open(k)},true);
+ document.addEventListener('click',e=>{const c=e.target.closest('.card');if(!c)return;const k=c.dataset.k;if(!DEF[k]||!DEF[k].photo)return;e.stopImmediatePropagation();e.preventDefault();if(S.yen<DEF[k].cost)return toast(L('엔이 부족해요'));if(window.READONLY)return;open(k)},true);
  BUS.on('build',o=>{if(DEF[o.k].photo){if(pending&&pending.kind==o.k){o.pic=pending.id;pending=null;ghost=null;buildCards()}}});
- BUS.on('info',(o,el)=>{if(!DEF[o.k].photo)return;const b=document.createElement('button');b.className='b';b.textContent='사진 바꾸기';b.onclick=()=>open(o.k,o);el.lastElementChild.prepend(b)});
+ BUS.on('info',(o,el)=>{if(!DEF[o.k].photo)return;const b=document.createElement('button');b.className='b';b.textContent=L('사진 바꾸기');b.onclick=()=>open(o.k,o);el.lastElementChild.prepend(b)});
  // 노렌 흔들림: 손님이 가까이 오면
  BUS.on('frame',()=>{for(const o of S.objs){if(o.k!='noren'&&o.k!='banner')continue;if(guests.some(g=>Math.abs(g.x-o.x-0.5)<0.8&&Math.abs(g.y-o.y-0.5)<0.8))o.sway=Math.min(0.35,(o.sway||0)+0.02)}});
  placeholders();

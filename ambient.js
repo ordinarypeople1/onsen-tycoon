@@ -159,9 +159,9 @@ const AMB=(()=>{
  // ---- 탭 반응 ----
  function tap(fx_,fy_,sx,sy){let best=null,bd=1e9;for(const g of guests){if(g.hide||g.dead)continue;const[X,Y]=toScreenT(g.x,g.y);const d=Math.hypot(X-sx,(Y-7*cam.z)-sy);if(d<bd){bd=d;best=g}}
   if(best&&bd<9*cam.z+6){best.hop=0.5;fx.push({k:'heart',g:best,l:1.2,L:1.2});if(best.inBath)fx.push({k:'ring',x:best.x,y:best.y,l:1,L:1},{k:'drop',x:best.x,y:best.y,n:8,l:0.7,L:0.7});
-   const L=['아~ 좋다','뜨끈뜨끈','최고야…','♨ 행복'],T=best.target&&DEF[best.target.k]?DEF[best.target.k].n:null;
+   const LN=[L('아~ 좋다'),L('뜨끈뜨끈'),L('최고야…'),L('♨ 행복')],T=best.target&&DEF[best.target.k]?DEF[best.target.k].n:null;
    const V=best.view&&DEF[best.view.k]?DEF[best.view.k].n:null;
-   const line=best.inBath?L[(R()*L.length)|0]:best.leaving?'집에 가는 중이에요':best.st=='look'?'풍경 구경 중':V?`${V} 구경하러 가는 중`:best.st=='wait'&&T?`${T} 자리 기다리는 중`:T?`${T} 가는 중`:'느긋하게 산책 중';think(best,line,true);window.SND&&SND.squeak&&SND.squeak();return !best.inBath}
+   const line=best.inBath?LN[(R()*LN.length)|0]:best.leaving?L('집에 가는 중이에요'):best.st=='look'?L('풍경 구경 중'):V?L`${V} 구경하러 가는 중`:best.st=='wait'&&T?L`${T} 자리 기다리는 중`:T?L`${T} 가는 중`:L('느긋하게 산책 중');think(best,line,true);window.SND&&SND.squeak&&SND.squeak();return !best.inBath}
   const o=OCC[(fx_|0)+','+(fy_|0)];if(o&&!DEF[o.k].isPath){const c=ctr(o);o.sway=Math.min(0.4,(o.sway||0)+0.3);fx.push({k:'spark',x:c[0],y:c[1],h:DEF[o.k].tree?20:10,l:0.8,L:0.8});
    if(DEF[o.k].pond){const d=pondData(o);const[X,Y]=iso(fx_,fy_);d.rip.push({x:X,y:Y,l:1.6},{x:X+2,y:Y+1,l:1.2})}}
   return false}
@@ -180,10 +180,10 @@ const AMB=(()=>{
   else{const P=Object.keys(S.plots).map(k=>k.split(',').map(Number));tx_=P[0][0]*PS+PS/2;ty_=P[0][1]*PS+PS/2}
   const zz=((VW>820?3.6:2.8)+Math.sin(zT/23)*0.35)*Math.max(1,VW/1280);
   const[wx,wy]=iso(tx_,ty_);const k=Math.min(1,dt*(zT<3?1.6:0.45));cam.z+=(zz-cam.z)*Math.min(1,dt*0.4);cam.tz=cam.z;const gx=VW/2-wx*cam.z,gy=VH/2-wy*cam.z;cam.x+=(gx-cam.x)*k;cam.y+=(gy-cam.y)*k}
- function setZen(on,quiet){zen=on;zT=0;document.body.classList.toggle('zen',on);if(on&&!quiet){zHint=document.createElement('div');zHint.id='zenHint';zHint.textContent='감상 모드 · 아무 곳이나 누르거나 Esc로 나가기';document.body.appendChild(zHint);setTimeout(()=>zHint&&zHint.classList.add('fade'),2500);window.SND&&SND.init&&SND.init()}else{zHint&&zHint.remove();zHint=null}}
+ function setZen(on,quiet){zen=on;zT=0;document.body.classList.toggle('zen',on);if(on&&!quiet){zHint=document.createElement('div');zHint.id='zenHint';zHint.textContent=L('감상 모드 · 아무 곳이나 누르거나 Esc로 나가기');document.body.appendChild(zHint);setTimeout(()=>zHint&&zHint.classList.add('fade'),2500);window.SND&&SND.init&&SND.init()}else{zHint&&zHint.remove();zHint=null}}
  addEventListener('keydown',e=>{if(window.SHELL&&SHELL.inTitle)return;if(e.key=='Escape'&&zen){setZen(false);e.stopPropagation()}else if((e.key=='z'||e.key=='Z')&&!e.ctrlKey&&document.activeElement.tagName!='INPUT')setZen(!zen)},true);
  addEventListener('pointerdown',e=>{if(zen&&!document.body.classList.contains('titling')&&!e.target.closest('#zenBtn,#title,.ovl')){setZen(false);e.stopPropagation();e.preventDefault()}},true);
- const tb=document.getElementById('tools');if(tb){const b=document.createElement('button');b.className='tool';b.id='zenBtn';b.innerHTML='<i>감상</i>';b.title='감상 모드 (Z)';b.onclick=e=>{e.stopPropagation();setZen(true)};tb.appendChild(b)}
+ const tb=document.getElementById('tools');if(tb){const b=document.createElement('button');b.className='tool';b.id='zenBtn';b.innerHTML=L('<i>감상</i>');b.title=L('감상 모드 (Z)');b.onclick=e=>{e.stopPropagation();setZen(true)};tb.appendChild(b)}
  return{tap,setZen,get zen(){return zen},flies,butts,birds,fx};
 })();
 window.AMB=AMB;

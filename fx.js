@@ -7,11 +7,11 @@
 //  · 연출 중에는 따뜻한 비네트·옅은 필름 그레인으로 빛바랜 사진 같은 톤
 // 고정 크기 파티클 풀(1600) → 아무리 눌러도 메모리/개수 상한
 (()=>{const $=id=>document.getElementById(id);
- const PN=1600,X=new Float32Array(PN),Y=new Float32Array(PN),VX=new Float32Array(PN),VY=new Float32Array(PN),L=new Float32Array(PN),ML=new Float32Array(PN),SZ=new Float32Array(PN),GR=new Float32Array(PN),TY=new Uint8Array(PN),CI=new Uint16Array(PN),PH=new Float32Array(PN),WS=new Uint8Array(PN);
+ const PN=1600,X=new Float32Array(PN),Y=new Float32Array(PN),VX=new Float32Array(PN),VY=new Float32Array(PN),LF=new Float32Array(PN),ML=new Float32Array(PN),SZ=new Float32Array(PN),GR=new Float32Array(PN),TY=new Uint8Array(PN),CI=new Uint16Array(PN),PH=new Float32Array(PN),WS=new Uint8Array(PN);
  let free=[];for(let i=PN-1;i>=0;i--)free.push(i);const act=new Set();
  const COL=[];const ci=c=>{let i=COL.indexOf(c);if(i<0){if(COL.length>60)return 0;COL.push(c);i=COL.length-1}return i};
  // 타입: 0 불꽃 점, 1 로켓, 2 등불, 3 반딧불, 4 꽃잎, 5 눈, 6 섬광 / WS: 1=맵 좌표, 0=화면 좌표
- function spawn(t,x,y,vx,vy,life,sz,col,gr=0,ws=1){const i=free.pop();if(i==null)return -1;TY[i]=t;X[i]=x;Y[i]=y;VX[i]=vx;VY[i]=vy;L[i]=ML[i]=life;SZ[i]=sz;CI[i]=ci(col);GR[i]=gr;PH[i]=Math.random()*6.28;WS[i]=ws;act.add(i);return i}
+ function spawn(t,x,y,vx,vy,life,sz,col,gr=0,ws=1){const i=free.pop();if(i==null)return -1;TY[i]=t;X[i]=x;Y[i]=y;VX[i]=vx;VY[i]=vy;LF[i]=ML[i]=life;SZ[i]=sz;CI[i]=ci(col);GR[i]=gr;PH[i]=Math.random()*6.28;WS[i]=ws;act.add(i);return i}
  const kill=i=>{act.delete(i);free.push(i)};
  // 빛바랜 파스텔: 샴페인 골드·복숭아·더스티 로즈·라벤더·민트
  const SH={peony:['#ffe2a8','#ffb994','#fff1dc'],willow:['#ffd59a','#e9b878'],ring:['#c4efdf','#fff4e2'],heart:['#f6b3c3','#ffd0da'],chrys:['#cdbdf6','#b4cdf2','#fff4e8']};
@@ -32,32 +32,32 @@
  const timed=[];function every(dur,rate,fn){if(timed.length>=12)timed.shift();timed.push({t:0,dur,rate,acc:0,fn})}
  let rainbow=0,aurora=0,parade=null,mood=0;
  const FX={
-  fw_peony:{n:'불꽃 · 국화',c:800,cd:20,h:2,star:1,run(){for(let i=0;i<3;i++)setTimeout(()=>rocket('peony'),i*600)}},
-  fw_willow:{n:'불꽃 · 버드나무',c:1500,cd:25,h:3,star:2,run(){for(let i=0;i<3;i++)setTimeout(()=>rocket('willow'),i*800)}},
-  fw_heart:{n:'불꽃 · 하트',c:2500,cd:30,h:3,star:2,run(){for(let i=0;i<2;i++)setTimeout(()=>rocket('heart'),i*900)}},
-  fw_show:{n:'불꽃놀이 대회 (30초)',c:12000,cd:180,h:8,star:3,run(){every(30,1.3,()=>rocket(SHK[Math.random()*SHK.length|0]))}},
-  sparkle:{n:'불꽃 섬광',c:600,cd:15,h:1,star:1,run(){every(8,10,()=>{const[x,y0]=fieldPt();const y=y0-8-Math.random()*22;for(let k=0;k<6;k++)spawn(6,x,y,(Math.random()-0.5)*30,(Math.random()-0.8)*30,0.7+Math.random()*0.5,1.5,'#fff1c4',30)})}},
-  lanterns:{n:'등불 날리기 (25초)',c:3000,cd:60,h:5,star:2,run(){every(25,2,()=>{const[x,y]=fieldPt(0.1,0.9,0.45,0.95);spawn(2,x,y-4,(Math.random()-0.5)*3,-(7+Math.random()*6),26,3+Math.random()*1.6,'#ffc27a')})}},
-  fireflies:{n:'반딧불 모으기 (40초)',c:1200,cd:45,h:3,star:1,run(){every(6,12,()=>{const[x,y]=fieldPt(0.05,0.95,0.2,0.95);spawn(3,x,y-4-Math.random()*16,0,0,34+Math.random()*8,1.6,'#e4ffa6')})}},
-  sakura:{n:'벚꽃비 (40초)',c:1500,cd:45,h:3,star:1,run(){every(40,9,()=>spawn(4,Math.random()*VW*1.2,-10,-(10+Math.random()*20),26+Math.random()*22,15,3+Math.random()*2,Math.random()<0.5?'#f4c0cc':'#fbe4ea',0,0))}},
-  snow:{n:'눈 내리기 (45초)',c:1500,cd:45,h:3,star:1,run(){every(45,14,()=>spawn(5,Math.random()*VW,-10,0,20+Math.random()*20,26,1.5+Math.random()*2.2,'#fffaf2',0,0))}},
-  rainbow:{n:'무지개 (20초)',c:2000,cd:60,h:4,star:2,run(){rainbow=20}},
-  aurora:{n:'오로라 (40초)',c:6000,cd:120,h:6,star:3,run(){aurora=40}},
-  parade:{n:'마을 축제 퍼레이드 (30초)',c:15000,cd:240,h:10,star:3,run(){const[a,b]=toTile(VW/2,VH*0.6);parade={t:0,dur:30,x0:Math.floor(a)-10,y:Math.floor(b)+0.5}}},
+  fw_peony:{n:L('불꽃 · 국화'),c:800,cd:20,h:2,star:1,run(){for(let i=0;i<3;i++)setTimeout(()=>rocket('peony'),i*600)}},
+  fw_willow:{n:L('불꽃 · 버드나무'),c:1500,cd:25,h:3,star:2,run(){for(let i=0;i<3;i++)setTimeout(()=>rocket('willow'),i*800)}},
+  fw_heart:{n:L('불꽃 · 하트'),c:2500,cd:30,h:3,star:2,run(){for(let i=0;i<2;i++)setTimeout(()=>rocket('heart'),i*900)}},
+  fw_show:{n:L('불꽃놀이 대회 (30초)'),c:12000,cd:180,h:8,star:3,run(){every(30,1.3,()=>rocket(SHK[Math.random()*SHK.length|0]))}},
+  sparkle:{n:L('불꽃 섬광'),c:600,cd:15,h:1,star:1,run(){every(8,10,()=>{const[x,y0]=fieldPt();const y=y0-8-Math.random()*22;for(let k=0;k<6;k++)spawn(6,x,y,(Math.random()-0.5)*30,(Math.random()-0.8)*30,0.7+Math.random()*0.5,1.5,'#fff1c4',30)})}},
+  lanterns:{n:L('등불 날리기 (25초)'),c:3000,cd:60,h:5,star:2,run(){every(25,2,()=>{const[x,y]=fieldPt(0.1,0.9,0.45,0.95);spawn(2,x,y-4,(Math.random()-0.5)*3,-(7+Math.random()*6),26,3+Math.random()*1.6,'#ffc27a')})}},
+  fireflies:{n:L('반딧불 모으기 (40초)'),c:1200,cd:45,h:3,star:1,run(){every(6,12,()=>{const[x,y]=fieldPt(0.05,0.95,0.2,0.95);spawn(3,x,y-4-Math.random()*16,0,0,34+Math.random()*8,1.6,'#e4ffa6')})}},
+  sakura:{n:L('벚꽃비 (40초)'),c:1500,cd:45,h:3,star:1,run(){every(40,9,()=>spawn(4,Math.random()*VW*1.2,-10,-(10+Math.random()*20),26+Math.random()*22,15,3+Math.random()*2,Math.random()<0.5?'#f4c0cc':'#fbe4ea',0,0))}},
+  snow:{n:L('눈 내리기 (45초)'),c:1500,cd:45,h:3,star:1,run(){every(45,14,()=>spawn(5,Math.random()*VW,-10,0,20+Math.random()*20,26,1.5+Math.random()*2.2,'#fffaf2',0,0))}},
+  rainbow:{n:L('무지개 (20초)'),c:2000,cd:60,h:4,star:2,run(){rainbow=20}},
+  aurora:{n:L('오로라 (40초)'),c:6000,cd:120,h:6,star:3,run(){aurora=40}},
+  parade:{n:L('마을 축제 퍼레이드 (30초)'),c:15000,cd:240,h:10,star:3,run(){const[a,b]=toTile(VW/2,VH*0.6);parade={t:0,dur:30,x0:Math.floor(a)-10,y:Math.floor(b)+0.5}}},
  };
  const CD={};
  function trigger(id){const f=FX[id];if(!f)return false;const D=window.__dbg,S=D&&D.S;const now=performance.now()/1000;
-  if((CD[id]||0)>now){toast&&toast('잠시 후 다시 할 수 있어요');return false}if(D&&D.stars()<f.star){toast('등급 '+f.star+'성부터 열려요');return false}
-  if(S){if(S.yen<f.c){toast('돈이 부족해요');return false}S.yen-=f.c;S.fin.exp+=f.c}
+  if((CD[id]||0)>now){toast&&toast(L('잠시 후 다시 할 수 있어요'));return false}if(D&&D.stars()<f.star){toast(L`등급 ${f.star}성부터 열려요`);return false}
+  if(S){if(S.yen<f.c){toast(L('돈이 부족해요'));return false}S.yen-=f.c;S.fin.exp+=f.c}
   CD[id]=now+f.cd;try{f.run()}catch(e){console.warn('fx',e)}
   if(D)D.guests().forEach(q=>{q.happy=Math.min(100,(q.happy||50)+f.h)});return true}
  window.FX={trigger,list:FX,stats:()=>({active:act.size,free:free.length,timed:timed.length,mood:+mood.toFixed(2)})};
  // 메뉴
  function menu(){const el=$('modal');const D=window.__dbg;const st=D?D.stars():5;const now=performance.now()/1000;
-  el.innerHTML=`<h3>온천 연출 <small>손님 만족도가 조금 올라가요</small></h3><div class="fxg">`+Object.entries(FX).map(([k,f])=>{const lock=st<f.star,cd=Math.max(0,(CD[k]||0)-now);return`<button class="fxb${lock?' lock':''}" data-fx="${k}" ${lock||cd?'disabled':''}><b>${f.n}</b><small>${lock?f.star+'성 필요':cd?Math.ceil(cd)+'초 후':'¥'+f.c.toLocaleString()}</small></button>`}).join('')+`</div><div style="text-align:right"><button class="b g" id="fxClose">닫기</button></div>`;
+  el.innerHTML=L`<h3>온천 연출 <small>손님 만족도가 조금 올라가요</small></h3><div class="fxg">`+Object.entries(FX).map(([k,f])=>{const lock=st<f.star,cd=Math.max(0,(CD[k]||0)-now);return`<button class="fxb${lock?' lock':''}" data-fx="${k}" ${lock||cd?'disabled':''}><b>${f.n}</b><small>${lock?L`${f.star}성 필요`:cd?L`${Math.ceil(cd)}초 후`:'¥'+f.c.toLocaleString()}</small></button>`}).join('')+L`</div><div style="text-align:right"><button class="b g" id="fxClose">닫기</button></div>`;
   el.style.display='block';el.querySelectorAll('[data-fx]').forEach(b=>b.onclick=()=>{if(trigger(b.dataset.fx))menu()});$('fxClose').onclick=()=>el.style.display='none'}
  const st=document.createElement('style');st.textContent='.fxg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin:10px 0}.fxb{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;background:rgba(255,255,255,0.05);color:#f5f2eb;font:inherit;cursor:pointer;text-align:left;transition:background .18s,border-color .18s,transform .15s}.fxb b{font-size:12.5px;font-weight:600;color:#faf8f5}.fxb small{color:#e8c468;font-size:11px}.fxb:disabled{opacity:.42;cursor:default}.fxb:not(:disabled):hover{background:rgba(255,255,255,0.11);border-color:rgba(255,255,255,0.24);transform:translateY(-1px)}';document.head.appendChild(st);
- setTimeout(()=>{const tools=$('tools');if(!tools)return;const b=document.createElement('button');b.className='tool';b.id='tFx';b.innerHTML=`<i>연출</i>`;b.onclick=menu;tools.insertBefore(b,tools.querySelector('.zoom'))},0);
+ setTimeout(()=>{const tools=$('tools');if(!tools)return;const b=document.createElement('button');b.className='tool';b.id='tFx';b.innerHTML=L`<i>연출</i>`;b.onclick=menu;tools.insertBefore(b,tools.querySelector('.zoom'))},0);
 
  // ---- 그리기 도구 ----
  const blobC={};const blob=c=>{if(blobC[c])return blobC[c];const b=document.createElement('canvas');b.width=b.height=32;const x=b.getContext('2d'),gr=x.createRadialGradient(16,16,0,16,16,16);gr.addColorStop(0,c);gr.addColorStop(0.3,c+'b0');gr.addColorStop(0.65,c+'30');gr.addColorStop(1,c+'00');x.fillStyle=gr;x.fillRect(0,0,32,32);return blobC[c]=b};
@@ -98,8 +98,8 @@
    if(Math.random()<dt*5){const[wx,wy]=iso(p.x0+p.t*sp-2,p.y);spawn(6,wx,wy-10,(Math.random()-0.5)*12,-8,1,1.4,'#ffe3b0',6)}if(p.t>=p.dur)parade=null}
   // 파티클
   const fwA=0.6+0.4*night;
-  for(const i of act){L[i]-=dt;if(L[i]<=0){if(TY[i]==1)burst(X[i],Y[i],SHK[PH[i]|0]||'peony');kill(i);continue}
-   const ty=TY[i],lf=L[i]/ML[i];
+  for(const i of act){LF[i]-=dt;if(LF[i]<=0){if(TY[i]==1)burst(X[i],Y[i],SHK[PH[i]|0]||'peony');kill(i);continue}
+   const ty=TY[i],lf=LF[i]/ML[i];
    if(ty==3){PH[i]+=dt;VX[i]=Math.cos(PH[i]*0.7)*5;VY[i]=Math.sin(PH[i]*1.1)*3.5}
    else if(ty==2){VX[i]=Math.sin(PH[i]+n/1900)*3}
    else if(ty==4){VX[i]+=Math.sin(PH[i]+n/700)*dt*20}else if(ty==5){VX[i]=Math.sin(PH[i]+n/1500)*10}

@@ -1,43 +1,32 @@
 'use strict';
 // ===== 셸: 타이틀 · 새로 시작하기 · 2026 초대/방문 · 일시정지 · 설정 · 저장 슬롯 · 크레딧 =====
 const SHELL=(()=>{
- const SET=Object.assign({vol:{master:0.8,bgm:0.6,sfx:0.8,amb:0.8},gfx:'auto',lang:'ko',fps:false},(()=>{try{return JSON.parse(localStorage.onsenSet||'{}')}catch(e){return{}}})());
+ const SET=Object.assign({vol:{master:0.8,bgm:0.6,sfx:0.8,amb:0.8},gfx:'auto',lang:window.LANG||'ko',fps:false},(()=>{try{return JSON.parse(localStorage.onsenSet||'{}')}catch(e){return{}}})());
  const saveSet=()=>{try{localStorage.onsenSet=JSON.stringify(SET)}catch(e){}};
  const I18N={
   ko:{
-   eyebrow:'CAPYBARA ONSEN · 료칸 타이쿤',
-   gameTitle:'카피바라 온센',
-   tagline:'따스한 온천 김 너머, 카피바라가 쉬어가는 계절 료칸',
-   show:'이웃 온천 놀러가기',cont:'이어하기',newg:'새로 시작하기',startNew:'온천 시작하기',
-   slots:'저장 슬롯',set:'설정',cred:'크레딧',resume:'계속하기',title:'타이틀로',
-   paused:'일시정지',vol:'음량',master:'전체',bgm:'배경음악',sfx:'효과음',amb:'환경음',
-   gfx:'그래픽 품질',auto:'자동',high:'높음',low:'낮음',lang:'언어',fps:'FPS 표시',
-   close:'닫기',slot:'슬롯',empty:'비어 있음',use:'불러오기',del:'삭제',
-   zen:'감상 모드',share:'초대 · 방문',press:'아무 키나 눌러 시작'
-  },
-  en:{
-   eyebrow:'CAPYBARA ONSEN · RYOKAN TYCOON',
-   gameTitle:'Capybara Onsen',
-   tagline:'A tranquil seasonal hot spring inn for capybaras',
-   show:'Visit Neighbor Onsen',cont:'Continue',newg:'New Game',startNew:'Start Onsen',
-   slots:'Save Slots',set:'Settings',cred:'Credits',resume:'Resume',title:'Title Screen',
-   paused:'Paused',vol:'Volume',master:'Master',bgm:'Music',sfx:'Effects',amb:'Ambience',
-   gfx:'Graphics',auto:'Auto',high:'High',low:'Low',lang:'Language',fps:'Show FPS',
-   close:'Close',slot:'Slot',empty:'Empty',use:'Load',del:'Delete',
-   zen:'Zen Mode',share:'Invite · Visit',press:'Press any key'
+   eyebrow:L('CAPYBARA ONSEN · 료칸 타이쿤'),
+   gameTitle:L('카피바라 온센'),
+   tagline:L('따스한 온천 김 너머, 카피바라가 쉬어가는 계절 료칸'),
+   show:L('이웃 온천 놀러가기'),cont:L('이어하기'),newg:L('새로 시작하기'),startNew:L('온천 시작하기'),
+   slots:L('저장 슬롯'),set:L('설정'),cred:L('크레딧'),resume:L('계속하기'),title:L('타이틀로'),
+   paused:L('일시정지'),vol:L('음량'),master:L('전체'),bgm:L('배경음악'),sfx:L('효과음'),amb:L('환경음'),
+   gfx:L('그래픽 품질'),auto:L('자동'),high:L('높음'),low:L('낮음'),lang:L('언어'),fps:L('FPS 표시'),
+   close:L('닫기'),slot:L('슬롯'),empty:L('비어 있음'),use:L('불러오기'),del:L('삭제'),
+   zen:L('감상 모드'),share:L('초대 · 방문'),press:L('아무 키나 눌러 시작')
   }
  };
- const T=k=>(I18N[SET.lang]||I18N.ko)[k]||I18N.ko[k]||k;
+ const T=k=>I18N.ko[k]||k;
  const el=(h)=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstChild};
  const slotKey=n=>n==1?'onsen2':'onsen2_s'+n;
- const slotInfo=n=>{try{const d=JSON.parse(localStorage[slotKey(n)]||'null');if(!d)return null;return{day:Math.floor(d.min/1440)+1,yen:d.yen,served:d.served,name:d.ryokanName||'유자향 카피바라 료칸',t:d.t}}catch(e){return{bad:1}}};
+ const slotInfo=n=>{try{const d=JSON.parse(localStorage[slotKey(n)]||'null');if(!d)return null;return{day:Math.floor(d.min/1440)+1,yen:d.yen,served:d.served,name:d.ryokanName||L('유자향 카피바라 료칸'),t:d.t}}catch(e){return{bad:1}}};
 
  // ---- 그래픽 ----
  function applyGfx(){const low=SET.gfx=='low'||(SET.gfx=='auto'&&autoLow);window.GFX_LOW=low;try{resize()}catch(e){}}
  let autoLow=localStorage.onsenAutoLow==='1';
  let fT=0,fN=0,fps=60,probe=0;const fpsEl=el('<div id="fps"></div>');document.body.appendChild(fpsEl);
  BUS.on('frame',dt=>{fT+=dt;fN++;if(fT>=1){fps=fN/fT;fT=0;fN=0;fpsEl.textContent=Math.round(fps)+' FPS';
-   if(SET.gfx=='auto'&&!autoLow&&!document.hidden){probe=fps<42?probe+1:0;if(probe>=5&&!(window.WSCALE<1)){window.WSCALE=0.75;probe=0;try{resize()}catch(e){}}else if(probe>=5){autoLow=true;localStorage.onsenAutoLow='1';applyGfx();toast('기기 성능에 맞춰 그래픽 품질을 낮췄어요 (설정에서 변경)')}}}
+   if(SET.gfx=='auto'&&!autoLow&&!document.hidden){probe=fps<42?probe+1:0;if(probe>=5&&!(window.WSCALE<1)){window.WSCALE=0.75;probe=0;try{resize()}catch(e){}}else if(probe>=5){autoLow=true;localStorage.onsenAutoLow='1';applyGfx();toast(L('기기 성능에 맞춰 그래픽 품질을 낮췄어요 (설정에서 변경)'))}}}
   fpsEl.style.display=SET.fps?'block':'none'});
 
  // ---- 오버레이 공통 ----
@@ -58,10 +47,10 @@ const SHELL=(()=>{
 
  // ---- 추천 이웃 료칸 프리셋 생성기 ----
  const NEIGHBORS=[
-  {id:'yuzu',name:'유자향 카피바라 료칸',stars:0,tag:'운영자의 료칸',desc:'이 게임을 만든 사람이 직접 꾸민 료칸'},
-  {id:'moonlight',name:'할머니의 달빛 료칸',stars:5,tag:'5★ 대표 쇼케이스',desc:'달빛 노천탕과 등불 정원 · Day 15'},
-  {id:'forest',name:'안개숲 편백 온천',stars:4,tag:'4★ 치유의 숲',desc:'대나무 숲과 폭포 노천탕 · Day 9'},
-  {id:'neon',name:'쇼와 네온 온천 거리',stars:3,tag:'3★ 야시장 골목',desc:'네온사인과 라멘·이자카야 거리 · Day 6'}
+  {id:'yuzu',name:L('유자향 카피바라 료칸'),stars:0,tag:L('운영자의 료칸'),desc:L('이 게임을 만든 사람이 직접 꾸민 료칸')},
+  {id:'moonlight',name:L('할머니의 달빛 료칸'),stars:5,tag:L('5★ 대표 쇼케이스'),desc:L('달빛 노천탕과 등불 정원 · Day 15')},
+  {id:'forest',name:L('안개숲 편백 온천'),stars:4,tag:L('4★ 치유의 숲'),desc:L('대나무 숲과 폭포 노천탕 · Day 9')},
+  {id:'neon',name:L('쇼와 네온 온천 거리'),stars:3,tag:L('3★ 야시장 골목'),desc:L('네온사인과 라멘·이자카야 거리 · Day 6')}
  ];
  async function buildNeighborData(id){
   if(id==='yuzu'){
@@ -70,7 +59,7 @@ const SHELL=(()=>{
   if(id==='moonlight'){
    try{
     const r=await fetch('assets/showcase.json');
-    if(r.ok){const d=await r.json();d.ryokanName='할머니의 달빛 료칸';d.t=Date.now();return d}
+    if(r.ok){const d=await r.json();d.ryokanName=L('할머니의 달빛 료칸');d.t=Date.now();return d}
    }catch(_){}
   }
   if(id==='forest'){
@@ -87,7 +76,7 @@ const SHELL=(()=>{
    for(let j=25;j<=30;j++)b('path',24,j);
    for(let i=18;i<=36;i++)if(i!==24)b('path',i,28);
    for(let j=22;j<=27;j++)b('path_gravel',31,j);
-   return{layout:16,ryokanName:'안개숲 편백 온천',yen:34500,min:8*1440+10*60+30,plots:{'1,1':1,'2,1':1},objs:o,fin:{inc:0,exp:0,hist:[]},rep:88,t:Date.now(),served:5200,ver:2};
+   return{layout:16,ryokanName:L('안개숲 편백 온천'),yen:34500,min:8*1440+10*60+30,plots:{'1,1':1,'2,1':1},objs:o,fin:{inc:0,exp:0,hist:[]},rep:88,t:Date.now(),served:5200,ver:2};
   }
   const o=[];const b=(k,x,y,lv=1,price=0)=>o.push({k,x,y,lv,rot:0,price:price||(DEF[k]&&DEF[k].price)||0,uses:0,earn:0});
   b('gate',23,31,1);
@@ -102,7 +91,7 @@ const SHELL=(()=>{
   for(const[x,y]of[[16,20],[16,24],[25,17],[31,17]])b('maple',x,y);
   for(let j=24;j<=30;j++)b('path',24,j);
   for(let i=18;i<=31;i++)if(i!==24)b('path',i,28);
-  return{layout:16,ryokanName:'쇼와 네온 온천 거리',yen:26800,min:5*1440+20*60+40,plots:{'1,1':1},objs:o,fin:{inc:0,exp:0,hist:[]},rep:83,t:Date.now(),served:2400,ver:2};
+  return{layout:16,ryokanName:L('쇼와 네온 온천 거리'),yen:26800,min:5*1440+20*60+40,plots:{'1,1':1},objs:o,fin:{inc:0,exp:0,hist:[]},rep:83,t:Date.now(),served:2400,ver:2};
  }
 
  // ---- 인메모리 방문 전환 & 복귀 ----
@@ -122,9 +111,9 @@ const SHELL=(()=>{
   if(window.AMB&&AMB.setZen)AMB.setZen(false);
   if(window.applyState)window.applyState(data,true);
   const st=meta.stars||(window.__dbg&&window.__dbg.stars?window.__dbg.stars():4);
-  const nm=meta.name||data.ryokanName||'이웃 카피바라 료칸';
+  const nm=meta.name||data.ryokanName||L('이웃 카피바라 료칸');
   visitUI({name:nm,stars:st,day:Math.floor((data.min||0)/1440)+1});
-  toast(`${nm}에 방문했어요! 자유롭게 둘러보세요`);
+  toast(L`${nm}에 방문했어요! 자유롭게 둘러보세요`);
  }
  function exitVisit(){
   const vb=document.getElementById('visitBar');if(vb)vb.remove();
@@ -139,7 +128,7 @@ const SHELL=(()=>{
   if(target&&window.applyState){
    window.applyState(target,false);
    save();
-   toast('내 료칸으로 돌아왔어요!');
+   toast(L('내 료칸으로 돌아왔어요!'));
   }else{
    location.href=location.pathname;
   }
@@ -152,12 +141,12 @@ const SHELL=(()=>{
   const rows=[1,2,3].map(n=>{
    const i=slotInfo(n);
    return `<div class="slot ${n==cur?'cur':''}">
-    <b>${T('slot')} ${n}${n==cur?' · 현재':''}</b>
-    <span>${i?(i.bad?'손상됨':`<b>${i.name}</b> · Day ${i.day} · ¥${fmt(i.yen)}<br><small>손님 ${fmt(i.served||0)}명 · ${new Date(i.t).toLocaleString('ko-KR')}</small>`):'비어 있음 (바로 시작 가능)'}</span>
-    <div class="sbtns"><button class="mb sm ${n==cur?'pri':'sec'}" data-newslot="${n}">${i?'초기화 후 시작':'새로 시작'}</button></div>
+    <b>${T('slot')} ${n}${n==cur?L(' · 현재'):''}</b>
+    <span>${i?(i.bad?L('손상됨'):L`<b>${i.name}</b> · Day ${i.day} · ¥${fmt(i.yen)}<br><small>손님 ${fmt(i.served||0)}명 · ${new Date(i.t).toLocaleString('ko-KR')}</small>`):L('비어 있음 (바로 시작 가능)')}</span>
+    <div class="sbtns"><button class="mb sm ${n==cur?'pri':'sec'}" data-newslot="${n}">${i?L('초기화 후 시작'):L('새로 시작')}</button></div>
    </div>`;
   }).join('');
-  const o=overlay('ovNew',`
+  const o=overlay('ovNew',L`
    <div class="m-head">
     <div class="m-head-left"><span class="m-eyebrow">NEW RYOKAN</span><h2>새로 시작하기</h2></div>
     <button class="m-close-x" data-x>${T('close')}</button>
@@ -171,7 +160,7 @@ const SHELL=(()=>{
   const startInSlot=(n)=>{
    const info=slotInfo(n);
    if(info&&!info.bad){
-    if(!confirm(`슬롯 ${n}의 기존 데이터(Day ${info.day} · ¥${fmt(info.yen)})를 지우고 Day 1부터 새로 시작할까요?`))return;
+    if(!confirm(L`슬롯 ${n}의 기존 데이터(Day ${info.day} · ¥${fmt(info.yen)})를 지우고 Day 1부터 새로 시작할까요?`))return;
    }
    const key=slotKey(n);
    try{localStorage[key+'_bak']=localStorage[key]||''}catch(_){}
@@ -182,7 +171,7 @@ const SHELL=(()=>{
     if(document.getElementById('visitBar'))exitVisit();
     window.applyState(f,false);
     start();
-    toast(`슬롯 ${n}에서 새로운 온천 료칸을 시작했어요!`);
+    toast(L`슬롯 ${n}에서 새로운 온천 료칸을 시작했어요!`);
    }else{
     localStorage.removeItem(key);
     localStorage.onsenSlot=n;
@@ -197,25 +186,25 @@ const SHELL=(()=>{
 
  // ---- 설정 ----
  function settings(){const v=SET.vol;const sl=k=>`<label class="row"><span>${T(k)}</span><input type="range" min="0" max="1" step="0.05" value="${v[k]}" data-v="${k}"></label>`;
-  const o=overlay('ovSet',`<div class="m-head"><div class="m-head-left"><span class="m-eyebrow">PREFERENCES</span><h2>${T('set')}</h2></div><button class="m-close-x" data-x>${T('close')}</button></div>
+  const o=overlay('ovSet',L`<div class="m-head"><div class="m-head-left"><span class="m-eyebrow">PREFERENCES</span><h2>${T('set')}</h2></div><button class="m-close-x" data-x>${T('close')}</button></div>
    <h3>${T('vol')}</h3>${sl('master')}${sl('bgm')}${sl('sfx')}${sl('amb')}
    <h3>${T('gfx')}</h3><div class="seg" data-k="gfx">${['auto','high','low'].map(g=>`<button data-g="${g}" class="${SET.gfx==g?'on':''}">${T(g)}</button>`).join('')}</div>
-   <h3>${T('lang')}</h3><div class="seg" data-k="lang"><button data-l="ko" class="${SET.lang=='ko'?'on':''}">한국어</button><button data-l="en" class="${SET.lang=='en'?'on':''}">English</button></div>
+   <h3>${T('lang')}</h3><div class="seg" data-k="lang">${[['ko','한국어'],['en','English'],['ja','日本語'],['zh-TW','繁體中文']].map(([c,n])=>`<button data-l="${c}" class="${(window.LANG||'ko')==c?'on':''}">${n}</button>`).join('')}</div>
    <label class="row chk"><span>${T('fps')}</span><input type="checkbox" ${SET.fps?'checked':''} id="sFps"></label>
    <h3>진단</h3><div class="btns"><button class="mb sm sec" id="sDiag">오류 로그 복사</button></div>
    <div class="btns"><button class="mb sec" data-x>${T('close')}</button></div>`);
-  o.querySelector('#sDiag').onclick=async()=>{const t=window.DIAG?DIAG.text():'';try{await navigator.clipboard.writeText(t);toast('오류 로그를 복사했어요. 그대로 붙여넣어 보내주세요')}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('오류 로그를 복사했어요')}catch(_){prompt('아래 내용을 복사하세요',t.slice(0,5000))}ta.remove()}};
+  o.querySelector('#sDiag').onclick=async()=>{const t=window.DIAG?DIAG.text():'';try{await navigator.clipboard.writeText(t);toast(L('오류 로그를 복사했어요. 그대로 붙여넣어 보내주세요'))}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast(L('오류 로그를 복사했어요'))}catch(_){prompt(L('아래 내용을 복사하세요'),t.slice(0,5000))}ta.remove()}};
   o.querySelectorAll('input[data-v]').forEach(i=>i.oninput=()=>{v[i.dataset.v]=+i.value;saveSet();SND.applyVol&&SND.applyVol()});
   o.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{SET.gfx=b.dataset.g;if(SET.gfx!='auto'){autoLow=false;localStorage.onsenAutoLow='0'}saveSet();applyGfx();settings()});
-  o.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{SET.lang=b.dataset.l;saveSet();settings();refreshTexts()});
+  o.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{if(b.dataset.l==(window.LANG||'ko'))return;SET.lang=b.dataset.l;saveSet();try{save()}catch(_){}location.reload()});
   o.querySelector('#sFps').onchange=e=>{SET.fps=e.target.checked;saveSet()};o.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>close('ovSet'))}
 
  // ---- 슬롯 ----
- function slots(fromTitle){const cur=SLOT;const rows=[1,2,3].map(n=>{const i=slotInfo(n);return`<div class="slot ${n==cur?'cur':''}"><b>${T('slot')} ${n}</b><span>${i?(i.bad?'손상됨':`<b>${i.name}</b> · Day ${i.day} · ¥${fmt(i.yen)} · 손님 ${fmt(i.served||0)}명<br><small>${new Date(i.t).toLocaleString('ko-KR')}</small>`):T('empty')}</span>
+ function slots(fromTitle){const cur=SLOT;const rows=[1,2,3].map(n=>{const i=slotInfo(n);return`<div class="slot ${n==cur?'cur':''}"><b>${T('slot')} ${n}</b><span>${i?(i.bad?L('손상됨'):L`<b>${i.name}</b> · Day ${i.day} · ¥${fmt(i.yen)} · 손님 ${fmt(i.served||0)}명<br><small>${new Date(i.t).toLocaleString('ko-KR')}</small>`):T('empty')}</span>
    <div class="sbtns"><button class="mb sm pri" data-use="${n}">${n==cur?T('resume'):(i?T('use'):T('newg'))}</button>${i?`<button class="mb sm ghost" data-del="${n}">${T('del')}</button>`:''}</div></div>`}).join('');
-  const o=overlay('ovSlot',`<div class="m-head"><div class="m-head-left"><span class="m-eyebrow">SAVE DATA</span><h2>${T('slots')}</h2></div><button class="m-close-x" data-x>${T('close')}</button></div>${rows}<p class="note">자동 저장: 5초마다 · 슬롯 전환 시 현재 진행은 자동 저장돼요</p><div class="btns"><button class="mb sec" data-x>${T('close')}</button></div>`);
+  const o=overlay('ovSlot',L`<div class="m-head"><div class="m-head-left"><span class="m-eyebrow">SAVE DATA</span><h2>${T('slots')}</h2></div><button class="m-close-x" data-x>${T('close')}</button></div>${rows}<p class="note">자동 저장: 5초마다 · 슬롯 전환 시 현재 진행은 자동 저장돼요</p><div class="btns"><button class="mb sec" data-x>${T('close')}</button></div>`);
   o.querySelectorAll('[data-use]').forEach(b=>b.onclick=()=>{const n=+b.dataset.use;if(n==cur){close('ovSlot');if(fromTitle)start();else resume();return}save();localStorage.onsenSlot=n;localStorage.onsenSkipTitle='1';location.reload()});
-  o.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const n=+b.dataset.del;if(confirm(`${T('slot')} ${n} 데이터를 초기화할까요? 되돌릴 수 없어요.`)){if(n==cur&&window.fresh&&window.applyState){const f=window.fresh();localStorage[slotKey(n)]=JSON.stringify(f);window.applyState(f,false)}else{localStorage.removeItem(slotKey(n))}slots(fromTitle)}});
+  o.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const n=+b.dataset.del;if(confirm(L`${T('slot')} ${n} 데이터를 초기화할까요? 되돌릴 수 없어요.`)){if(n==cur&&window.fresh&&window.applyState){const f=window.fresh();localStorage[slotKey(n)]=JSON.stringify(f);window.applyState(f,false)}else{localStorage.removeItem(slotKey(n))}slots(fromTitle)}});
   o.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>close('ovSlot'))}
 
  // ---- QR 배지 드로잉 & 초대장 이미지 합성 ----
@@ -269,26 +258,26 @@ const SHELL=(()=>{
   g.fillStyle='#e8c468';g.font='700 22px Pretendard, sans-serif';
   g.fillText('★'.repeat(stCount)+'☆'.repeat(Math.max(0,5-stCount)),402,154);
   g.fillStyle='rgba(244,239,230,0.78)';g.font='600 17px Pretendard, sans-serif';
-  g.fillText(`Day ${dayNum}  ·  누적 손님 ${fmt(servedNum)}명`,402,190);
+  g.fillText(L`Day ${dayNum}  ·  누적 손님 ${fmt(servedNum)}명`,402,190);
   g.fillStyle='rgba(244,239,230,0.52)';g.font='500 14px Pretendard, sans-serif';
-  g.fillText('따스한 온천 김 너머, 카피바라가 쉬어가는 계절 료칸',402,226);
+  g.fillText(L('따스한 온천 김 너머, 카피바라가 쉬어가는 계절 료칸'),402,226);
   // QR 배지
   const qr=document.createElement('canvas');qr.width=96;qr.height=96;
   drawQrBadge(qr,code);
   g.drawImage(qr,402,262,96,96);
   g.fillStyle='#faf8f5';g.font='700 15px Pretendard, sans-serif';
-  g.fillText('초대 코드로 바로 놀러오세요',514,298);
+  g.fillText(L('초대 코드로 바로 놀러오세요'),514,298);
   g.fillStyle='rgba(244,239,230,0.6)';g.font='500 13px monospace';
   g.fillText((code||'').slice(0,22)+'…',514,324);
   g.fillStyle='#6fd4a6';g.font='600 13px Pretendard, sans-serif';
-  g.fillText('카피바라 온센 · 초대 · 방문',514,348);
+  g.fillText(L('카피바라 온센 · 초대 · 방문'),514,348);
 
   const a=document.createElement('a');
   a.download=`capybara-onsen-${Date.now().toString(36)}.png`;
   a.href=c.toDataURL('image/png');
   c.width=c.height=0;qr.width=qr.height=0;
   a.click();
-  toast('초대장 이미지를 저장했어요! 메신저나 SNS에 공유해보세요');
+  toast(L('초대장 이미지를 저장했어요! 메신저나 SNS에 공유해보세요'));
  }
 
  // ---- 클립보드/붙여넣기 코드에서 온천 입장 ----
@@ -301,22 +290,22 @@ const SHELL=(()=>{
   if(cMatch)code=cMatch[1];
   const d=await SAVE.codec.decode(code);
   const st=Math.min(5,Math.max(1,Math.floor((d.served||0)/1500)+1));
-  enterVisit(d,{name:d.ryokanName||'친구의 카피바라 료칸',stars:st});
+  enterVisit(d,{name:d.ryokanName||L('친구의 카피바라 료칸'),stars:st});
   return true;
  }
 
  // ---- 2026 초대 · 방문 모달 (Visual Invite Pass + 1-Click Neighbor Feed) ----
  async function share(){
   save();
-  if(!S.ryokanName)S.ryokanName='유자향 카피바라 료칸';
+  if(!S.ryokanName)S.ryokanName=L('유자향 카피바라 료칸');
   let code='';
-  try{code=await SAVE.codec.encode(S)}catch(e){toast('초대 코드를 만들지 못했어요');return}
+  try{code=await SAVE.codec.encode(S)}catch(e){toast(L('초대 코드를 만들지 못했어요'));return}
   let link=(window.WEB_BASE||location.origin+location.pathname)+'#visit='+code;
   const stCount=window.stars?stars():1;
   const dNum=window.dayN?dayN():1;
   const svNum=S.served||0;
 
-  const nbHtml=NEIGHBORS.map(nb=>`
+  const nbHtml=NEIGHBORS.map(nb=>L`
    <div class="nb-card">
     <div>
      <span class="nb-tag">${nb.tag}</span>
@@ -326,7 +315,7 @@ const SHELL=(()=>{
     <button class="mb pri sm" data-nb="${nb.id}">놀러가기</button>
    </div>`).join('');
 
-  const o=overlay('ovShare',`
+  const o=overlay('ovShare',L`
    <div class="m-head">
     <div class="m-head-left"><span class="m-eyebrow">INVITE & VISIT · 2026 PASS</span><h2>초대 · 방문</h2></div>
     <button class="m-close-x" data-x>${T('close')}</button>
@@ -392,7 +381,7 @@ const SHELL=(()=>{
   // 2) 료칸 이름 실시간 변경 시 초대 링크 갱신
   const nameInp=o.querySelector('#invName');
   nameInp.onchange=async()=>{
-   const v=nameInp.value.trim()||'유자향 카피바라 료칸';
+   const v=nameInp.value.trim()||L('유자향 카피바라 료칸');
    nameInp.value=v;S.ryokanName=v;save();
    try{
     code=await SAVE.codec.encode(S);
@@ -400,7 +389,7 @@ const SHELL=(()=>{
     o.querySelector('#shL').value=link;
     o.querySelector('#shC').value=code;
     drawQrBadge(o.querySelector('#invQr'),code);
-    toast(`료칸 이름을 '${v}'(으)로 변경했어요`);
+    toast(L`료칸 이름을 '${v}'(으)로 변경했어요`);
    }catch(_){}
   };
 
@@ -411,21 +400,21 @@ const SHELL=(()=>{
     const inp=o.querySelector('#shL');inp.select();try{document.execCommand('copy')}catch(_){}
    }
    copyBtn.classList.add('copied');
-   copyBtn.textContent='✓ 초대 링크 복사 완료! (메신저에 붙여넣기)';
-   toast('초대 링크를 복사했어요! 카카오톡·슬랙·디스코드에 바로 붙여넣어 보세요');
-   setTimeout(()=>{if(copyBtn.isConnected){copyBtn.classList.remove('copied');copyBtn.textContent='초대 링크 원클릭 복사'}},2800);
+   copyBtn.textContent=L('✓ 초대 링크 복사 완료! (메신저에 붙여넣기)');
+   toast(L('초대 링크를 복사했어요! 카카오톡·슬랙·디스코드에 바로 붙여넣어 보세요'));
+   setTimeout(()=>{if(copyBtn.isConnected){copyBtn.classList.remove('copied');copyBtn.textContent=L('초대 링크 원클릭 복사')}},2800);
   };
 
   // 4) 초대장 포스트카드 PNG 저장
   o.querySelector('#btnSaveCard').onclick=()=>{
-   downloadInviteCard(S.ryokanName||'유자향 카피바라 료칸',stCount,dNum,svNum,code);
+   downloadInviteCard(S.ryokanName||L('유자향 카피바라 료칸'),stCount,dNum,svNum,code);
   };
 
   // 5) 추천 이웃 료칸 1-Click 놀러가기
   o.querySelectorAll('[data-nb]').forEach(b=>b.onclick=async()=>{
    const id=b.dataset.nb;
    const nb=NEIGHBORS.find(x=>x.id===id)||NEIGHBORS[0];
-   b.textContent='이동 중…';
+   b.textContent=L('이동 중…');
    const d=await buildNeighborData(id);
    enterVisit(d,{name:nb.name,stars:nb.stars});
   });
@@ -435,13 +424,13 @@ const SHELL=(()=>{
   pasteInp.oninput=async()=>{
    const v=pasteInp.value.trim();
    if(v.includes('CAPY1.')||v.includes('YUZU1.')||v.includes('#visit=')){
-    try{await tryEnterFromText(v)}catch(e){toast('초대 링크 형식을 확인해주세요')}
+    try{await tryEnterFromText(v)}catch(e){toast(L('초대 링크 형식을 확인해주세요'))}
    }
   };
   o.querySelector('#btnClipVisit').onclick=async()=>{
    const typed=pasteInp.value.trim();
    if(typed){
-    try{await tryEnterFromText(typed);return}catch(e){toast('초대 링크가 올바르지 않아요: '+e.message);return}
+    try{await tryEnterFromText(typed);return}catch(e){toast(L('초대 링크가 올바르지 않아요: ')+e.message);return}
    }
    try{
     const clip=await navigator.clipboard.readText();
@@ -450,10 +439,10 @@ const SHELL=(()=>{
      return;
     }
     pasteInp.focus();
-    toast('클립보드에 초대 링크가 없어요. 입력창에 Ctrl+V로 붙여넣어 주세요!');
+    toast(L('클립보드에 초대 링크가 없어요. 입력창에 Ctrl+V로 붙여넣어 주세요!'));
    }catch(_){
     pasteInp.focus();
-    toast('입력창에 초대 링크를 붙여넣으면(Ctrl+V) 바로 이동해요!');
+    toast(L('입력창에 초대 링크를 붙여넣으면(Ctrl+V) 바로 이동해요!'));
    }
   };
 
@@ -463,14 +452,14 @@ const SHELL=(()=>{
    const txt=(e.clipboardData||window.clipboardData)?.getData('text')||'';
    if(txt&&(txt.includes('CAPY1.')||txt.includes('YUZU1.')||txt.includes('#visit='))){
     e.preventDefault();
-    try{await tryEnterFromText(txt)}catch(err){toast('초대 코드를 읽지 못했어요')}
+    try{await tryEnterFromText(txt)}catch(err){toast(L('초대 코드를 읽지 못했어요'))}
    }
   };
   addEventListener('paste',pasteHandler);
 
   // 7) 고급 백업/복원 핸들러 유지
-  o.querySelectorAll('[data-c]').forEach(b=>b.onclick=async()=>{const t=o.querySelector('#'+b.dataset.c);t.select();try{await navigator.clipboard.writeText(t.value)}catch(e){document.execCommand('copy')}b.textContent='복사됨';setTimeout(()=>b.textContent='복사',1500)});
-  o.querySelector('#shGo').onclick=async()=>{const v=o.querySelector('#shI').value;try{const d=await SAVE.codec.decode(v);if(!confirm(`Day ${Math.floor(d.min/1440)+1} · ¥${fmt(d.yen)} 저장으로 슬롯 ${SLOT}을(를) 덮어쓸까요?`))return;localStorage[SKEY+'_bak']=localStorage[SKEY]||'';localStorage[SKEY]=JSON.stringify(d);if(window.applyState){close('ovShare');window.applyState(d,false);toast(`슬롯 ${SLOT}에 저장 데이터를 복원했어요!`)}else{localStorage.onsenSkipTitle='1';location.reload()}}catch(e){toast('코드를 읽지 못했어요: '+e.message)}};
+  o.querySelectorAll('[data-c]').forEach(b=>b.onclick=async()=>{const t=o.querySelector('#'+b.dataset.c);t.select();try{await navigator.clipboard.writeText(t.value)}catch(e){document.execCommand('copy')}b.textContent=L('복사됨');setTimeout(()=>b.textContent=L('복사'),1500)});
+  o.querySelector('#shGo').onclick=async()=>{const v=o.querySelector('#shI').value;try{const d=await SAVE.codec.decode(v);if(!confirm(L`Day ${Math.floor(d.min/1440)+1} · ¥${fmt(d.yen)} 저장으로 슬롯 ${SLOT}을(를) 덮어쓸까요?`))return;localStorage[SKEY+'_bak']=localStorage[SKEY]||'';localStorage[SKEY]=JSON.stringify(d);if(window.applyState){close('ovShare');window.applyState(d,false);toast(L`슬롯 ${SLOT}에 저장 데이터를 복원했어요!`)}else{localStorage.onsenSkipTitle='1';location.reload()}}catch(e){toast(L('코드를 읽지 못했어요: ')+e.message)}};
   o.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>close('ovShare'));
  }
 
@@ -478,9 +467,9 @@ const SHELL=(()=>{
  function visitUI(meta={}){
   document.body.classList.add('visit');
   const old=document.getElementById('visitBar');if(old)old.remove();
-  const nm=meta.name||(window.SHOWCASE?'할머니의 달빛 료칸':(window.VISIT_SAVE&&VISIT_SAVE.ryokanName)||(window.S&&S.ryokanName)||'이웃 카피바라 료칸');
+  const nm=meta.name||(window.SHOWCASE?L('할머니의 달빛 료칸'):(window.VISIT_SAVE&&VISIT_SAVE.ryokanName)||(window.S&&S.ryokanName)||L('이웃 카피바라 료칸'));
   const st=meta.stars||(window.SHOWCASE?5:(window.stars?stars():4));
-  const b=el(`<div id="visitBar" class="box">
+  const b=el(L`<div id="visitBar" class="box">
    <span class="vb-badge">방문 중</span>
    <b class="vb-name">${nm}</b>
    <span class="stars">${'★'.repeat(st)}</span>
@@ -490,9 +479,9 @@ const SHELL=(()=>{
   </div>`);
   document.body.appendChild(b);
   b.querySelector('#vCheer').onclick=(e)=>{
-   if(cheeredVisit){toast('이미 따뜻한 응원을 보냈어요 ♥');return}
+   if(cheeredVisit){toast(L('이미 따뜻한 응원을 보냈어요 ♥'));return}
    cheeredVisit=true;
-   e.currentTarget.textContent='♥ 응원 완료';
+   e.currentTarget.textContent=L('♥ 응원 완료');
    e.currentTarget.style.color='var(--gold)';
    if(window.SND&&SND.quest)SND.quest();
    if(homeBackup)homeBackup.yen=(homeBackup.yen||0)+500;
@@ -500,14 +489,14 @@ const SHELL=(()=>{
    if(window.AMB&&AMB.fx&&window.guests){
     guests.slice(0,5).forEach(g=>{g.hop=0.5;AMB.fx.push({k:'heart',g,l:1.4,L:1.4})});
    }
-   toast(`${nm}에 응원(♥)을 보냈어요! 내 료칸에 응원 보너스 +¥500이 적립되었어요`);
+   toast(L`${nm}에 응원(♥)을 보냈어요! 내 료칸에 응원 보너스 +¥500이 적립되었어요`);
   };
   b.querySelector('#vOther').onclick=()=>share();
   b.querySelector('#vHome').onclick=()=>exitVisit();
  }
 
  // ---- 크레딧 ----
- function credits(){const o=overlay('ovCred',`<div class="m-head"><div class="m-head-left"><span class="m-eyebrow">CREDITS</span><h2>${T('cred')}</h2></div><button class="m-close-x" data-x>${T('close')}</button></div><div class="cred">
+ function credits(){const o=overlay('ovCred',L`<div class="m-head"><div class="m-head-left"><span class="m-eyebrow">CREDITS</span><h2>${T('cred')}</h2></div><button class="m-close-x" data-x>${T('close')}</button></div><div class="cred">
   <p><b>카피바라 온센 · 료칸 타이쿤</b><br>CAPYBARA ONSEN · v3.0</p>
   <p><b>기획 · 개발 · 문의</b><br><a href="mailto:youkim.official@gmail.com">youkim.official@gmail.com</a></p>
   <p><b>아트</b><br>이미지 생성 후 수작업 파이프라인(크로마키·디스필·박스 축소·팔레트 정리)으로 픽셀화</p>
@@ -539,7 +528,7 @@ const SHELL=(()=>{
  // ---- 타이틀 ----
  function showTitle(){const prev=document.getElementById("title");if(prev)prev.remove();inTitle=true;paused=true;document.body.classList.add('titling');AMB.setZen(true,true);const info=slotInfo(SLOT),has=!!info&&!info.bad;
   const metaTxt=has?`${T('slot')} ${SLOT} · Day ${info.day}`:`${T('slot')} ${SLOT} · NEW`;
-  const o=el(`<div id="title"><div class="tl">
+  const o=el(L`<div id="title"><div class="tl">
    <div class="tl-head">
     <span class="tl-eyebrow">${T('eyebrow')}</span>
     <h1><span class="k">${T('gameTitle')}</span><span class="s">${T('tagline')}</span></h1>
@@ -558,7 +547,7 @@ const SHELL=(()=>{
    </div>
    <div class="ver">v3.0  ·  ESC 일시정지  ·  Z 감상 모드</div></div></div>`);
   document.body.appendChild(o);requestAnimationFrame(()=>o.classList.add('on'));
-  o.querySelectorAll('[data-a]').forEach(b=>b.onclick=async e=>{e.stopPropagation();SND.init();const a=b.dataset.a;if(a=='cont')start();else if(a=='newg')newGameModal(true);else if(a=='slots')slots(true);else if(a=='share')share();else if(a=='set')settings();else if(a=='cred')credits();else if(a=='zen'){start();AMB.setZen(true)}else if(a=='show'){const d=await buildNeighborData('moonlight');enterVisit(d,{name:'할머니의 달빛 료칸',stars:5})}})}
+  o.querySelectorAll('[data-a]').forEach(b=>b.onclick=async e=>{e.stopPropagation();SND.init();const a=b.dataset.a;if(a=='cont')start();else if(a=='newg')newGameModal(true);else if(a=='slots')slots(true);else if(a=='share')share();else if(a=='set')settings();else if(a=='cred')credits();else if(a=='zen'){start();AMB.setZen(true)}else if(a=='show'){const d=await buildNeighborData('moonlight');enterVisit(d,{name:L('할머니의 달빛 료칸'),stars:5})}})}
  function start(){const o=document.getElementById('title');if(o){o.classList.remove('on');o.id='';setTimeout(()=>o.remove(),700)}inTitle=false;paused=false;document.body.classList.remove('titling');AMB.setZen(false);const zh=document.getElementById('zHome');zh&&zh.click()}
  function refreshTexts(){const o=document.getElementById('title');if(o){o.remove();showTitle()}}
 
@@ -572,19 +561,19 @@ const SHELL=(()=>{
 
  // ---- 상단 HUD '초대 · 방문' + '일시정지' 버튼 & 하단 툴바 '초대·방문' 버튼 ----
  const sp=$('bSpeed');
- const invBtn=el('<div class="box btn" id="bInvite" title="내 온천 초대장 · 이웃 온천 놀러가기">초대 · 방문</div>');
+ const invBtn=el(L('<div class="box btn" id="bInvite" title="내 온천 초대장 · 이웃 온천 놀러가기">초대 · 방문</div>'));
  sp.parentNode.insertBefore(invBtn,sp);invBtn.onclick=()=>share();
- const pb=el('<div class="box btn" id="bPause" title="일시정지 (Esc)">일시정지</div>');
+ const pb=el(L('<div class="box btn" id="bPause" title="일시정지 (Esc)">일시정지</div>'));
  sp.parentNode.insertBefore(pb,sp);pb.onclick=()=>pause();
  const tools=$('tools');
  if(tools){
-  const tInv=el('<button class="tool" id="tInvite" title="초대 · 방문"><i>초대·방문</i></button>');
+  const tInv=el(L('<button class="tool" id="tInvite" title="초대 · 방문"><i>초대·방문</i></button>'));
   tInv.onclick=()=>share();
   tools.insertBefore(tInv,tools.querySelector('.zoom'));
  }
 
  // ---- 오류 처리 ----
- let errShown=0;const onErr=m=>{console.warn('[onsen]',m);try{save()}catch(e){}if(!errShown++)toast('앗, 작은 문제가 생겼지만 진행은 안전하게 저장했어요')};
+ let errShown=0;const onErr=m=>{console.warn('[onsen]',m);try{save()}catch(e){}if(!errShown++)toast(L('앗, 작은 문제가 생겼지만 진행은 안전하게 저장했어요'))};
  addEventListener('error',e=>onErr(e.message));addEventListener('unhandledrejection',e=>onErr(String(e.reason)));
  applyGfx();
  BUS.on('info',(o,el)=>{if(window.READONLY){const b=el.lastElementChild;if(b)b.querySelectorAll('button').forEach(x=>{if(x.id!='iCl')x.remove()});el.querySelectorAll('[data-p]').forEach(x=>x.remove())}});
