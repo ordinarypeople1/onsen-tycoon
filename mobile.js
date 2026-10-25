@@ -30,6 +30,22 @@
  const tagIcons=()=>{for(const b of tools.querySelectorAll('.tool')){if(b.dataset.ic||b===menu)continue;const t=b.textContent.trim();for(const k in IC)if(t.startsWith(k)){b.dataset.ic=IC[k];break}}};
  menu.dataset.ic='menu';const bo=$('bOpen');if(bo)bo.dataset.ic='build';
  tagIcons();let tn=0;const ti=setInterval(()=>{tagIcons();if(++tn>20)clearInterval(ti)},500);
+ // ---- 건설·철거 중 하단 바: [회전] [취소] (모든 기기). 휴대폰은 배치하는 동안 건설 시트를 내려 화면을 비움 ----
+ const bar=document.createElement('div');bar.id='ghBar';bar.className='box';
+ bar.innerHTML='<span id="ghTxt"></span><button id="ghR" data-ic="rotate"><i>회전</i></button><button id="ghX" data-ic="close"><i>취소</i></button>';
+ document.body.appendChild(bar);
+ const ghR=bar.querySelector('#ghR'),ghX=bar.querySelector('#ghX'),ghT=bar.querySelector('#ghTxt');
+ const stop=e=>{e.stopPropagation();e.preventDefault()};
+ ghR.addEventListener('pointerdown',stop);ghX.addEventListener('pointerdown',stop);
+ ghR.onclick=e=>{stop(e);const r=$('ghRot');if(r)r.click()};
+ ghX.onclick=e=>{stop(e);try{escCancel()}catch(_){}};
+ setInterval(()=>{let g=null,m=null;try{g=ghost;m=mode}catch(_){return}
+  const mv=(()=>{try{return moving}catch(_){return null}})();
+  const on=!!(g||m=='del')&&!mv;bar.classList.toggle('on',on);document.body.classList.toggle('placing',on);
+  if(!on)return;const d=g&&DEF[g];
+  ghR.style.display=(d&&g!='gate'&&!d.isPath&&!d.erase)?'':'none';
+  ghT.textContent=m=='del'?'철거할 시설을 눌러주세요':d?(d.isPath||d.erase?d.n+' · 눌러서 칠하기':d.n+' · 놓을 곳을 눌러주세요'):'';
+ },150);
  const apply=()=>{const on=mq.matches;document.body.classList.toggle('phone',on);document.body.classList.toggle('phone-land',on&&innerWidth>innerHeight);if(!on)close()};
  mq.addEventListener?mq.addEventListener('change',apply):mq.addListener(apply);addEventListener('resize',apply);apply();
 })();

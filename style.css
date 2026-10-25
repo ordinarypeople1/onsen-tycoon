@@ -715,3 +715,18 @@ body.phone #quest.qmin.ready>.qf span{display:none}
 body.phone-land #tools.open{grid-template-columns:repeat(5,1fr);max-height:calc(100vh - 16px);overflow:auto;padding:10px}
 body.phone-land #tools.open>.tool[data-ic]{height:50px}
 body.phone-land #tools.open>#tMenu{height:40px}
+/* ===== 건설·철거 중 하단 바 ===== */
+#ghRot{display:none!important}
+#ghBar{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9;display:none;align-items:center;gap:8px;padding:7px 8px 7px 16px;border-radius:999px;font:600 13.5px Pretendard,sans-serif;white-space:nowrap;max-width:calc(100vw - 16px)}
+#ghBar.on{display:flex}
+#ghTxt{color:var(--txt-pri);overflow:hidden;text-overflow:ellipsis}
+#ghBar button{display:inline-flex;align-items:center;gap:5px;border:0;border-radius:999px;padding:8px 14px;font:700 13.5px Pretendard,sans-serif;cursor:pointer}
+#ghBar button::before{content:'';width:16px;height:16px;background:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
+#ghBar button i{font-style:normal}
+#ghR{background:rgba(255,255,255,.12);color:var(--txt-pri)}
+#ghX{background:var(--bg-ivory);color:var(--ink-dark)}
+/* 휴대폰: 배치하는 동안 건설 시트·하단 버튼을 내리고 바만 남김 */
+body.phone.placing #build,body.phone.placing #bOpen,body.phone.placing #tools{visibility:hidden}
+body.phone #ghBar{bottom:calc(14px + env(safe-area-inset-bottom));padding:6px 6px 6px 14px;font-size:13px}
+body.phone #ghBar button{padding:10px 14px}
+[data-ic="rotate"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M20%2012a8%208%200%201%201-2.6-5.9%22/%3E%3Cpath%20d%3D%22M20%204v4.5h-4.5%22/%3E%3C/svg%3E")}
