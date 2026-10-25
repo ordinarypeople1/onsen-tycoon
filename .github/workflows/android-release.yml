@@ -48,6 +48,7 @@ jobs:
           VERSION_CODE: ${{ github.run_number }}
           VERSION_NAME: ${{ inputs.version_name || (startsWith(github.ref_name, 'v') && github.ref_name) || '1.0.0' }}
         run: |
+          export VERSION_NAME="${VERSION_NAME#v}"
           chmod +x gradlew
           ./gradlew bundleRelease --no-daemon > /tmp/gradle.txt 2>&1 || { grep -A6 "What went wrong" /tmp/gradle.txt | head -8 | while read -r l; do echo "::error::$l"; done; tail -5 /tmp/gradle.txt; exit 1; }
           tail -3 /tmp/gradle.txt
