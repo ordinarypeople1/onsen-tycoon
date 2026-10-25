@@ -10,3 +10,6 @@ __pycache__/
 /sim*.json
 /trailer.webm
 /trailer_preview.gif
+
+# 앱 빌드 산출물
+/www/
