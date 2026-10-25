@@ -600,3 +600,62 @@ body.visit #build,body.visit #bOpen,body.visit #tDel,body.visit #quest,body.visi
  #title h1 .k{font-size:38px}
  #info.pop{min-width:230px;font-size:13px}
 }
+
+/* ===== 휴대폰 (가로 600px 이하 또는 세로 500px 이하) ===== */
+.tool.mx,#tMenu{display:none}
+body.phone #top{flex-wrap:nowrap;gap:5px;top:8px;left:8px;right:8px}
+body.phone #top .box{font-size:12.5px;padding:5px 9px;border-radius:10px}
+body.phone #top .hud-lbl,body.phone #top .clock .sub,body.phone #bMute,body.phone #bInvite,body.phone #bPause{display:none}
+body.phone #top .sp{display:block;flex:1}
+body.phone #top .clock{display:flex;align-items:center}
+@media (max-width:420px){body.phone #top>.box:nth-child(2){display:none}body.phone #top .coin{display:none}}
+@media (max-width:420px){body.phone #dayn,body.phone .dsep{display:none}}
+body.phone #top .clock{white-space:nowrap}
+body.phone #quest{top:50px;left:8px;width:auto;max-width:min(250px,62vw);font-size:12px;padding:8px 11px;border-radius:12px}
+body.phone #quest .qh{font-size:13px;margin-bottom:3px;cursor:pointer}
+body.phone #quest .qh:after{content:'접기';margin-left:10px;font:500 11px Pretendard,sans-serif;color:var(--txt-muted)}
+body.phone #quest.qmin .qh:after{content:'펼치기'}
+body.phone #quest .qt{font-size:12.5px;margin-bottom:4px}
+body.phone #quest .qf{font-size:11.5px;margin-top:5px}
+body.phone #quest .qs{display:none}
+body.phone #quest.qmin>*:not(.qh){display:none}
+body.phone #quest.qmin .qh{margin:0}
+body.phone #quest button.b{padding:4px 10px;font-size:12px}
+/* 하단 독 */
+body.phone #tools{left:8px;right:auto;bottom:max(8px,env(safe-area-inset-bottom));flex-wrap:nowrap;gap:6px}
+body.phone #tools>*{display:none}
+body.phone #tools>.dock{display:inline-flex}
+body.phone .tool{height:42px;padding:0 14px;border-radius:12px}
+body.phone .tool i{font-size:14px}
+body.phone #bOpen{top:auto;right:8px;bottom:max(8px,env(safe-area-inset-bottom));height:42px;padding:0 16px;border-radius:12px;font-size:14.5px;align-items:center;background:var(--bg-ivory);color:var(--ink-dark);border-color:var(--bg-ivory)}
+body.phone:not(.visit) #tools:not(.low):not(.open){display:none}
+/* 메뉴 시트 */
+body.phone #tools.open{left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:14px 12px max(14px,env(safe-area-inset-bottom));background:rgba(12,15,21,0.94);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-top:1px solid var(--border-glass);border-radius:18px 18px 0 0;box-shadow:0 -14px 40px rgba(0,0,0,0.45);z-index:30}
+body.phone #tools.open>.tool{display:inline-flex;width:100%;padding:0 4px}
+body.phone #tools.open>.zoom{display:none}
+body.phone #tools.open>#tMenu{grid-column:1/-1;order:99;background:var(--bg-ivory)}
+body.phone #tools.open>#tMenu i{color:var(--ink-dark)}
+body.phone.visit #tools.open>#tDel{display:none}
+/* 건설 시트 */
+body.phone #build{top:auto;left:0;right:0;bottom:0;width:auto;height:min(46vh,400px);border-radius:18px 18px 0 0;padding:10px 10px max(8px,env(safe-area-inset-bottom))}
+body.phone .bh{font-size:15px;padding:0 2px 8px}
+body.phone .tabs{gap:2px;padding:3px}
+body.phone .tab{font-size:13px;padding:7px 0}
+body.phone .cards{grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+body.phone .card{padding:6px 4px;border-radius:11px}
+body.phone .card img{height:40px;margin:2px auto 3px}
+body.phone .card b{font-size:12.5px}
+body.phone .card .p{font-size:12px}
+body.phone .card .fpb{font-size:10px;padding:2px 4px;top:4px;left:4px}
+body.phone .tip{display:none}
+body.phone #visitBar{top:50px;left:8px;right:8px;transform:none;width:auto;max-width:600px;margin:0 auto;flex-wrap:wrap;justify-content:center;gap:6px;padding:6px 8px;font-size:12.5px;border-radius:14px}
+body.phone #visitBar .vb-name{font-size:13px}
+body.phone #visitBar button{font-size:12px!important;padding:5px 9px!important}
+body.phone #modal{max-height:calc(100vh - 24px);width:min(568px,calc(100vw - 16px));z-index:45;font-size:13px}
+body.phone #warn{top:96px;max-width:90vw;white-space:normal;text-align:center}
+body.phone #moveBar{top:50px}
+/* 휴대폰 가로: 건설은 오른쪽 패널 */
+body.phone-land #build{top:50px;bottom:8px;left:auto;right:8px;width:min(330px,44vw);height:auto;border-radius:16px}
+body.phone-land .cards{grid-template-columns:repeat(3,1fr)}
+body.phone-land #quest{max-width:240px}
+body.phone-land #tools.open{left:auto;right:8px;bottom:8px;width:min(420px,60vw);border-radius:16px;border:1px solid var(--border-glass)}
