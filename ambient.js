@@ -141,7 +141,8 @@ const AMB=(()=>{
  function tap(fx_,fy_,sx,sy){let best=null,bd=1e9;for(const g of guests){if(g.hide||g.dead)continue;const[X,Y]=toScreenT(g.x,g.y);const d=Math.hypot(X-sx,(Y-7*cam.z)-sy);if(d<bd){bd=d;best=g}}
   if(best&&bd<9*cam.z+6){best.hop=0.5;fx.push({k:'heart',g:best,l:1.2,L:1.2});if(best.inBath)fx.push({k:'ring',x:best.x,y:best.y,l:1,L:1},{k:'drop',x:best.x,y:best.y,n:8,l:0.7,L:0.7});
    const L=['아~ 좋다','뜨끈뜨끈','최고야…','♨ 행복'],T=best.target&&DEF[best.target.k]?DEF[best.target.k].n:null;
-   const line=best.inBath?L[(R()*L.length)|0]:best.leaving?'집에 가는 중이에요':best.st=='wait'&&T?`${T} 자리 기다리는 중`:T?`${T} 가는 중`:'느긋하게 산책 중';think(best,line,true);window.SND&&SND.squeak&&SND.squeak();return !best.inBath}
+   const V=best.view&&DEF[best.view.k]?DEF[best.view.k].n:null;
+   const line=best.inBath?L[(R()*L.length)|0]:best.leaving?'집에 가는 중이에요':best.st=='look'?'풍경 구경 중':V?`${V} 구경하러 가는 중`:best.st=='wait'&&T?`${T} 자리 기다리는 중`:T?`${T} 가는 중`:'느긋하게 산책 중';think(best,line,true);window.SND&&SND.squeak&&SND.squeak();return !best.inBath}
   const o=OCC[(fx_|0)+','+(fy_|0)];if(o&&!DEF[o.k].isPath){const c=ctr(o);o.sway=Math.min(0.4,(o.sway||0)+0.3);fx.push({k:'spark',x:c[0],y:c[1],h:DEF[o.k].tree?20:10,l:0.8,L:0.8});
    if(DEF[o.k].pond){const d=pondData(o);const[X,Y]=iso(fx_,fy_);d.rip.push({x:X,y:Y,l:1.6},{x:X+2,y:Y+1,l:1.2})}}
   return false}
