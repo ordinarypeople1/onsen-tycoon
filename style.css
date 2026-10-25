@@ -659,3 +659,17 @@ body.phone-land #build{top:50px;bottom:8px;left:auto;right:8px;width:min(330px,4
 body.phone-land .cards{grid-template-columns:repeat(3,1fr)}
 body.phone-land #quest{max-width:240px}
 body.phone-land #tools.open{left:auto;right:8px;bottom:8px;width:min(420px,60vw);border-radius:16px;border:1px solid var(--border-glass)}
+
+/* ===== 노치·홈바 영역(safe area) + 앱 전용 ===== */
+html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+input,textarea{user-select:text;-webkit-user-select:text}
+img{-webkit-user-drag:none}
+body.phone #top{top:calc(8px + env(safe-area-inset-top));left:calc(8px + env(safe-area-inset-left));right:calc(8px + env(safe-area-inset-right))}
+body.phone #quest{top:calc(50px + env(safe-area-inset-top));left:calc(8px + env(safe-area-inset-left))}
+body.phone #visitBar,body.phone #moveBar{top:calc(50px + env(safe-area-inset-top))}
+body.phone #tools{left:calc(8px + env(safe-area-inset-left))}
+body.phone #bOpen{right:calc(8px + env(safe-area-inset-right))}
+body.phone-land #build{top:calc(50px + env(safe-area-inset-top));right:calc(8px + env(safe-area-inset-right))}
+body.phone #tools.open{left:0;padding-left:calc(12px + env(safe-area-inset-left));padding-right:calc(12px + env(safe-area-inset-right))}
+body.phone-land #tools.open{left:auto;right:calc(8px + env(safe-area-inset-right))}
+#zenHint{bottom:calc(28px + env(safe-area-inset-bottom))}

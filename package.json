@@ -1,0 +1,26 @@
+{
+  "name": "capybara-onsen",
+  "version": "1.0.0",
+  "private": true,
+  "description": "카피바라 온센 료칸 타이쿤 — 웹(GitHub Pages)과 Android/iOS 앱(Capacitor)",
+  "scripts": {
+    "build:www": "node tools/build_www.js",
+    "sync": "npm run build:www && npx cap sync",
+    "android": "npm run sync && npx cap open android",
+    "ios": "npm run sync && npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.4"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.3",
+    "@capacitor/ios": "^8.5.3"
+  }
+}
