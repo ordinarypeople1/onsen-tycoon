@@ -376,7 +376,9 @@ function pickTarget(g){
   if(!c.length){think(g,THOUGHT.none[nk]);g.happy-=6;g.need[nk]-=15;continue}
   return pickBy(g,c,nk)}
  return null}
-function pickBy(g,list,nk){list.sort((a,b)=>(dist(g,a)+a.price/300)-(dist(g,b)+b.price/300));const o=list[0];
+// 혼잡도: 이용 중 + 이 시설로 가는 중 + 대기 중인 손님 수. 꽉 찰 시설은 빈자리 있는 시설보다 뒤로 (모두 차면 가장 가까운 곳에서 대기)
+function loadOf(o,self){let n=o.users||0;for(const x of guests)if(x!==self&&x.target===o&&!x.leaving)n++;return n}
+function pickBy(g,list,nk){const sc=new Map();for(const o of list){const full=loadOf(o,g)>=capOf(o);sc.set(o,dist(g,o)+o.price/300+(full?40:0))}list.sort((a,b)=>sc.get(a)-sc.get(b));const o=list[0];
  if(Math.random()<0.25)think(g,THOUGHT.want[nk]||'');return o}
 const ctr=o=>{const[fw,fh]=fpOf(o.k,o.rot);return[o.x+fw/2,o.y+fh/2]};
 const dist=(g,o)=>{const[a,b]=ctr(o);return Math.hypot(a-g.x,b-g.y)};
@@ -427,7 +429,7 @@ function updGuest(g,dt){
   if(g.target){arrive(g);return}
   if(g.leaving){g.dead=1;return}
   if(_pb-->0)decide(g)}
- else if(g.st=='wait'){g.t-=dt;if(g.t<=0){g.st='walk';arrive(g)}}
+ else if(g.st=='wait'){g.t-=dt;if(g.wx!=null){const dx=g.wx-g.x,dy=g.wy-g.y,d=Math.hypot(dx,dy);if(d>0.03){const sp=Math.min(d,1.1*dt);g.x+=dx/d*sp;g.y+=dy/d*sp;g.dir=(dx-dy)>=0?1:-1}}if(g.t<=0){g.wx=g.wy=null;g.st='walk';arrive(g)}}
  else if(g.st=='use'){g.waited=0;g.t-=dt;if(g.t<=0)finish(g)}
 }
 function decide(g){
@@ -437,7 +439,7 @@ function decide(g){
  const pp=pathToObj(g,o);if(pp)g.path=pp;if(!pp){if(!g.blocked)g.blocked=new Set();if(!g.blocked.size){think(g,'길이 막혔어요…');g.happy-=4}g.blocked.add(o);g.path=[];return}g.target=o;}
 function arrive(g){g.ax=g.x;g.ay=g.y;const o=g.target;if(!o||!DEF[o.k]){g.target=null;g.st='walk';if(_pb-->0)decide(g);return}const d=DEF[o.k];g.target=null;o.users=o.users||0;
  if(!S.objs.includes(o)){decide(g);return}
- const cap=capOf(o);if(o.users>=cap){if(!g.waited){g.waited=1;if(Math.random()<0.5)think(g,'자리가 날 때까지 기다릴게요');g.st='wait';g.t=5;g.target=o;return}g.waited=0;think(g,'자리가 없네…');g.happy-=3;(g.used=g.used||[]).push(o);return}
+ const cap=capOf(o);if(o.users>=cap){if(!g.waited){g.waited=1;if(Math.random()<0.5)think(g,'자리가 날 때까지 기다릴게요');g.st='wait';g.t=5;g.target=o;const w=waitSpot(g,o);g.wx=w[0];g.wy=w[1];return}g.waited=0;think(g,'자리가 없네…');g.happy-=3;(g.used=g.used||[]).push(o);return}
  const fair=fairPrice(o)*(0.8+g.happy/150);
  if(o.price>fair*1.45){think(g,THOUGHT.pricey[Math.random()*3|0]);g.happy-=9;o.rej=(o.rej||0)+1;(g.used=g.used||[]).push(o);return}
  if(o.price>g.budget){think(g,'다음에 또 올게요');leave(g);return}
@@ -448,6 +450,9 @@ function arrive(g){g.ax=g.x;g.ay=g.y;const o=g.target;if(!o||!DEF[o.k]){g.target
  const bonus=o.price<fair*0.9?8:o.price<fair*1.15?3:-3;g.happy+=bonus+o.lv*2;
  for(const k in d.eff)if(g.need[k]!=null)g.need[k]=Math.max(0,g.need[k]+d.eff[k]*(1+o.lv*0.1));
  if(d.joy)g.happy+=d.joy*0.3;if(d.bath&&Math.random()<0.6)setTimeout(()=>think(g,THOUGHT.good[Math.random()*6|0]),1500);}
+// 대기 위치: 시설에 붙은 걸을 수 있는 칸 중 현재 위치에서 가깝고(2.5칸 이내) 다른 대기 손님이 적은 곳
+function waitSpot(g,o){const T=new Set(tilesOf(o).map(([x,y])=>x+','+y)),c=[];for(const[x,y]of tilesOf(o))for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,k=nx+','+ny;if(T.has(k)||!walkable(nx,ny)||c.some(p=>p.k==k))continue;const px=nx+0.5,py=ny+0.5,d=Math.hypot(px-g.x,py-g.y);if(d>2.5)continue;let crowd=0;for(const q of guests)if(q!==g&&q.st=='wait'&&Math.hypot((q.wx??q.x)-px,(q.wy??q.y)-py)<0.6)crowd++;c.push({k,px,py,s:d+crowd*3})}
+ if(!c.length)return[g.x,g.y];c.sort((a,b)=>a.s-b.s);const p=c[0];return[p.px+(Math.random()-0.5)*0.4,p.py+(Math.random()-0.5)*0.4]}
 function freeSlot(o){const used=guests.filter(x=>x.cur===o&&x.inBath).map(x=>x.slot);for(let i=0;i<capOf(o);i++)if(!used.includes(i))return i;return 0}
 function finish(g){const o=g.cur;if(g.ax!=null){g.x=g.ax;g.y=g.ay}if(o)o.users=Math.max(0,o.users-1);(g.used=g.used||[]).push(o);if(g.used.length>3)g.used.shift();
  g.cur=null;g.hide=false;const[a,b]=door(o);g.x=a;g.y=b;g.inBath=false;g.st='walk';g.tx=g.x;g.ty=g.y;g.path=[]}
