@@ -77,14 +77,36 @@ const QX=(()=>{
  BUS.on('spawn',g=>{const m=M();m.col.g[g.vip?'vip':g.spr]=1;
   if(!g.vip&&S.served>=15&&Math.random()<0.14){const free=REGS.filter(([n])=>!guests.some(x=>x.reg==n));if(free.length){const[n,img]=free[Math.random()*free.length|0];g.reg=n;g.spr=img;g.budget+=1500;g.happy+=8;const r=m.regs[n]=m.regs[n]||{v:0};r.v++;st().regular++;if(r.v==1)toast(`새 단골 손님 '${n}'이(가) 찾아왔어요!`);setTimeout(()=>think(g,r.v>1?`${n}: 또 왔어요~ (${r.v}번째)`:`${n}: 처음 왔어요!`),1200)}}
   if(g.vip)setTimeout(()=>think(g,'VIP: 최고의 서비스를 기대할게요'),1000)});
- BUS.on('leave',g=>review(g));
+ BUS.on('leave',g=>{review(g);postcard(g)});
+ // ----- 엽서: 단골이 방문 단계마다, 아주 행복했던 손님이 가끔 보내는 손편지 (방문·미리 진행 중엔 없음) -----
+ const PC_REG={3:'{n}{ye}. 벌써 세 번째 왔네요. {rest}이 요즘 제 작은 낙이에요.',7:'{n}{ye}. 지난번엔 가족들을 데리고 왔는데, 다들 {f}{i} 제일 좋았대요. 덕분에 행복한 하루였어요.',15:'{n}{ye}. 이제 여기가 제 두 번째 집 같아요. 언제 와도 반겨줘서 고마워요.',30:'{n}{ni} 드려요. 오래오래 이 자리에 있어 주세요. 저도 계속 올게요.'};
+ const PC_FAM=[['세 식구 카피바라 가족','가족들과 행복한 시간을 보내게 해줘서 고마워요. 아이가 집에 와서도 {f} 이야기를 계속해요.'],
+  ['쌍둥이네 가족','쌍둥이가 {f}{r} 제일 좋아했어요. 가족 모두 푹 쉬고 갑니다. 고마워요.'],
+  ['효도 여행 온 남매','오랜만에 부모님을 모시고 왔어요. {f}{at} 함께 웃던 시간이 오래 기억날 것 같아요.'],
+  ['퇴근길 직장인','바쁜 한 주였는데 {f} 덕분에 마음이 다 녹았어요. 꼭 또 올게요.'],
+  ['신혼부부 카피바라','둘이 처음 여행 온 곳이 여기예요. {f}{at} 보낸 시간을 오래 간직할게요.'],
+  ['할머니와 손녀','할머니가 {f}{r} 보시고 옛날 생각이 난다며 좋아하셨어요. 고맙습니다.'],
+  ['단짝 친구 셋','친구들이랑 실컷 웃고 쉬다 가요. {f}{i} 특히 좋았어요.']];
+ // 손님이 좋아한 곳: 구경한 장식(60%) 또는 이용한 시설. 장식이면 '앞에서/바라보며', 시설이면 '에서/쉬며'
+ function favOf(g){const seen=g.seen?[...g.seen].filter(o=>S.objs.includes(o)):[];if(seen.length&&Math.random()<0.6)return{n:DEF[seen[seen.length-1].k].n.replace(/\s*\(.*\)$/,''),deco:1};const ks=g.kinds?[...g.kinds]:[];if(ks.length)return{n:DEF[ks[ks.length-1]].n,deco:0};return{n:'따뜻한 온천',deco:0}}
+ function fill(t,n,F){const f=F.n,rest=F.deco?f+josa(f,'을','를')+' 바라보며 쉬는 시간':f+'에서 보내는 시간';return t.replace('{rest}',rest).replace('{n}',n).replace('{ye}',n?josa(n,'이에요','예요'):'').replace('{ni}',n?josa(n,'이','가'):'').replace('{f}',f).replace('{at}',F.deco?' 앞에서':'에서').replace('{i}',josa(f,'이','가')).replace('{r}',josa(f,'을','를'))}
+ function sendCard(from,text){const m=M();(m.cards||(m.cards=[])).unshift({d:typeof dayN=='function'?dayN():1,from,t:text,read:0});if(m.cards.length>40)m.cards.length=40;toast(`${from}에게서 엽서가 도착했어요`);SND.quest&&SND.quest();cardBadge()}
+ function postcard(g){if(window.READONLY||window.__warm)return;const m=M();
+  if(g.reg&&g.happy>=60){const r=m.regs[g.reg];if(r&&PC_REG[r.v]&&!(r.c||(r.c=[])).includes(r.v)){r.c.push(r.v);sendCard(g.reg,fill(PC_REG[r.v],g.reg,favOf(g)));return}}
+  const day=typeof dayN=='function'?dayN():0;if(m.cardDay!==day){m.cardDay=day;m.cardN=0}
+  if(!g.reg&&g.happy>=85&&(m.cardN||0)<2&&Math.random()<0.05){m.cardN=(m.cardN||0)+1;const[fr,tx]=PC_FAM[Math.random()*PC_FAM.length|0];sendCard(fr,fill(tx,'',favOf(g)))}}
+ function modalCards(){const el=$('modal'),m=M(),cs=m.cards||[];
+  el.innerHTML=`<h3>엽서함 <small>손님들이 보낸 손편지</small></h3>`+(cs.map(c=>`<div class="pcard${c.read?'':' new'}"><div class="pstamp">♨</div><p>${c.t}</p><div class="pfrom">— ${c.from}<small>Day ${c.d}</small></div></div>`).join('')||'<div class="row" style="border:0"><span>아직 받은 엽서가 없어요. 손님들이 행복하게 쉬다 가면 엽서가 와요.</span></div>')+`<div style="text-align:right;margin-top:10px"><button class="b g" onclick="this.closest('.panel').style.display='none'">닫기</button></div>`;
+  el.style.display='block';cs.forEach(c=>c.read=1);cardBadge()}
+ const pcs=document.createElement('style');pcs.textContent='.pcard{position:relative;background:linear-gradient(180deg,#f6ecd6,#efe0c2);color:#3b2a1c;border-radius:6px;padding:14px 64px 12px 16px;margin:10px 0;box-shadow:0 2px 10px rgba(0,0,0,.25);font-size:13.5px;line-height:1.65}.pcard p{margin:0 0 8px}.pcard .pstamp{position:absolute;top:10px;right:12px;width:38px;height:44px;border:2px dashed #b98c5a;border-radius:3px;display:flex;align-items:center;justify-content:center;color:#b5643a;font-size:18px;background:#f9f1e1;transform:rotate(4deg)}.pcard .pfrom{text-align:right;color:#6b4a2e;font-weight:600}.pcard .pfrom small{display:block;font-weight:400;opacity:.7;font-size:11px}.pcard.new{outline:2px solid rgba(232,196,104,.7)}.pbadge{display:inline-block;min-width:16px;padding:0 5px;margin-left:4px;border-radius:9px;background:#e0703a;color:#fff;font-size:11px;font-style:normal;line-height:16px;text-align:center}';document.head.appendChild(pcs);
  BUS.on('hour',()=>render_());
  BUS.on('text',t=>{if(cam.z<2.2)return;t.font='700 11px Pretendard';for(const g of guests){if(!(g.reg||g.vip)||g.hide||g.inBath)continue;const[X,Y]=toScreenT(g.x,g.y);const s=g.reg||'VIP';const w=t.measureText(s).width+10;t.fillStyle=g.vip?'rgba(200,150,30,0.9)':'rgba(60,110,170,0.9)';rr(t,X-w/2,Y+4,w,15,7);t.fill();t.fillStyle='#fff';t.fillText(s,X,Y+12)}});
  // 가격 조정 감지
  document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('[data-p]'))st().price++;if(e.target.closest&&e.target.closest('button,.card,.tab'))SND.click()},true);
  // 도구 버튼 (아이콘 없이 깔끔한 텍스트 알약 버튼)
  const tools=$('tools');const mkT=(ic,lb,fn)=>{const b=document.createElement('button');b.className='tool';b.innerHTML=`<i>${lb}</i>`;b.onclick=fn;tools.insertBefore(b,tools.querySelector('.zoom'));return b};
- mkT('','퀘스트',modalQuest);mkT('','도감',modalBook);mkT('','리뷰',modalReviews);
+ mkT('','퀘스트',modalQuest);mkT('','도감',modalBook);mkT('','리뷰',modalReviews);const cardBtn=mkT('','엽서',modalCards);
+ function cardBadge(){const n=((S&&S.meta&&S.meta.cards)||[]).filter(c=>!c.read).length;cardBtn.innerHTML=`<i>엽서${n?`<b class="pbadge">${n}</b>`:''}</i>`}cardBadge();
  const mute=document.createElement('div');mute.className='box btn';mute.id='bMute';mute.textContent=SND.muted()?'음소거':'사운드';mute.onclick=()=>{mute.textContent=SND.toggle()?'음소거':'사운드'};$('bSpeed').before(mute);
- setInterval(()=>{if(S)render_()},1000);
+ setInterval(()=>{if(S){render_();cardBadge()}},1000);
  return{render:render_,modalQuest,modalBook,modalReviews,M,TUT,milesReady}})();
