@@ -147,6 +147,10 @@ function load(){
    return}}catch(e){}
  S=fresh();
 }
+// 탭을 숨겨둔 동안: 화면 갱신이 멈춰 게임이 정지하므로, 돌아오면 껐다 켰을 때와 같은 방식(평균 순이익의 50%, 최대 8시간)으로 정산
+let _hidAt=0;document.addEventListener('visibilitychange',()=>{if(window.READONLY||!S)return;if(document.hidden){_hidAt=Date.now();return}if(!_hidAt)return;
+ const off=Math.min((Date.now()-_hidAt)/1000,8*3600);_hidAt=0;const g=Math.floor(Math.max(0,avgNet())*(off/3600)*0.5);
+ if(off>60&&g>0){S.yen+=g;toast(`쉬는 동안 ${fmt(g)}엔 벌었어요! (${Math.floor(off/60)}분)`);save()}});
 function migrateLayout(){if(S.layout==16)return;const old=Object.keys(S.plots).length-1;let ref=0;
  for(const k in S.plots)if(k!='1,1')ref+=12000;S.plots={'1,1':1};S.yen+=ref;
  for(const o of S.objs){o.x=o.x-8+20;o.y=o.y-8+20}S.layout=16;if(ref)setTimeout(()=>toast(`구역이 16×16으로 커졌어요! 추가 구역 비용 ¥${fmt(ref)} 환불`),2000)}
