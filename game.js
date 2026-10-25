@@ -385,21 +385,26 @@ const dist=(g,o)=>{const[a,b]=ctr(o);return Math.hypot(a-g.x,b-g.y)};
 function think(g,t){if(!t)return;(window.__thinks=window.__thinks||{})[t]=(window.__thinks[t]||0)+1;bubbles=bubbles.filter(b=>b.g!==g);if(bubbles.length>=4)return;bubbles.push({g,t,l:3.2})}
 function walkable(x,y){if(!tileOpen(x,y))return false;const o=OCC[x+','+y];return !o||!!DEF[o.k].walk||!!DEF[o.k].isPath||DEF[o.k].fp==1&&!!DEF[o.k].isPath}
 function fairPrice(o){return DEF[o.k].price*(1+o.lv*0.12)}
-function doorTile(o){const[fw,fh]=fpOf(o.k,o.rot);const sides=[[o.x+(fw>>1),o.y+fh],[o.x+fw,o.y+(fh>>1)],[o.x+(fw>>1),o.y-1],[o.x-1,o.y+(fh>>1)]];const r=(o.rot|0)&1;const c=[sides[r],sides[(r+1)&3],sides[(r+3)&3],sides[(r+2)&3]];for(let i=0;i<fw;i++)c.push([o.x+i,o.y+fh],[o.x+i,o.y-1]);for(let j=0;j<fh;j++)c.push([o.x+fw,o.y+j],[o.x-1,o.y+j]);return c.find(([x,y])=>walkable(x,y))}
+function doorTile(o){const[fw,fh]=fpOf(o.k,o.rot);const sides=[[o.x+(fw>>1),o.y+fh],[o.x+fw,o.y+(fh>>1)],[o.x+(fw>>1),o.y-1],[o.x-1,o.y+(fh>>1)]];const r=(o.rot|0)&1;const c=[sides[r],sides[(r+1)&3],sides[(r+3)&3],sides[(r+2)&3]];for(let i=0;i<fw;i++)c.push([o.x+i,o.y+fh],[o.x+i,o.y-1]);for(let j=0;j<fh;j++)c.push([o.x+fw,o.y+j],[o.x-1,o.y+j]);
+ // 대문과 이어진 칸을 우선 (시설 사이에 갇힌 구석 칸으로 내보내면 손님이 빠져나오지 못함)
+ const gen=_bfsGate();if(gen){const r=c.find(([x,y])=>x>=0&&y>=0&&x<N&&y<N&&walkable(x,y)&&_rSeen[y*N+x]===gen);if(r)return r}return c.find(([x,y])=>walkable(x,y))}
 function door(o){const[,fh]=fpOf(o.k,o.rot);const d=doorTile(o)||[o.x,o.y+fh];return[d[0]+0.5,d[1]+0.5]}
 function heapPush(h,v){h.push(v);let i=h.length-1;while(i>0){const p=(i-1)>>1;if(h[p][0]<=h[i][0])break;[h[p],h[i]]=[h[i],h[p]];i=p}}
 function heapPop(h){const top=h[0],last=h.pop();if(h.length){h[0]=last;let i=0;for(;;){const l=i*2+1,r=l+1;let m=i;if(l<h.length&&h[l][0]<h[m][0])m=l;if(r<h.length&&h[r][0]<h[m][0])m=r;if(m==i)break;[h[m],h[i]]=[h[i],h[m]];i=m}}return top}
-const _pDist=new Float32Array(N*N),_pFrom=new Int32Array(N*N);
+const _pDist=new Float64Array(N*N),_pFrom=new Int32Array(N*N);
+// 거리 배열은 Float64: Float32면 0.6(길) 비용 누적의 반올림 오차로 꺼낸 거리가 저장값보다 커져 칸이 통째로 건너뛰어지고,
+// 이어진 길도 '길이 막혔어요'로 판정됨. 탐색 상한도 지도 전체(N×N)를 덮도록 (600이면 구역 3개 이상에서 먼 시설을 놓침)
+const PF_MAX=N*N*2;
 function findPath(sx,sy,ex,ey){sx|=0;sy|=0;ex|=0;ey|=0;if(sx==ex&&sy==ey)return[];if(sx<0||sy<0||sx>=N||sy>=N||ex<0||ey<0||ex>=N||ey>=N)return null;
  const s0=sy*N+sx,goal=ey*N+ex;_pDist.fill(1e9);_pFrom.fill(-1);_pDist[s0]=0;const h=[[Math.abs(ex-sx)+Math.abs(ey-sy),s0]];let it=0;
- while(h.length&&it++<600){const[,k]=heapPop(h),d=_pDist[k];if(k==goal){const p=[];let c=k,gd=0;while(c!=s0){if(c<0||gd++>N*N)return null;p.unshift([c%N+0.5,Math.floor(c/N)+0.5]);c=_pFrom[c]}return p}
+ while(h.length&&it++<PF_MAX){const[,k]=heapPop(h),d=_pDist[k];if(k==goal){const p=[];let c=k,gd=0;while(c!=s0){if(c<0||gd++>N*N)return null;p.unshift([c%N+0.5,Math.floor(c/N)+0.5]);c=_pFrom[c]}return p}
   const x=k%N,y=(k/N)|0;for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=N||ny>=N)continue;if(!(nx==ex&&ny==ey)&&!walkable(nx,ny))continue;
    const o=OCC[nx+','+ny],nk=ny*N+nx,nd=d+(o&&!!DEF[o.k].isPath?0.6:1);if(nd<_pDist[nk]){_pDist[nk]=nd;_pFrom[nk]=k;heapPush(h,[nd+Math.abs(ex-nx)+Math.abs(ey-ny),nk])}}}
  return null}
 // 다익스트라: 시설 풋프린트에 인접한 '도달 가능한' 칸 중 가장 가까운 곳으로
 function pathToObj(g,o){const goal=new Set();for(const[x,y]of tilesOf(o))for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){if(walkable(x+dx,y+dy))goal.add((y+dy)*N+(x+dx))}
  if(!goal.size)return null;const sx=g.x|0,sy=g.y|0,s0=sy*N+sx;if(sx<0||sy<0||sx>=N||sy>=N)return null;_pDist.fill(1e9);_pFrom.fill(-1);_pDist[s0]=0;const h=[[0,s0]];let it=0;
- while(h.length&&it++<600){const[d,k]=heapPop(h);if(d>_pDist[k])continue;if(goal.has(k)){const p=[];let c=k,gd=0;while(c!=s0){if(c<0||gd++>N*N)return null;p.unshift([c%N+0.5,Math.floor(c/N)+0.5]);c=_pFrom[c]}return p}
+ while(h.length&&it++<PF_MAX){const[d,k]=heapPop(h);if(d>_pDist[k])continue;if(goal.has(k)){const p=[];let c=k,gd=0;while(c!=s0){if(c<0||gd++>N*N)return null;p.unshift([c%N+0.5,Math.floor(c/N)+0.5]);c=_pFrom[c]}return p}
   const x=k%N,y=(k/N)|0;for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=N||ny>=N||!walkable(nx,ny))continue;const oc=OCC[nx+','+ny],nk=ny*N+nx,nd=d+(oc&&DEF[oc.k].isPath?0.6:1);if(nd<_pDist[nk]){_pDist[nk]=nd;_pFrom[nk]=k;heapPush(h,[nd,nk])}}}
  return null}
 function goTo(g,x,y){const p=findPath(g.x,g.y,x,y);if(!p){g.path=[];return false}g.path=p;return true}
