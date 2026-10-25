@@ -87,6 +87,21 @@ const DEF={
  pond:{n:'비단잉어 연못',tab:'deco',img:null,ic:'🐟',fp:3,cost:3000,beauty:14,star:1,flat:1,pond:1,desc:'잉어가 헤엄치고 연잎이 떠 있어요'},
  path_erase:{n:'길 지우기',tab:'deco',img:null,ic:'🧽',fp:1,cost:0,star:1,erase:1,desc:'드래그해서 길 제거 (50% 환불)'},
 };
+// ---- 3~5★ 확장: 새 그림 없이 기존 그림 재활용 ----
+// 탕: like=바탕 탕(좌석·수면 모양 공유), tint=수면에 입히는 물빛, wfx=수면 효과 / 장식: from=원본 그림, recolor=색조 변형 방식
+Object.assign(DEF,{
+ sulfur:{n:'유황천 노천탕',tab:'bath',like:'rock',img:'sulfur',wrec:{h:78,sk:0.55,sa:0.05,vk:1.05},fp:4,sc:1,cost:13000,price:1000,cap:5,dur:30,eff:{fatigue:-80,fun:16},wage:90,star:3,bath:1,water:'#cfe0a6',tint:[206,224,150],veil:0.22,appeal:16,desc:'은은한 유황 향의 연둣빛 노천탕'},
+ soda:{n:'탄산 히노키탕',tab:'bath',like:'hinoki',img:'soda',wrec:{h:188,sk:0.55,sa:0,vk:1.12},fp:2,sc:1,cost:9000,price:800,cap:2,dur:24,eff:{fatigue:-65,fun:20},wage:60,star:3,bath:1,water:'#aee6ee',tint:[160,226,240],wfx:'bubble',appeal:12,desc:'톡톡 기포가 올라오는 탄산천'},
+ iron:{n:'적탕 (철분천)',tab:'bath',like:'cave',img:'iron',wrec:{h:18,sk:0.9,sa:0.15,vk:0.8},fp:4,sc:1,cost:19000,price:1300,cap:5,dur:30,eff:{fatigue:-90,fun:20},wage:120,star:4,bath:1,water:'#b8673f',tint:[184,96,58],appeal:18,light:[[0,-0.5]],desc:'철분이 녹아든 붉은빛 온천'},
+ petal:{n:'꽃잎탕',tab:'bath',like:'rock',img:'petal',wrec:{h:345,sk:0.55,sa:0.06,vk:1.08},fp:4,sc:1,cost:20000,price:1400,cap:5,dur:30,eff:{fatigue:-80,fun:30},wage:110,star:4,bath:1,water:'#f3c6d2',tint:[242,176,196],wfx:'petal',appeal:20,desc:'분홍 꽃잎이 둥실 떠다니는 노천탕'},
+ matcha:{n:'녹차 대욕장',tab:'bath',like:'milky',img:'matcha',wrec:{h:84,sk:1,sa:0.3,vk:0.9},fp:4,sc:1,cost:26000,price:1700,cap:6,dur:30,eff:{fatigue:-90,fun:28},wage:130,star:5,bath:1,water:'#9fc27a',tint:[150,196,110],veil:0.12,appeal:22,desc:'쌉싸름한 녹차 향이 감도는 대욕장'},
+ starlight:{n:'별빛 노천탕',tab:'bath',like:'fall',img:'starlight',wrec:{h:228,sk:0.85,sa:0.15,vk:0.62},fp:4,sc:1,cost:32000,price:2000,cap:6,dur:30,eff:{fatigue:-95,fun:35},wage:140,star:5,bath:1,water:'#3a4f8f',tint:[70,92,170],wfx:'star',appeal:26,desc:'밤이면 수면에 별이 반짝이는 노천탕'},
+ ginkgo:{tree:1,n:'은행나무',tab:'deco',img:'ginkgo',from:'maple',recolor:'ginkgo',fp:2,sc:1.12,cost:2400,beauty:10,star:3,emit:'gleaf',desc:'노란 은행잎이 팔랑팔랑 떨어져요'},
+ ume:{tree:1,n:'매화나무',tab:'deco',img:'ume',from:'sakura',recolor:'ume',fp:2,sc:1.12,cost:2400,beauty:10,star:3,emit:'ume',desc:'하얀 매화가 소담하게 피었어요'},
+ wisteria_w:{n:'흰 등나무 정자',tab:'deco',img:'wisteria_w',from:'wisteria',recolor:'white',fp:2,sc:1.05,cost:7000,beauty:20,star:4,desc:'하얀 등꽃이 늘어진 정자'},
+ torii_gold:{n:'금빛 토리이',tab:'deco',img:'torii_gold',from:'torii',recolor:'gold',fp:2,fph:1,sc:1.05,cost:9000,beauty:22,star:5,desc:'노을빛을 머금은 금빛 토리이'},
+});
+
 const TABS=[['bath','♨️','탕'],['food','🍜','음식'],['shop','🏮','상점'],['deco','🌸','장식'],['theme','🎐','테마'],['custom','📷','사진']];
 function fpOf(k,rot){const d=DEF[k];if(!d)return[1,1];const w=d.fp||1,h=d.fph||w;return(rot&1)?[h,w]:[w,h]}window.fpOf=fpOf;
 const SETS={trad:['전통','⛩️',['shishi','nodate','pagoda','bamboofence']],modern:['모던','☕',['cafe','lamppost','olive','lounger']],forest:['숲','🌲',['cedar','mushroom','fern','birdhouse']],season:['계절','🍂',['snowman','hydrangea','tsukimi','kadomatsu']]};
@@ -149,6 +164,27 @@ function avgNet(){const h=S.fin.hist;if(!h.length)return 0;const a=h.slice(-24);
 const TIERED=['rock','hinoki','sauna','milky','ramen','teishoku','izakaya','milk','yuzu','gift','room','cave','foot','fall','fam','wine','dango','sake','tea','ice','shoot','massage','pingpong','nap'];
 const IMG={},VAR=new Proxy({},{get(t,k){if(typeof k!='string')return t[k];if(t[k])return t[k];if(k.includes('~m')){const src=VAR[k.replace('~m','')];if(!src)return undefined;return t[k]={base:src.base,get sil(){return src.sil},get rimL(){return src.rimR},get rimR(){return src.rimL},m:1}}if(IMG[k]){variants(k,IMG[k]);return t[k]}return undefined}}); // 지연 생성 + 좌우반전 캔버스 공유
 const NAMES=[...TIERED.flatMap(n=>[1,2,3,4,5].flatMap(l=>[n+'_lv'+l])),'rock','hinoki','sauna','milky','ramen','teishoku','izakaya','milk','yuzu','gift','room','cave','foot','fall','fam','wine','dango','sake','tea','ice','shoot','massage','pingpong','nap','ema','jizo','tanuki','iris','lanternpath','sakura','maple','pine','lantern','torii','bamboo','sandgarden','bridge','waterwheel','wisteria','rocks','shishi','nodate','pagoda','bamboofence','cafe','lamppost','olive','lounger','cedar','mushroom','fern','birdhouse','snowman','hydrangea','tsukimi','kadomatsu','cb1','cb2','cb3','cb4','cw1','cw2','cw3','cw4','gate','andon_lantern','takeakari','chochin_tower','kagaribi','floating_lanterns','neon_yu','neon_izakaya','neon_capy','bamboo_bench','wood_bench','engawa_bench','stone_bench','parasol_table'];
+// 색조 변형: 원본 그림의 특정 색 영역만 HSV로 바꿈 (캔버스 filter는 Safari 지원이 불확실해 픽셀 단위로 처리)
+const TINTURL={};window.TINTURL=TINTURL;window.SPRURL=(src,k)=>TINTURL[k]||TINTURL[src]||'assets/'+src+'.png';
+function rgb2hsv(r,g,b){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;let h=0;if(d){h=mx==r?((g-b)/d)%6:mx==g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return[h,mx?d/mx:0,mx]}
+function hsv2rgb(h,s,v){const c=v*s,x=c*(1-Math.abs((h/60)%2-1)),m=v-c;const[r,g,b]=h<60?[c,x,0]:h<120?[x,c,0]:h<180?[0,c,x]:h<240?[0,x,c]:h<300?[x,0,c]:[c,0,x];return[(r+m)*255,(g+m)*255,(b+m)*255]}
+const RECOLOR={
+ ginkgo:(h,s,v)=>(h>=330||h<=45)&&s>0.4&&v>0.35?[42+((h+30)%360)*0.12,Math.min(1,s*0.95),Math.min(1,v*1.1)]:null,
+ ume:(h,s,v)=>(h>=290||h<=20)&&s>0.06&&v>0.5?[h,s*0.22,Math.min(1,v*1.08)]:null,
+ white:(h,s,v)=>h>=225&&h<=320&&s>0.12?[h,s*0.14,Math.min(1,v*1.18)]:null,
+ gold:(h,s,v)=>(h>=340||h<=25)&&s>0.42?[42,Math.min(1,s*0.8+0.08),Math.min(1,v*1.15)]:null};
+function recolor(src,fn){const c=mk(src.width,src.height),x=c.getContext('2d');x.drawImage(src,0,0);const id=x.getImageData(0,0,c.width,c.height),p=id.data;
+ for(let i=0;i<p.length;i+=4){if(p[i+3]<10)continue;const[h,s,v]=rgb2hsv(p[i],p[i+1],p[i+2]),o=fn(h,s,v);if(!o)continue;const[r,g,b]=hsv2rgb(o[0]%360,o[1],o[2]);p[i]=r;p[i+1]=g;p[i+2]=b}x.putImageData(id,0,0);return c}
+const SPRALIAS={};window.SPRALIAS=SPRALIAS;
+// 물 픽셀 선택: 청록(바위·동굴·폭포·히노키) / 크림(유백) → 명암·질감은 유지하고 색만 옮김
+function waterFn(like,w){const cream=like=='milky';return(h,s,v)=>{const isW=cream?(h>=25&&h<=75&&s<0.24&&v>0.76):(h>=158&&h<=208&&s>0.14&&v>0.28);if(!isW)return null;
+  return[(w.h+(h-(cream?50:182))*0.3+360)%360,Math.min(1,Math.max(0,s*w.sk+w.sa)),Math.min(1,v*w.vk)]}}
+function makeVariants(){const W=window.WATER||{};for(const[k,d]of Object.entries(DEF)){try{
+  if(d.from&&d.recolor&&IMG[d.from]&&!IMG[d.img]){IMG[d.img]=recolor(IMG[d.from],RECOLOR[d.recolor]);TINTURL[d.img]=IMG[d.img].toDataURL()}
+  if(d.like&&d.wrec&&!IMG[k+'_lv1']){const fn=waterFn(d.like,d.wrec);if(IMG[d.like])IMG[k]=recolor(IMG[d.like],fn);
+   for(let l=1;l<=5;l++){const b=d.like+'_lv'+l,n=k+'_lv'+l;if(!IMG[b])continue;IMG[n]=recolor(IMG[b],fn);SPRALIAS[n]=b;if(W[b])W[n]=W[b];if(OVER[b]!=null)OVER[n]=OVER[b];if(window.LIGHTS&&LIGHTS[b])LIGHTS[n]=LIGHTS[b]}
+   if(IMG[k+'_lv1'])TINTURL[k]=IMG[k+'_lv1'].toDataURL()}
+ }catch(e){console.warn('[variant]',k,e)}}}
 function loadImgs(){return Promise.all(NAMES.map(n=>new Promise(r=>{const i=new Image();i.onload=()=>{IMG[n]=i;r()};i.onerror=r;i.src='assets/'+n+'.png'})))}
 // 멀티 레이어 스프라이트: 마스크 경로 순서대로 픽셀을 잘라 레이어로 분리 (나머지 = ground)
 const roofY=(x,W,H)=>H*(0.294+0.144*x/W);
@@ -426,7 +462,7 @@ function goTo(g,x,y){const p=findPath(g.x,g.y,x,y);if(!p){g.path=[];return false
 const SEATS={hinoki:[[-0.36,-0.22],[0.36,0.12]],sauna:[[-0.4,-0.3],[0.38,-0.28],[-0.28,0.3],[0.42,0.32]],
  rock:[[-0.1,-0.7],[0.45,-0.5],[-0.62,-0.3],[0.05,-0.18],[0.7,0.0],[-0.5,0.22],[0.3,0.35],[-0.08,0.6]],
  milky:[[0,-0.62],[-0.3,-0.32],[0.3,-0.32],[-0.6,0],[0,-0.02],[0.6,0],[-0.3,0.3],[0.3,0.3],[0,0.6],[-0.15,0.15],[0.15,-0.17],[0.45,0.15]]};
-function capOf(o){const d=DEF[o.k];const c=d.cap+(o.lv-1)*(d.bath&&d.fp>=4?2:1);return SEATS[o.k]?Math.min(c,SEATS[o.k].length):c}
+function capOf(o){const d=DEF[o.k],st=SEATS[d.like||o.k];const c=d.cap+(o.lv-1)*(d.bath&&d.fp>=4?2:1);return st?Math.min(c,st.length):c}
 const FOOT_SEATS={
  1:[[0.64,0.38],[0.56,0.44],[0.48,0.50],[0.40,0.56],[0.60,0.41],[0.52,0.47],[0.44,0.53],[0.36,0.59]],
  2:[[0.58,0.53],[0.51,0.57],[0.44,0.61],[0.37,0.65],[0.55,0.55],[0.48,0.59],[0.41,0.63],[0.34,0.67]],
@@ -435,7 +471,7 @@ const FOOT_SEATS={
  5:[[0.46,0.58],[0.52,0.60],[0.58,0.62],[0.64,0.64],[0.49,0.59],[0.55,0.61],[0.61,0.63],[0.43,0.57]]
 };
 function bathSlot(o,i){if(o.k=='foot'){const G=objGeom(o),lv=Math.min(5,Math.max(1,o.lv||1)),fs=FOOT_SEATS[lv];let[u,v]=fs[i%fs.length];if(o.rot&1)u=1-u;const X=G.X+(u-0.5)*G.W,Y=G.Y-G.H+v*G.H;return[(X/(TW/2)+Y/(TH/2))/2,(Y/(TH/2)-X/(TW/2))/2]}
- const W=wgeo(o),st=SEATS[o.k];let u,v;if(st){[u,v]=st[i%st.length];if(o.rot&1)u=-u}else{const n=capOf(o),a=(i/n)*Math.PI*2+0.6;u=Math.cos(a)*0.6;v=Math.sin(a)*0.6;if(o.rot&1)u=-u}
+ const W=wgeo(o),st=SEATS[DEF[o.k].like||o.k];let u,v;if(st){[u,v]=st[i%st.length];if(o.rot&1)u=-u}else{const n=capOf(o),a=(i/n)*Math.PI*2+0.6;u=Math.cos(a)*0.6;v=Math.sin(a)*0.6;if(o.rot&1)u=-u}
  const sp=W.dia?0.9:0.85;const X=W.cX+u*W.rx*sp,Y=W.cY+v*W.ry*sp+2;return[(X/(TW/2)+Y/(TH/2))/2,(Y/(TH/2)-X/(TW/2))/2]}
 function bathClip(o){const W=wgeo(o);const{cX,cY,rx,ry}=W;cx.beginPath();if(W.dia){cx.moveTo(cX+rx,cY);cx.lineTo(cX,cY+ry);cx.lineTo(cX-rx,cY)}else{cx.moveTo(cX+rx,cY-1);cx.ellipse(cX,cY-1,rx,ry,0,0,Math.PI)}cx.lineTo(cX-rx,cY-40);cx.lineTo(cX+rx,cY-40);cx.lineTo(cX+rx,cY);cx.closePath();cx.clip()}
 function updGuest(g,dt){
@@ -457,9 +493,13 @@ function updGuest(g,dt){
 // 구경 말풍선: 장식 종류별 대사, 같은 종류가 주변(반경 6칸)에 3개 이상이면 '가득' 대사, 등불은 밤·낮을 나눔
 const LOOKS=[
  [/^maple/,{one:['단풍이 참 곱네요','빨갛게 물들었어요'],many:['단풍이 정말 가득해요','단풍길이 너무 예뻐요','온통 붉게 물들었네요']}],
+ [/^ginkgo/,{one:['은행잎이 노랗게 물들었어요','황금빛 나무네요'],many:['노란 은행잎 길이에요','온통 황금빛이네요']}],
+ [/^ume/,{one:['매화 향이 은은해요','하얀 꽃이 피었네요'],many:['매화밭이 고와요']}],
+ [/^torii_gold/,{one:['금빛 토리이가 반짝여요','왠지 복이 올 것 같아요']}],
  [/^sakura/,{one:['벚꽃이 참 예뻐요','꽃잎이 흩날려요'],many:['벚꽃 터널 같아요','온통 벚꽃이네요']}],
  [/^(pine|cedar)/,{one:['솔향이 좋아요','나무가 늠름하네요'],many:['숲속에 온 것 같아요','나무 그늘이 시원해요']}],
  [/^(bamboo|bamboofence)/,{one:['대나무 소리가 좋아요','사각사각 소리가 나요'],many:['대나무 숲길이네요']}],
+ [/^wisteria_w/,{one:['하얀 등꽃이 늘어졌어요','눈처럼 하얀 꽃이네요']}],
  [/^wisteria/,{one:['등나무 꽃이 늘어졌어요','보랏빛이 예뻐요']}],
  [/^(hydrangea|iris|olive|fern|tsukimi)/,{one:['꽃 색이 고와요','싱그럽네요'],many:['꽃밭이 예뻐요']}],
  [/^mushroom/,{one:['버섯이 귀여워요']}],
@@ -624,7 +664,7 @@ function render(t){
   if(p.k=='steam'){cx.globalAlpha=(0.13+0.04*lt.sun)*Math.min(1,p.l)*(1-0.35*lt.night);const r=p.s*0.85;cx.drawImage(_sb,X-r,Y-p.h-r,r*2,r*2)}
   else if(p.k=='spark'){cx.globalAlpha=Math.min(1,p.l);const tw=(Math.sin(t/60+p.x*9)+1)/2;FS(tw>0.5?'#fff6c0':'#ffd65a');cx.fillRect(X-1,Y-p.h-1,2,2);if(tw>0.6){cx.fillRect(X-3,Y-p.h-0.4,6,0.8);cx.fillRect(X-0.4,Y-p.h-3,0.8,6)}}
   else if(p.k=='dust'){cx.globalAlpha=0.5*p.l;FS('#e8dcc0');cx.beginPath();cx.arc(X,Y,2+(0.9-p.l)*4,0,6.283);cx.fill()}
-  else{cx.globalAlpha=Math.min(1,p.l);FS(p.k=='petal'?'#ffc6d9':p.k=='leaf'?(p.ph%2<1?'#e8643a':'#f0a03a'):'#ffffff');const w=p.k=='snow'?1:Math.abs(Math.sin(p.ph))*1.5+0.6;cx.fillRect(X,Y-p.h,w,1)}}
+  else{cx.globalAlpha=Math.min(1,p.l);FS(p.k=='petal'?'#ffc6d9':p.k=='leaf'?(p.ph%2<1?'#e8643a':'#f0a03a'):p.k=='gleaf'?(p.ph%2<1?'#f2c94c':'#e3ad2a'):p.k=='ume'?'#fff6f8':'#ffffff');const w=p.k=='snow'?1:Math.abs(Math.sin(p.ph))*1.5+0.6;cx.fillRect(X,Y-p.h,w,1)}}
  cx.globalAlpha=1;drawBuild(t);BUS.emit('over',t,lt,sv);
  // 빛줄기 (낮) – 김 사이로
  if(lt.sun>0.2&&!window.GFX_LOW){cx.save();cx.globalCompositeOperation='screen';for(const o of S.objs){if(!DEF[o.k].bath)continue;const G=objGeom(o);
@@ -659,7 +699,7 @@ function drawGrid(){const P=N/PS;
   for(const[a,b,on]of E)if(on){cx.moveTo(...iso(...a));cx.lineTo(...iso(...b))}}cx.stroke();cx.restore()}
 const easeOut=t=>1-Math.pow(1-t,3);
 const EMI={},LMI={};let _emiS=null;function emiOf(key){if(key in EMI)return EMI[key];const mir=key.includes('~m'),bk=key.replace('~m','');const L=(window.LIGHTS||{})[bk];if(!L)return EMI[key]=null;if(mir){const b=emiOf(bk);return b?EMI[key]={c:b.c,m:1,pts:b.pts.map(([x,y,w])=>[1-x,y,w])}:null}
- let im=LMI[bk];if(!im){im=LMI[bk]=new Image();im.src='assets/lights/'+bk+'.png'}if(!im.complete||!im.naturalWidth)return null;
+ let im=LMI[bk];if(!im){im=LMI[bk]=new Image();im.src='assets/lights/'+(SPRALIAS[bk]||bk)+'.png'}if(!im.complete||!im.naturalWidth)return null;
  const sc=Math.min(1,112/Math.max(im.naturalWidth,im.naturalHeight,1)),W=Math.max(1,Math.round(im.naturalWidth*sc)),H=Math.max(1,Math.round(im.naturalHeight*sc)),c=mk(W,H),g=c.getContext('2d');
  // 번짐: 공용 스크래치 캔버스 축소-확대 소프트 글로우 + 원본
  const sw=Math.max(1,W>>2),sh=Math.max(1,H>>2),s2=_emiS||(_emiS=mk(sw,sh));s2.width=sw;s2.height=sh;const g2=s2.getContext('2d');g2.drawImage(im,0,0,sw,sh);g.imageSmoothingEnabled=true;g.globalAlpha=0.5;g.drawImage(s2,0,0,W,H);g.globalAlpha=1;g.drawImage(im,0,0,W,H);delete LMI[bk];
@@ -734,8 +774,8 @@ function drawForest_(){const r=rng(42);for(let i=0;i<180;i++){const side=i%2;con
    cx.fillStyle='rgba(166,204,84,0.55)';cx.beginPath();cx.moveTo(X,Y-h);cx.lineTo(X-3,Y-h*0.2);cx.lineTo(X-8.5,Y-h*0.1);cx.fill();
   }}}
 const WGEO={milky:{ins:0.7,lift:12}};
-function wgeo(o){const d=DEF[o.k],f=d.fp,w=WGEO[o.k];const sk0=skey(o),e0=(window.WATER||{})[sk0.replace('~m','')],e=e0&&sk0.includes('~m')?{...e0,cx:1-e0.cx}:e0;
- if(e){const G=objGeom(o);const cX=G.X+(e.cx-0.5)*G.W,cY=G.Y-G.H+e.cy*G.H;const dia=o.k=='milky',s=dia?1.5:1;return{d,f,cX,cY,rx:e.rx*G.W*s,ry:e.ry*G.H*s,dia}}
+function wgeo(o){const d=DEF[o.k],f=d.fp,w=WGEO[d.like||o.k];const sk0=skey(o),e0=(window.WATER||{})[sk0.replace('~m','')],e=e0&&sk0.includes('~m')?{...e0,cx:1-e0.cx}:e0;
+ if(e){const G=objGeom(o);const cX=G.X+(e.cx-0.5)*G.W,cY=G.Y-G.H+e.cy*G.H;const dia=(d.like||o.k)=='milky',s=dia?1.5:1;return{d,f,cX,cY,rx:e.rx*G.W*s,ry:e.ry*G.H*s,dia}}
  const[cX,cY0]=iso(o.x+f/2,o.y+f/2);if(w){const k=f/2-w.ins;return{d,f,cX,cY:cY0-w.lift,rx:k*TW,ry:k*TH,dia:1}}return{d,f,cX,cY:cY0,rx:f*TW*0.25,ry:f*TH*0.25,dia:0}}
 function wpath(W){cx.beginPath();if(W.dia){cx.moveTo(W.cX,W.cY-W.ry);cx.lineTo(W.cX+W.rx,W.cY);cx.lineTo(W.cX,W.cY+W.ry);cx.lineTo(W.cX-W.rx,W.cY);cx.closePath()}else cx.ellipse(W.cX,W.cY-1,W.rx,W.ry,0,0,6.283)}
 function drawMilky(W,t,lt){const{cX,cY,rx,ry}=W;const sk=lt.sky,n=lt.night,su=lt.sun;
@@ -765,7 +805,15 @@ function drawWater_(o,G,t,lt){if(o.k=='foot')return;const W=wgeo(o);const{d,f,cX
  cx.globalCompositeOperation='source-over';cx.restore()}
 const SUNT={};function sunTex(left,sun,ar){const k=left+'|'+sun+'|'+ar.toFixed(2);if(SUNT.k===k)return SUNT.c;const H=180,W=Math.round(H*ar),c=SUNT.c||document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');const gr=g.createRadialGradient(left?W*0.05:W*0.95,-H*0.15,0,left?W*0.05:W*0.95,-H*0.15,H*0.55);gr.addColorStop(0,`rgba(255,240,195,${0.08*sun})`);gr.addColorStop(1,'rgba(255,240,195,0)');g.fillStyle=gr;g.fillRect(0,0,W,H);SUNT.k=k;SUNT.c=c;return c}
 function drawWater(o,G,t,lt){if(o.k=='foot')return;const W=wgeo(o);const{cX,cY,rx,ry}=W;
- cx.save();drawWater_(o,G,t,lt);cx.beginPath();cx.ellipse(cX,cY-1,rx*0.72,ry*0.72,0,0,6.283);cx.clip();BUS.emit('water',o,cX,cY,rx*0.72,ry*0.72,t,lt);cx.restore()}
+ cx.save();drawWater_(o,G,t,lt);cx.beginPath();cx.ellipse(cX,cY-1,rx*0.72,ry*0.72,0,0,6.283);cx.clip();const d=DEF[o.k];if(d.tint)tintWater(o,d,cX,cY,rx*0.72,ry*0.72,t,lt);BUS.emit('water',o,cX,cY,rx*0.72,ry*0.72,t,lt);cx.restore()}
+// 확장 탕 수면 효과: 우윳빛 막·기포·꽃잎·별 (물빛 자체는 불러올 때 그림에서 바꿈 → makeVariants)
+function tintWater(o,d,cX,cY,rx,ry,t,lt){
+ if(d.veil){cx.globalCompositeOperation='screen';cx.globalAlpha=d.veil;cx.fillStyle='rgb(250,248,232)';cx.fillRect(cX-rx,cY-ry-2,rx*2,ry*2+4)}
+ cx.globalCompositeOperation='source-over';cx.globalAlpha=1;const R=rng(o.x*97+o.y*13);
+ if(d.wfx=='bubble'){for(let i=0;i<14;i++){const ph=((t/1600+R())%1),a=R()*6.28,rr=Math.sqrt(R())*0.8;const X=cX+Math.cos(a)*rx*rr,Y=cY+Math.sin(a)*ry*rr-ph*3;cx.globalAlpha=0.75*(1-ph);cx.strokeStyle='#f4fdff';cx.lineWidth=0.5;cx.beginPath();cx.arc(X,Y,0.6+ph*0.7,0,6.283);cx.stroke()}}
+ else if(d.wfx=='petal'){for(let i=0;i<12;i++){const a=R()*6.28+t/9000*(R()<0.5?1:-1),rr=0.25+R()*0.6;const X=cX+Math.cos(a)*rx*rr,Y=cY+Math.sin(a)*ry*rr;cx.globalAlpha=0.9;cx.fillStyle=i%3?'#ffd3df':'#fff1f4';cx.fillRect(X-1,Y-0.5,2,1.2)}}
+ else if(d.wfx=='star'){const nn=0.35+0.65*lt.night;for(let i=0;i<16;i++){const a=R()*6.28,rr=Math.sqrt(R())*0.85,tw=Math.max(0,Math.sin(t/(500+R()*700)+i*1.7));const X=cX+Math.cos(a)*rx*rr,Y=cY+Math.sin(a)*ry*rr;cx.globalAlpha=nn*tw;cx.fillStyle='#fffbe6';cx.fillRect(X-0.5,Y-0.5,1,1);if(tw>0.85){cx.fillRect(X-1.6,Y-0.15,3.2,0.3);cx.fillRect(X-0.15,Y-1.6,0.3,3.2)}}}
+ cx.globalAlpha=1}
 function drawGuest(g,t,lt,sv){if(g.inBath&&g.cur&&g.cur.k=='foot'){
   const o=g.cur;[g.x,g.y]=bathSlot(o,g.slot||0);const[X,Y]=iso(g.x,g.y);
   if(g.vip||g.reg){cx.save();cx.globalCompositeOperation='lighter';cx.globalAlpha=g.vip?0.35:0.28;cx.drawImage(blob(g.vip?'255,215,90':'140,200,255'),X-12,Y-18,24,24);cx.globalAlpha=1;cx.restore()}
@@ -840,8 +888,8 @@ function buildTabs(){$('tabs').innerHTML=TABS.map(([k,i,n])=>`<div class="tab ${
 const SUBCATS={
  bath:[
   ['bath_basic','기본·실내 온천탕','bath',['foot','hinoki','sauna','fam']],
-  ['bath_nature','자연·노천 온천탕','steam',['rock','cave','fall']],
-  ['bath_special','이색·특수 온천탕','sakura',['milky','wine']]
+  ['bath_nature','자연·노천 온천탕','steam',['rock','cave','fall','sulfur','iron','starlight']],
+  ['bath_special','이색·특수 온천탕','sakura',['milky','wine','soda','petal','matcha']]
  ],
  food:[
   ['food_snack','간식·노점·찻집','food',['dango','ice','tea']],
@@ -856,9 +904,9 @@ const SUBCATS={
   ['deco_light','일본 전통 조명','andon',['andon_lantern','takeakari','chochin_tower','lantern','bamboo','kagaribi','floating_lanterns','lanternpath']],
   ['deco_neon','온천·레트로 네온 간판','neon',['neon_yu','neon_izakaya','neon_capy']],
   ['deco_path','길·다리','bridge',['path_erase','path_gravel','path','path_wood','path_tatami','bridge']],
-  ['deco_garden','정원·수경 장식','pond',['rocks','iris','pond','sandgarden','wisteria','waterwheel']],
-  ['deco_statue','전통 조형물','gate',['jizo','ema','torii','tanuki']],
-  ['deco_tree','계절 나무','tree',['sakura','maple','pine']]
+  ['deco_garden','정원·수경 장식','pond',['rocks','iris','pond','sandgarden','wisteria','waterwheel','wisteria_w']],
+  ['deco_statue','전통 조형물','gate',['jizo','ema','torii','tanuki','torii_gold']],
+  ['deco_tree','계절 나무','tree',['sakura','maple','pine','ginkgo','ume']]
  ],
  theme:[
   ['theme_trad','전통 세트','gate',['shishi','nodate','pagoda','bamboofence'],'trad'],
@@ -880,7 +928,7 @@ function sortSubItems(items,st){
  });
 }
 function buildCards(){_stC.k='';const st=stars();
- const card=([k,d])=>{const fw=d.fp||1,fh=d.fph||fw,fpBadge=d.erase?'':`<span class="fpb">${fw}×${fh}</span>`,src=d.img?(TIERED.includes(d.img)?d.img+'_lv1':d.img):null;return`<div class="card ${ghost==k?'sel':''} ${(d.star||1)>st?'lock':''}" data-k="${k}" data-need="${d.star}★ 필요" title="${d.desc} (${fw}×${fh}칸)">${fpBadge}${src?`<img src="assets/${src}.png" style="${d.filter?'filter:'+d.filter:''}">`:`<div class="c-thumb" style="height:56px;display:flex;align-items:center;justify-content:center;font-size:30px">${d.ic||'🪨'}</div>`}<b>${d.n}</b><span class="p">${d.erase?'50% 환불':d.isPath?'¥'+fmt(d.cost)+'/칸':'¥'+fmt(d.cost)}</span></div>`};
+ const card=([k,d])=>{const fw=d.fp||1,fh=d.fph||fw,fpBadge=d.erase?'':`<span class="fpb">${fw}×${fh}</span>`,src=d.img?(TIERED.includes(d.img)?d.img+'_lv1':d.img):null;return`<div class="card ${ghost==k?'sel':''} ${(d.star||1)>st?'lock':''}" data-k="${k}" data-need="${d.star}★ 필요" title="${d.desc} (${fw}×${fh}칸)">${fpBadge}${src?`<img src="${SPRURL(src,k)}" style="${d.filter?'filter:'+d.filter:''}">`:`<div class="c-thumb" style="height:56px;display:flex;align-items:center;justify-content:center;font-size:30px">${d.ic||'🪨'}</div>`}<b>${d.n}</b><span class="p">${d.erase?'50% 환불':d.isPath?'¥'+fmt(d.cost)+'/칸':'¥'+fmt(d.cost)}</span></div>`};
  const done=setsDone(),subs=SUBCATS[tab]||[],seen=new Set();
  const blocks=subs.map(([id,title,icKey,keys,sk])=>{
   const raw=keys.filter(k=>DEF[k]).map(k=>{seen.add(k);return[k,DEF[k]]});
@@ -955,7 +1003,7 @@ function modalRank(){const m=$('modal');const st=stars(),sc=Math.floor(starScore
   nextHtml=`<div class="rk-next"><div style="font-weight:800;font-size:14px;color:var(--jade)">최고 등급 (5★ 전설의 카피바라 료칸) 달성 완료!</div><div style="font-size:12px;color:var(--txt-sec);margin-top:3px">모든 시설과 장식이 해금되었어요. 명성 점수 <b>${fmt(sc)}점</b> · 누적 손님 <b>${fmt(sv)}회</b> · 열린 구역 <b>${pl}구역</b></div></div>`;
  }
  const rankNames=['','1★ 시작의 온천','2★ 인기 온천 료칸','3★ 명소 온천 료칸','4★ 전통 명문 료칸','5★ 전설의 카피바라 료칸'];
- const chip=([k,d])=>{const src=d.img?(TIERED.includes(d.img)?d.img+'_lv1':d.img):null;return`<span class="rk-chip">${src?`<img src="assets/${src}.png" alt="">`:`${d.ic||'🌸'}`}<span>${d.n}</span></span>`};
+ const chip=([k,d])=>{const src=d.img?(TIERED.includes(d.img)?d.img+'_lv1':d.img):null;return`<span class="rk-chip">${src?`<img src="${SPRURL(src,k)}" alt="">`:`${d.ic||'🌸'}`}<span>${d.n}</span></span>`};
  const rankCards=[1,2,3,4,5].map(r=>{
   const done=r<=st,isNext=r===st+1;
   const[rq,rsv,rpl]=STAR_REQ[r]||[0,0,1];
@@ -1104,6 +1152,7 @@ function frame_(now){warnAcc+=1;if(warnAcc%90==1)checkReach();const dt=Math.min(
  stepBuild(dt);BUS.emit('frame',dt,now);if(!window.__norender&&(!window.GFX_LOW||!window.FPS30||(frameN++&1)==0)){render(now);hud()}saveAcc+=dt;if(saveAcc>5){saveAcc=0;save()}}
 async function boot(){resize();addEventListener('resize',resize);if(window.VISIT_PROMISE){try{window.VISIT_SAVE=await window.VISIT_PROMISE}catch(e){window.VISIT_SAVE=null;setTimeout(()=>toast('방문 링크가 올바르지 않아요'),1200)}}load();S.objs.forEach(o=>o.users=0);migrateLayout();migrate();OCC=occ();ensureGate();OCC=occ();
  await Promise.all([loadImgs(),Promise.race([Promise.all([document.fonts.load('700 14px Pretendard',window.FONT_GLYPHS||'가'),document.fonts.ready]).catch(e=>console.warn('[font]',e)),new Promise(r=>setTimeout(r,4000))])]); // 폰트 조각 일부가 실패하거나 느려도 시스템 폰트로 시작
+ makeVariants();
  if(IMG.gate){variants('gate',IMG.gate);const flip=src=>{const c=mk(src.width,src.height),g=c.getContext('2d');g.translate(c.width,0);g.scale(-1,1);g.drawImage(src,0,0);return c};const gf=flip(IMG.gate);variants('gate_f',gf);gf.width=gf.height=0;
   const L=splitLayers(IMG.gate,GATE_MASKS);for(const n in L){variants('gate_'+n,L[n]);const fn=flip(L[n]);variants('gate_f_'+n,fn);fn.width=fn.height=0;L[n].width=L[n].height=0}}
  for(const k in OVER){if(!IMG[k])continue;const L=splitLayers(IMG[k],[['over',(g,W,H)=>g.rect(0,0,W,H*OVER[k])]]);variants(k+'_over',L.over);for(const n in L)L[n].width=L[n].height=0}
