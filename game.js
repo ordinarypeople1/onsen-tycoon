@@ -440,14 +440,28 @@ function updGuest(g,dt){
   if(d<=0.05&&g.path&&g.path.length){g.path.shift();return}
   if(d>0.05){const sp=1.3*dt;g.x+=dx/d*Math.min(sp,d);g.y+=dy/d*Math.min(sp,d);g.dir=(dx-dy)>=0?1:-1;return}
   if(g.target){arrive(g);return}
+  if(g.view){look(g);return}
   if(g.leaving){g.dead=1;return}
   if(_pb-->0)decide(g)}
  else if(g.st=='wait'){g.t-=dt;if(g.wx!=null){const dx=g.wx-g.x,dy=g.wy-g.y,d=Math.hypot(dx,dy);if(d>0.03){const sp=Math.min(d,1.1*dt);g.x+=dx/d*sp;g.y+=dy/d*sp;g.dir=(dx-dy)>=0?1:-1}}if(g.t<=0){g.wx=g.wy=null;g.st='walk';arrive(g)}}
  else if(g.st=='use'){g.waited=0;g.t-=dt;if(g.t<=0)finish(g)}
+ else if(g.st=='look'){g.t-=dt;if(g.t<=0)g.st='walk'}
 }
+// 산책·감상: 급한 욕구가 없을 때 아직 안 본 장식(벚꽃·석등·연못·도리이 등)을 찾아가 잠시 바라봄 → 기분↑, 재미 욕구↓
+const LOOK_LINES=[[/sakura|maple|wisteria|iris|hydrangea|ume|flower|kiku|tsubaki|tsukimi/,['꽃이 참 예뻐요','향기가 좋아요']],[/lantern|andon|takeakari|chochin|kagaribi|neon|lamppost|floating/,['불빛이 따뜻해요','은은하니 좋네요']],[/pond|koi|bridge|waterwheel|fall/,['물소리가 좋아요','잉어가 헤엄쳐요']],[/torii|jizo|ema|shishi|tanuki|pagoda/,['마음이 편안해져요','소원을 빌어볼까']],[/pine|cedar|bamboo|tree|fern|moss|sand|rock|mushroom/,['바람 소리가 좋아요','고즈넉하네요']],[/bench|parasol|lounger|engawa/,['잠깐 쉬어갈까','여기 앉으면 좋겠다']]];
+function lookLine(k){for(const[re,ls]of LOOK_LINES)if(re.test(k))return ls[Math.random()*ls.length|0];return '정말 예쁘다~'}
+function stroll(g){if((g.strolls||0)>=3||g.leaving)return false;const seen=g.seen||(g.seen=new Set()),c=[];
+ for(const o of S.objs){const d=DEF[o.k];if(!d||!(d.beauty>0)||d.isPath||seen.has(o)||o===moving)continue;c.push([dist(g,o)+Math.random()*5-Math.min(8,d.beauty*0.25),o])}
+ if(!c.length)return false;c.sort((a,b)=>a[0]-b[0]);const pick=c[Math.random()*Math.min(4,c.length)|0][1];seen.add(pick);
+ const pp=pathToObj(g,pick);if(!pp)return false;g.path=pp;g.view=pick;g.strolls=(g.strolls||0)+1;return true}
+function look(g){const o=g.view;g.view=null;if(!o||!S.objs.includes(o))return;const[a,b]=ctr(o);g.dir=(a-g.x)-(b-g.y)>=0?1:-1;g.st='look';g.t=2.5+Math.random()*2.5;
+ const d=DEF[o.k];g.happy=Math.min(100,g.happy+Math.min(6,(d.beauty||4)*0.35));g.need.fun=Math.max(0,g.need.fun-12);if(Math.random()<0.45)think(g,lookLine(o.k));window.__looks=(window.__looks||0)+1}
 function decide(g){
  if(g.life>220||g.budget<200||g.happy<15){leave(g);return}
- const o=pickTarget(g);if(!o){if(NEEDK.every(k=>g.need[k]<35)||Math.random()<0.4){leave(g);return}
+ const o=pickTarget(g);
+ // 시설로 가기 전에 가끔(30%, 손님당 최대 3번) 장식 하나 구경하고 가기
+ if(o&&Math.random()<0.3&&stroll(g))return;
+ if(!o){if(Math.random()<0.75&&stroll(g))return;if(NEEDK.every(k=>g.need[k]<35)||Math.random()<0.4){leave(g);return}
   for(let i=0;i<3;i++){const x=(g.x|0)+((Math.random()*9)|0)-4,y=(g.y|0)+((Math.random()*9)|0)-4;if(walkable(x,y)&&goTo(g,x,y))return}leave(g);return}
  const pp=pathToObj(g,o);if(pp)g.path=pp;if(!pp){if(!g.blocked)g.blocked=new Set();if(!g.blocked.size){think(g,'길이 막혔어요…');g.happy-=4}voice(g,'path',o);g.blocked.add(o);g.path=[];return}g.target=o;}
 function arrive(g){g.ax=g.x;g.ay=g.y;const o=g.target;if(!o||!DEF[o.k]){g.target=null;g.st='walk';if(_pb-->0)decide(g);return}const d=DEF[o.k];g.target=null;o.users=o.users||0;
@@ -468,7 +482,7 @@ function waitSpot(g,o){const T=new Set(tilesOf(o).map(([x,y])=>x+','+y)),c=[];fo
 function freeSlot(o){const used=guests.filter(x=>x.cur===o&&x.inBath).map(x=>x.slot);for(let i=0;i<capOf(o);i++)if(!used.includes(i))return i;return 0}
 function finish(g){const o=g.cur;if(g.ax!=null){g.x=g.ax;g.y=g.ay}if(o)o.users=Math.max(0,o.users-1);(g.used=g.used||[]).push(o);if(g.used.length>3)g.used.shift();
  g.cur=null;g.hide=false;const[a,b]=door(o);g.x=a;g.y=b;g.inBath=false;g.st='walk';g.tx=g.x;g.ty=g.y;g.path=[]}
-function leave(g){if(!g.leaving)BUS.emit('leave',g);g.leaving=true;g.target=null;const gi=gateInfo();if(!gi){g.dead=1;return}const[mx,my]=gi.m,[ox,oy]=gi.o;if(!goTo(g,mx,my))g.path=[[mx+0.5,my+0.5]];g.path.push([mx+0.5+ox*1.5,my+0.5+oy*1.5],[mx+0.5+ox*4,my+0.5+oy*4]);
+function leave(g){if(!g.leaving)BUS.emit('leave',g);g.leaving=true;g.target=null;g.view=null;if(g.st=='look')g.st='walk';const gi=gateInfo();if(!gi){g.dead=1;return}const[mx,my]=gi.m,[ox,oy]=gi.o;if(!goTo(g,mx,my))g.path=[[mx+0.5,my+0.5]];g.path.push([mx+0.5+ox*1.5,my+0.5+oy*1.5],[mx+0.5+ox*4,my+0.5+oy*4]);
  S.rep=S.rep*0.97+g.happy*0.03;if(g.happy>70&&Math.random()<0.5)think(g,'또 올게요~');}
 const toScreenT=(x,y)=>{const[a,b]=iso(x,y);return toScreen(a,b)};
 let SHK=0,SHKo=[0,0];
