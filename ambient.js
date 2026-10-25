@@ -137,6 +137,25 @@ const AMB=(()=>{
   // 새
   for(const b of birds){const w=Math.sin(t/110+b.p)*3*b.s;cx.strokeStyle='rgba(50,45,50,0.55)';cx.lineWidth=1.2;cx.beginPath();cx.moveTo(b.x-5*b.s,b.y-w);cx.quadraticCurveTo(b.x-2*b.s,b.y-1,b.x,b.y);cx.quadraticCurveTo(b.x+2*b.s,b.y-1,b.x+5*b.s,b.y-w);cx.stroke()}
  });
+ // ---- 나무 사이를 오가는 작은 새 (낮, 나무 3그루 이상: 2그루당 1마리, 최대 10마리) ----
+ const TREEK=/^(sakura|maple|pine|cedar|olive)/;const tbirds=[];window.__birds=tbirds;let tbT=0,treeList=[];
+ function perchOf(o){const G=objGeom(o);return[G.X+(Math.random()-0.5)*G.W*0.45,G.Y-G.H*(0.62+Math.random()*0.2)]}
+ BUS.on('screen',(t,lt)=>{const n=performance.now();if(n-tbT>2000){tbT=n;treeList=S.objs.filter(o=>TREEK.test(o.k)&&o!==window.__dbg?.moving)}
+  const want=lt.night>0.6||treeList.length<3?0:Math.min(10,treeList.length>>1);
+  while(tbirds.length<want){const o=treeList[Math.random()*treeList.length|0];const[x,y]=perchOf(o);tbirds.push({x,y,st:'perch',t:2+Math.random()*6,ph:Math.random()*6,a:0})}
+  if(tbirds.length>want){const b=tbirds[tbirds.length-1];b.leave=1}
+  const dt=Math.min(0.05,(n-(tbirds._l||n))/1000);tbirds._l=n;const z=cam.z,s=Math.max(1.4,z*1.1);
+  cx.save();cx.globalCompositeOperation='source-over';
+  for(let i=tbirds.length-1;i>=0;i--){const b=tbirds[i];b.ph+=dt;b.a=Math.min(1,b.a+dt*(b.leave?-1.5:1.5));if(b.a<=0&&b.leave){tbirds.splice(i,1);continue}
+   if(b.st=='perch'){b.t-=dt;if(b.t<=0&&treeList.length){const near=treeList.map(q=>{const G=objGeom(q);return[Math.hypot(G.X-b.x,G.Y-b.y),q]}).sort((p,q)=>p[0]-q[0]).slice(0,4);const o=near[1+Math.random()*Math.max(1,near.length-1)|0]?.[1]||near[0][1];const[tx_,ty_]=perchOf(o);const d=Math.hypot(tx_-b.x,ty_-b.y);
+     b.st='fly';b.fx=b.x;b.fy=b.y;b.tx=tx_;b.ty=ty_;b.ft=0;b.fd=Math.max(0.6,d/70);b.arc=Math.min(40,10+d*0.25)}}
+   else{b.ft+=dt;const u=Math.min(1,b.ft/b.fd),e=u*u*(3-2*u);b.x=b.fx+(b.tx-b.fx)*e;b.y=b.fy+(b.ty-b.fy)*e-Math.sin(u*Math.PI)*b.arc;b.dir=b.tx>b.fx?1:-1;if(u>=1){b.st='perch';b.t=3+Math.random()*6}}
+   const[X,Y]=toScreen(b.x,b.y+(b.st=='perch'?Math.sin(b.ph*3)*0.4:0));if(X<-10||X>VW+10||Y<-10||Y>VH+10)continue;
+   cx.globalAlpha=b.a*(1-0.6*lt.night);const flap=b.st=='fly'?Math.sin(b.ph*28)>0:Math.sin(b.ph*5)>0.97,dr=b.dir||1;
+   cx.fillStyle='#4a3424';cx.fillRect(X-s,Y-s*0.5,s*2,s);cx.fillRect(X+dr*s,Y-s,s,s);// 몸·머리
+   cx.fillStyle='#c98a4a';cx.fillRect(X+dr*s*1.6,Y-s*0.6,s*0.6,s*0.4);// 부리
+   cx.fillStyle='#6b4a32';if(flap)cx.fillRect(X-s*0.8,Y-s*1.6,s*1.4,s*0.9);else cx.fillRect(X-s*0.8,Y,s*1.4,s*0.7)}// 날개
+  cx.restore()});
  // ---- 탭 반응 ----
  function tap(fx_,fy_,sx,sy){let best=null,bd=1e9;for(const g of guests){if(g.hide||g.dead)continue;const[X,Y]=toScreenT(g.x,g.y);const d=Math.hypot(X-sx,(Y-7*cam.z)-sy);if(d<bd){bd=d;best=g}}
   if(best&&bd<9*cam.z+6){best.hop=0.5;fx.push({k:'heart',g:best,l:1.2,L:1.2});if(best.inBath)fx.push({k:'ring',x:best.x,y:best.y,l:1,L:1},{k:'drop',x:best.x,y:best.y,n:8,l:0.7,L:0.7});

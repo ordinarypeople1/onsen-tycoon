@@ -362,7 +362,10 @@ const THOUGHT={
 function entrance(){const s=START_PLOT;return[s[0]*PS+PS/2,s[1]*PS+PS]}
 function wageNow(h){const nt=(h%24)>=23||(h%24)<6;return Math.round(S.objs.reduce((s,o)=>{const d=DEF[o.k];if(!d.wage)return s;const w=d.wage*(1+0.5*(o.lv-1))*(0.35+0.65*Math.min(1,(o.hu||0)/2));o.hu=0;return s+(nt&&!d.stay&&!d.night?w*0.3:w)},0)+S.objs.filter(o=>!DEF[o.k].isPath&&!DEF[o.k].wage).length*4)}
 function capTotal(){return S.objs.reduce((a,o)=>{const d=DEF[o.k];return a+(d.cap&&!d.stay?capOf(o):0)},0)}
-function maxGuests(){return Math.min(12+stars()*8,Math.round(capTotal()*1.5)+4)}
+const TUNE=window.TUNE||{spread:1,dur:1.5,funFix:0,starK:12,fill:1.5};
+// 동시 손님 상한: 12+★×starK (기존 8 → 시설이 더 북적이도록), 단 설치 정원×1.5+4를 넘지 않음
+// (설치 정원에 비례하게 하면 시설을 늘릴수록 손님·매출이 함께 불어나 경제가 폭주함 — 밸런스 봇으로 확인)
+function maxGuests(){const ct=capTotal();return Math.min(12+stars()*(TUNE.starK||8),Math.round(ct*1.5)+4)}
 function spawnRate(){const h=hour();const f=h<6?0.05:h<9?0.5:h<12?0.7:h<15?0.6:h<17?0.8:h<21?1.15:h<23?0.5:0.15;return f*(0.12+stars()*0.06)}
 function spawn(){const gi=gateInfo();if(!gi)return;const[mx,my]=gi.m,[ox,oy]=gi.o;const vip=Math.random()<0.1*stars();const c=(k)=>[mx+0.5+ox*k,my+0.5+oy*k];const s0=c(5);
  guests.push({x:s0[0]+(Math.random()-0.5)*0.3,y:s0[1],tx:s0[0],ty:s0[1],path:[c(3),c(1),c(0)],st:'walk',spr:'cw'+(1+(Math.random()*4|0)),cb:'cb'+(1+(Math.random()*4|0)),
@@ -379,7 +382,9 @@ function pickTarget(g){
  return null}
 // 혼잡도: 이용 중 + 이 시설로 가는 중 + 대기 중인 손님 수. 꽉 찰 시설은 빈자리 있는 시설보다 뒤로 (모두 차면 가장 가까운 곳에서 대기)
 function loadOf(o,self){let n=o.users||0;for(const x of guests)if(x!==self&&x.target===o&&!x.leaving)n++;return n}
-function pickBy(g,list,nk){const sc=new Map();for(const o of list){const full=loadOf(o,g)>=capOf(o);sc.set(o,dist(g,o)+o.price/300+(full?40:0))}list.sort((a,b)=>sc.get(a)-sc.get(b));const o=list[0];
+// 시설 선택: 거리·가격 + 혼잡도(덜 붐비는 곳 선호) + 이 손님이 이미 써 본 종류는 뒤로 + 약간의 무작위 → 여러 시설을 골고루 즐김
+function pickBy(g,list,nk){const sc=new Map(),kinds=g.kinds||(g.kinds=new Set());for(const o of list){const ld=loadOf(o,g),cap=capOf(o),full=ld>=cap;
+  sc.set(o,dist(g,o)+o.price/300+(full?40:0)+(TUNE.spread?ld/cap*8+(kinds.has(o.k)?6:0)+Math.random()*4:0))}list.sort((a,b)=>sc.get(a)-sc.get(b));const o=list[0];
  if(Math.random()<0.25)think(g,THOUGHT.want[nk]||'');return o}
 const ctr=o=>{const[fw,fh]=fpOf(o.k,o.rot);return[o.x+fw/2,o.y+fh/2]};
 const dist=(g,o)=>{const[a,b]=ctr(o);return Math.hypot(a-g.x,b-g.y)};
@@ -449,14 +454,34 @@ function updGuest(g,dt){
  else if(g.st=='look'){g.t-=dt;if(g.t<=0)g.st='walk'}
 }
 // 산책·감상: 급한 욕구가 없을 때 아직 안 본 장식(벚꽃·석등·연못·도리이 등)을 찾아가 잠시 바라봄 → 기분↑, 재미 욕구↓
-const LOOK_LINES=[[/sakura|maple|wisteria|iris|hydrangea|ume|flower|kiku|tsubaki|tsukimi/,['꽃이 참 예뻐요','향기가 좋아요']],[/lantern|andon|takeakari|chochin|kagaribi|neon|lamppost|floating/,['불빛이 따뜻해요','은은하니 좋네요']],[/pond|koi|bridge|waterwheel|fall/,['물소리가 좋아요','잉어가 헤엄쳐요']],[/torii|jizo|ema|shishi|tanuki|pagoda/,['마음이 편안해져요','소원을 빌어볼까']],[/pine|cedar|bamboo|tree|fern|moss|sand|rock|mushroom/,['바람 소리가 좋아요','고즈넉하네요']],[/bench|parasol|lounger|engawa/,['잠깐 쉬어갈까','여기 앉으면 좋겠다']]];
-function lookLine(k){for(const[re,ls]of LOOK_LINES)if(re.test(k))return ls[Math.random()*ls.length|0];return '정말 예쁘다~'}
+// 구경 말풍선: 장식 종류별 대사, 같은 종류가 주변(반경 6칸)에 3개 이상이면 '가득' 대사, 등불은 밤·낮을 나눔
+const LOOKS=[
+ [/^maple/,{one:['단풍이 참 곱네요','빨갛게 물들었어요'],many:['단풍이 정말 가득해요','단풍길이 너무 예뻐요','온통 붉게 물들었네요']}],
+ [/^sakura/,{one:['벚꽃이 참 예뻐요','꽃잎이 흩날려요'],many:['벚꽃 터널 같아요','온통 벚꽃이네요']}],
+ [/^(pine|cedar)/,{one:['솔향이 좋아요','나무가 늠름하네요'],many:['숲속에 온 것 같아요','나무 그늘이 시원해요']}],
+ [/^(bamboo|bamboofence)/,{one:['대나무 소리가 좋아요','사각사각 소리가 나요'],many:['대나무 숲길이네요']}],
+ [/^wisteria/,{one:['등나무 꽃이 늘어졌어요','보랏빛이 예뻐요']}],
+ [/^(hydrangea|iris|olive|fern|tsukimi)/,{one:['꽃 색이 고와요','싱그럽네요'],many:['꽃밭이 예뻐요']}],
+ [/^mushroom/,{one:['버섯이 귀여워요']}],
+ [/^birdhouse/,{one:['새가 살고 있을까?']}],
+ [/^(lantern|andon|takeakari|chochin|kagaribi|lanternpath|lamppost)/,{one:['석등이 운치 있네요','등이 예쁘네요'],night:['불빛이 따뜻해요','은은하니 좋네요'],many:['등불이 이어져 있어요']}],
+ [/^floating/,{one:['물 위에 등이 떠 있어요'],night:['유등이 반짝여요']}],
+ [/^neon/,{one:['간판이 레트로하네요'],night:['네온이 반짝반짝해요']}],
+ [/^(pond)/,{one:['잉어가 헤엄쳐요','물소리가 좋아요']}],
+ [/^bridge/,{one:['다리가 참 예쁘네요']}],[/^waterwheel/,{one:['물레방아가 돌아가요']}],[/^shishi/,{one:['딱— 소리가 좋아요']}],
+ [/^sandgarden/,{one:['모래 무늬가 차분해요']}],[/^tanuki/,{one:['너구리 상이 귀여워요']}],
+ [/^(torii|jizo|ema|pagoda)/,{one:['마음이 편안해져요','소원을 빌어볼까']}],
+ [/^rocks/,{one:['이끼가 예쁘게 앉았어요','고즈넉하네요']}],
+ [/(bench|parasol|lounger|nodate|cafe)/,{one:['잠깐 쉬어갈까','여기 앉으면 좋겠다']}]];
+function lookLine(o){const k=o.k,pick=a=>a[Math.random()*a.length|0];for(const[re,L]of LOOKS){if(!re.test(k))continue;
+  if(L.many){const[cx_,cy_]=ctr(o);let n=0;for(const q of S.objs)if(q.k.replace(/_.*$/,'')==k.replace(/_.*$/,'')&&Math.hypot(ctr(q)[0]-cx_,ctr(q)[1]-cy_)<6)n++;if(n>=3&&Math.random()<0.65)return pick(L.many)}
+  if(L.night&&light().night>0.5)return pick(L.night);return pick(L.one)}return '정말 예쁘다~'}
 function stroll(g){if((g.strolls||0)>=3||g.leaving)return false;const seen=g.seen||(g.seen=new Set()),c=[];
  for(const o of S.objs){const d=DEF[o.k];if(!d||!(d.beauty>0)||d.isPath||seen.has(o)||o===moving)continue;c.push([dist(g,o)+Math.random()*5-Math.min(8,d.beauty*0.25),o])}
  if(!c.length)return false;c.sort((a,b)=>a[0]-b[0]);const pick=c[Math.random()*Math.min(4,c.length)|0][1];seen.add(pick);
  const pp=pathToObj(g,pick);if(!pp)return false;g.path=pp;g.view=pick;g.strolls=(g.strolls||0)+1;return true}
 function look(g){const o=g.view;g.view=null;if(!o||!S.objs.includes(o))return;const[a,b]=ctr(o);g.dir=(a-g.x)-(b-g.y)>=0?1:-1;g.st='look';g.t=2.5+Math.random()*2.5;
- const d=DEF[o.k];g.happy=Math.min(100,g.happy+Math.min(6,(d.beauty||4)*0.35));g.need.fun=Math.max(0,g.need.fun-12);if(Math.random()<0.45)think(g,lookLine(o.k));window.__looks=(window.__looks||0)+1}
+ const d=DEF[o.k];g.happy=Math.min(100,g.happy+Math.min(6,(d.beauty||4)*0.35));g.need.fun=Math.max(0,g.need.fun-12);if(Math.random()<0.45)think(g,lookLine(o));window.__looks=(window.__looks||0)+1}
 function decide(g){
  if(g.life>220||g.budget<200||g.happy<15){leave(g);return}
  const o=pickTarget(g);
@@ -472,10 +497,10 @@ function arrive(g){g.ax=g.x;g.ay=g.y;const o=g.target;if(!o||!DEF[o.k]){g.target
  if(o.price>g.budget){think(g,'다음에 또 올게요');leave(g);return}
  g.budget-=o.price;S.yen+=o.price;S.fin.inc+=o.price;o.earn=(o.earn||0)+o.price;o.uses=(o.uses||0)+1;o.hu=(o.hu||0)+1;S.served++;BUS.emit('pay',o,g,o.price);
  const[sx,sy]=toScreenT(...ctr(o));floats.push({x:ctr(o)[0],y:ctr(o)[1],t:'+¥'+fmt(o.price),l:1.6});
- o.users++;g.cur=o;g.st='use';g.t=d.stay?Math.max(30,((30-hour()+24)%24+7)*60/120):d.dur*(1+o.lv*0.1);
+ o.users++;g.cur=o;g.st='use';g.t=d.stay?Math.max(30,((30-hour()+24)%24+7)*60/120):d.dur*(1+o.lv*0.1)*(TUNE.dur||1);(g.kinds||(g.kinds=new Set())).add(o.k);
  if(d.bath&&!d.inside){g.slot=freeSlot(o);const[a,b]=bathSlot(o,g.slot);g.x=a;g.y=b;g.inBath=true}else g.hide=true;
  const bonus=o.price<fair*0.9?8:o.price<fair*1.15?3:-3;g.happy+=bonus+o.lv*2;
- for(const k in d.eff)if(g.need[k]!=null)g.need[k]=Math.max(0,g.need[k]+d.eff[k]*(1+o.lv*0.1));
+ for(const k in d.eff)if(g.need[k]!=null){const e=k=='fun'&&TUNE.funFix?-Math.abs(d.eff[k]):d.eff[k];g.need[k]=Math.max(0,g.need[k]+e*(1+o.lv*0.1))}
  if(d.joy)g.happy+=d.joy*0.3;if(d.bath&&Math.random()<0.6)setTimeout(()=>think(g,THOUGHT.good[Math.random()*6|0]),1500);}
 // 대기 위치: 시설에 붙은 걸을 수 있는 칸 중 현재 위치에서 가깝고(2.5칸 이내) 다른 대기 손님이 적은 곳
 function waitSpot(g,o){const T=new Set(tilesOf(o).map(([x,y])=>x+','+y)),c=[];for(const[x,y]of tilesOf(o))for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,k=nx+','+ny;if(T.has(k)||!walkable(nx,ny)||c.some(p=>p.k==k))continue;const px=nx+0.5,py=ny+0.5,d=Math.hypot(px-g.x,py-g.y);if(d>2.5)continue;let crowd=0;for(const q of guests)if(q!==g&&q.st=='wait'&&Math.hypot((q.wx??q.x)-px,(q.wy??q.y)-py)<0.6)crowd++;c.push({k,px,py,s:d+crowd*3})}
@@ -1048,7 +1073,8 @@ function step(dt){if(_pb<=0)_pb=2;
  if(nowH!=prevH){popCheck();const wages=wageNow(nowH);const pay=Math.min(wages,Math.max(0,S.yen)),unpaid=wages-pay;S.yen-=pay;if(unpaid>0){if(!S._wt||S.min-S._wt>600){S._wt=S.min;toast('잔고가 조금 부족해요. 손님을 맞이하면 금방 채워져요')}}BUS.emit('hour',nowH);if(nowH%24==0)BUS.emit('day',Math.floor(nowH/24)+1);S.fin.exp+=pay;
   S.fin.hist.push((S.fin._h||0)-wages);S.fin._h=0;if(S.fin.hist.length>48)S.fin.hist.shift();if(nowH%24==0){S.fin.inc=0;S.fin.exp=0}}
  const before=S.yen;
- if(Math.random()<dt*spawnRate()*3&&guests.length<maxGuests())spawn();
+ {const mg=maxGuests(),fill=1+(TUNE.fill||0)*Math.max(0,1-guests.length/mg); // 빈자리가 많을수록 손님이 조금 더 빨리 들어옴
+  if(Math.random()<dt*spawnRate()*3*fill&&guests.length<mg)spawn()}
  for(const g of guests)updGuest(g,dt);guests=guests.filter(g=>!g.dead);
  emit(dt);updParts(dt);
  const earned=Math.max(0,S.yen-before);S.fin._h=(S.fin._h||0)+earned;
