@@ -561,10 +561,9 @@ function render(t){
  for(const g of GS){let i=0;for(let j=0;j<sorted.length;j++){const o=sorted[j];if(o.g){if(o.z<=g.z)i=Math.max(i,j+1);continue}if(ov(o,g)&&cmp(o,g)<0)i=j+1;else if(!ov(o,g)&&o.z<=g.z)i=Math.max(i,j+1)}
   for(let j=i-1;j>=0;j--){const o=sorted[j];if(!o.g&&ov(o,g)&&cmp(o,g)>0){i=j}}sorted.splice(i,0,g)}
  list.length=0;list.push(...sorted);window._order=list.filter(it=>it.o&&(!it.part||it.part=='pondrim')).map(it=>it.o);
- // 뒤에 가려진 손님/커서가 있으면 건물 반투명
- const hidden=new Set();for(const it of list){if(!it.o)continue;const o=it.o,G=objGeom(o);
-  const pts=guests.filter(g=>!g.hide&&!g.inBath&&g.x<it.x1&&g.y<it.y1&&!(g.x>=it.x0&&g.y>=it.y0)&&(g.x+g.y)<it.x1+it.y1-0.5).map(g=>iso(g.x,g.y));
-  if(hoverT&&ghost)pts.push(iso(hoverT[0]+0.5,hoverT[1]+0.5));
+ // 건설 중 커서가 건물 뒤에 가려지면 그 건물만 반투명 (손님이 지나갈 때는 반투명하지 않음)
+ const hidden=new Set();if(hoverT&&ghost)for(const it of list){if(!it.o)continue;const o=it.o,G=objGeom(o);
+  const pts=[iso(hoverT[0]+0.5,hoverT[1]+0.5)];
   if(pts.some(([X,Y])=>Math.abs(X-G.X)<G.W*0.42&&Y<G.Y-6&&Y>G.Y-G.H*0.9))hidden.add(o)}
  for(const it of list)if(it.o&&it.part!='front'){const o=it.o,G=objGeom(o),key=skey(o);if(o.k=='gate'){drawSprite(key+'_ground',o,G.X,G.Y,G.W,lt,sv,1)}ao(G.X,G.cY,G.W*0.5,G.W*0.25,0.3);drawShadow(key,G.X,G.Y,G.W,lt,sv,DEF[o.k].bath?0.4:1)}
  for(const it of list){
