@@ -613,8 +613,8 @@ body.phone #top .clock{display:flex;align-items:center}
 body.phone #top .clock{white-space:nowrap}
 body.phone #quest{top:50px;left:8px;width:auto;max-width:min(250px,62vw);font-size:12px;padding:8px 11px;border-radius:12px}
 body.phone #quest .qh{font-size:13px;margin-bottom:3px;cursor:pointer}
-body.phone #quest .qh:after{content:'접기';margin-left:10px;font:500 11px Pretendard,sans-serif;color:var(--txt-muted)}
-body.phone #quest.qmin .qh:after{content:'펼치기'}
+body.phone #quest .qh:after{content:var(--fold,'접기');margin-left:10px;font:500 11px Pretendard,sans-serif;color:var(--txt-muted)}
+body.phone #quest.qmin .qh:after{content:var(--unfold,'펼치기')}
 body.phone #quest .qt{font-size:12.5px;margin-bottom:4px}
 body.phone #quest .qf{font-size:11.5px;margin-top:5px}
 body.phone #quest .qs{display:none}

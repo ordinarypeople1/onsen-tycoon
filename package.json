@@ -21,6 +21,11 @@
     "@capacitor/android": "^8.5.3",
     "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.5.3",
-    "@capacitor/ios": "^8.5.3"
+    "@capacitor/ios": "^8.5.3",
+    "@expo-google-fonts/huninn": "^0.4.3",
+    "@expo-google-fonts/m-plus-rounded-1c": "^0.4.4",
+    "@expo-google-fonts/nunito": "^0.4.2",
+    "acorn": "^8.19.0",
+    "acorn-walk": "^8.3.5"
   }
 }

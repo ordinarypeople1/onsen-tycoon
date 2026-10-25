@@ -6,9 +6,9 @@ const SaveCodec={
  async encode(obj){const json=JSON.stringify(obj);let bytes=new TextEncoder().encode(json);
   if(window.CompressionStream){const cs=new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw'));bytes=new Uint8Array(await new Response(cs).arrayBuffer());return this.PFX+'z.'+b64u(bytes)}
   return this.PFX+'j.'+b64u(bytes)},
- async decode(code){code=String(code).trim().replace(/\s+/g,'');if(!code.startsWith('CAPY1.')&&!code.startsWith('YUZU1.'))throw new Error('형식이 달라요');const[kind,data]=[code.slice(6,7),code.slice(8)];let bytes=unb64u(data);
-  if(kind=='z'){if(!window.DecompressionStream)throw new Error('이 브라우저는 압축 해제를 지원하지 않아요');const ds=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));bytes=new Uint8Array(await new Response(ds).arrayBuffer())}
-  const obj=JSON.parse(new TextDecoder().decode(bytes));if(!obj||obj.ver!==2||!Array.isArray(obj.objs)||!obj.plots)throw new Error('저장 데이터가 아니에요');return cleanSave(obj)}};
+ async decode(code){code=String(code).trim().replace(/\s+/g,'');if(!code.startsWith('CAPY1.')&&!code.startsWith('YUZU1.'))throw new Error(L('형식이 달라요'));const[kind,data]=[code.slice(6,7),code.slice(8)];let bytes=unb64u(data);
+  if(kind=='z'){if(!window.DecompressionStream)throw new Error(L('이 브라우저는 압축 해제를 지원하지 않아요'));const ds=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));bytes=new Uint8Array(await new Response(ds).arrayBuffer())}
+  const obj=JSON.parse(new TextDecoder().decode(bytes));if(!obj||obj.ver!==2||!Array.isArray(obj.objs)||!obj.plots)throw new Error(L('저장 데이터가 아니에요'));return cleanSave(obj)}};
 // 남이 보낸 코드·링크로 들어온 저장 데이터 정리: 이름의 HTML 문자 제거, 사진 장식은 data:image만 허용
 function cleanSave(o){const txt=v=>String(v==null?'':v).replace(/[<>&"'`]/g,'').slice(0,40);if('ryokanName'in o)o.ryokanName=txt(o.ryokanName);
  if(o.pics&&typeof o.pics=='object'){for(const k in o.pics){const e=o.pics[k];if(!e||typeof e.d!='string'||!/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(e.d)||!/^[a-z0-9]+$/i.test(k))delete o.pics[k];else e.kind=txt(e.kind)}}else o.pics={};
@@ -38,5 +38,5 @@ const SAVE={adapter:new LocalAdapter(),codec:SaveCodec,LocalAdapter,SupabaseAdap
  _t:0,mirror(obj){if(this.adapter.name=='local')return;clearTimeout(this._t);this._t=setTimeout(()=>this.adapter.save(+localStorage.onsenSlot||1,obj).catch(e=>console.warn('remote save',e)),30000)}};
 window.SAVE=SAVE;
 // 방문 링크: #visit=YUZU1....
-(()=>{const m=location.hash.match(/visit=([^&]+)/);if(m)window.VISIT_PROMISE=SaveCodec.decode(decodeURIComponent(m[1]));else if(/^#[a-z0-9_-]{2,24}$/i.test(location.hash)&&!/^#showcase$/i.test(location.hash)){const id=location.hash.slice(1).toLowerCase();window.VISIT_PROMISE=fetch('assets/visits/'+id+'.json').then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(d=>{if(!d||d.ver!==2||!Array.isArray(d.objs)||!d.plots)throw new Error('저장 데이터가 아니에요');d=cleanSave(d);d.t=Date.now();return d})}
+(()=>{const m=location.hash.match(/visit=([^&]+)/);if(m)window.VISIT_PROMISE=SaveCodec.decode(decodeURIComponent(m[1]));else if(/^#[a-z0-9_-]{2,24}$/i.test(location.hash)&&!/^#showcase$/i.test(location.hash)){const id=location.hash.slice(1).toLowerCase();window.VISIT_PROMISE=fetch('assets/visits/'+id+'.json').then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(d=>{if(!d||d.ver!==2||!Array.isArray(d.objs)||!d.plots)throw new Error(L('저장 데이터가 아니에요'));d=cleanSave(d);d.t=Date.now();return d})}
  else if(/showcase/.test(location.hash)){window.SHOWCASE=1;window.VISIT_PROMISE=fetch('assets/showcase.json').then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(d=>{d.t=Date.now();return d})}})();

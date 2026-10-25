@@ -6,110 +6,110 @@ const START_PLOT=[1,1];
 const $=id=>document.getElementById(id);
 const cv=$('c'),tc=$('tc'),tx=tc.getContext('2d');let cx=cv.getContext('2d');
 const DEF={
- rock:{n:'바위 노천탕',tab:'bath',img:'rock',fp:4,sc:1,cost:6000,price:600,cap:5,dur:28,eff:{fatigue:-70,fun:12},wage:60,star:1,bath:1,water:'#8fe3df',appeal:12,desc:'김이 피어오르는 바위 노천탕'},
- hinoki:{n:'히노키 욕조',tab:'bath',img:'hinoki',fp:2,sc:1,cost:3500,price:450,cap:2,dur:22,eff:{fatigue:-50,fun:8},wage:35,star:1,bath:1,water:'#9fd6e6',appeal:7,desc:'편백나무 향 가득한 욕조'},
- sauna:{n:'사우나',tab:'bath',inside:1,img:'sauna',fp:2,sc:1,cost:7000,price:700,cap:3,dur:20,eff:{fatigue:-40,fun:25},wage:55,star:2,appeal:8,light:[[0.1,-0.45]],desc:'땀 빼고 나면 개운!'},
- milky:{n:'유백 대욕장',tab:'bath',img:'milky',fp:4,sc:1,cost:15000,price:1100,cap:6,dur:30,eff:{fatigue:-85,fun:15},wage:110,star:3,bath:1,water:'#f1ede0',appeal:16,desc:'우윳빛 온천수의 대욕장'},
- cave:{n:'동굴탕',tab:'bath',img:'cave',fp:4,sc:1,cost:15000,price:1100,cap:5,dur:30,eff:{fatigue:-80,fun:18},wage:90,star:3,bath:1,water:'#7fdcd6',appeal:16,light:[[0,-0.5]],desc:'바위 동굴 속 신비로운 온천'},
- foot:{n:'족욕탕',tab:'bath',img:'foot',fp:2,sc:1,cost:2500,price:250,cap:4,dur:12,eff:{fatigue:-30,fun:10},wage:20,star:1,bath:1,water:'#a6dde8',appeal:5,desc:'발만 담가도 노곤노곤'},
- fall:{n:'폭포탕',tab:'bath',img:'fall',fp:4,sc:1,cost:22000,price:1400,cap:6,dur:30,eff:{fatigue:-85,fun:25},wage:110,star:4,bath:1,water:'#86e0e6',appeal:20,desc:'쏟아지는 폭포 아래 노천탕'},
- fam:{n:'가족탕',tab:'bath',inside:1,img:'fam',fp:2,sc:1,cost:12000,price:1600,cap:4,dur:26,eff:{fatigue:-60,fun:20},wage:70,star:3,appeal:10,light:[[0.1,-0.5]],desc:'가족끼리 오붓한 전세 욕탕'},
- wine:{n:'와인탕',tab:'bath',img:'wine',fp:2,sc:1,cost:18000,price:1500,cap:3,dur:24,eff:{fatigue:-60,fun:30},wage:90,star:4,bath:1,water:'#8a1f3a',appeal:14,desc:'포도향 가득 레드 와인탕'},
- dango:{n:'당고 노점',tab:'food',img:'dango',fp:2,fph:1,sc:0.96,cost:2000,price:300,cap:2,dur:8,eff:{hunger:-30,fun:10},wage:15,star:1,appeal:4,light:[[0.2,-0.4]],desc:'달콤한 미타라시 당고'},
- sake:{n:'사케 바',tab:'food',img:'sake',fp:2,sc:1,cost:9000,price:1000,cap:3,dur:16,eff:{hunger:-20,fun:40},wage:60,star:2,appeal:8,light:[[0.15,-0.5],[-0.2,-0.4]],night:1,desc:'온천 후 한 잔의 사케'},
- tea:{n:'찻집',tab:'food',img:'tea',fp:2,sc:1,cost:6000,price:600,cap:3,dur:18,eff:{hunger:-25,fun:20},wage:40,star:2,appeal:9,light:[[0.1,-0.45]],desc:'말차와 화과자가 있는 찻집'},
- ice:{n:'빙수 가게',tab:'food',img:'ice',fp:2,fph:1,sc:0.96,cost:3500,price:450,cap:2,dur:10,eff:{hunger:-25,fun:18},wage:25,star:2,appeal:6,desc:'목욕 후 시원한 빙수'},
- ramen:{n:'라멘집',tab:'food',img:'ramen',fp:2,sc:1,cost:4000,price:900,cap:3,dur:15,eff:{hunger:-70,fun:5},wage:45,star:1,appeal:6,light:[[0.15,-0.55],[0.28,-0.3]],desc:'유자 시오 라멘이 명물'},
- teishoku:{n:'정식당',tab:'food',img:'teishoku',fp:2,sc:1,cost:9000,price:1600,cap:4,dur:20,eff:{hunger:-90,fun:10},wage:80,star:2,appeal:8,light:[[0.3,-0.35]],desc:'오늘의 유자 연어 정식'},
- izakaya:{n:'이자카야',tab:'food',img:'izakaya',fp:2,sc:1,cost:16000,price:2200,cap:5,dur:25,eff:{hunger:-50,thirst:-50,fun:40},wage:120,star:3,appeal:10,night:1,light:[[-0.1,-0.6],[0.1,-0.6],[0.3,-0.6]],desc:'밤에 북적이는 선술집'},
- milk:{n:'우유 매점',tab:'shop',img:'milk',fp:2,sc:1,cost:1500,price:250,cap:3,dur:8,eff:{thirst:-70},wage:20,star:1,appeal:4,desc:'목욕 후엔 역시 커피우유'},
- yuzu:{n:'유자차 매점',tab:'shop',img:'yuzu',fp:2,sc:1,cost:2500,price:350,cap:3,dur:8,eff:{thirst:-60,fun:8},wage:25,star:1,appeal:6,desc:'따끈한 유자차 한 잔'},
- gift:{n:'기념품 가게',tab:'shop',img:'gift',fp:2,sc:1,cost:6000,price:1500,cap:3,dur:12,eff:{fun:-0,joy:30},wage:50,star:2,appeal:7,fun:1,light:[[0.2,-0.4]],desc:'카피바라 인형이 인기'},
- shoot:{n:'사격 노점',tab:'shop',img:'shoot',fp:2,fph:1,sc:0.96,cost:3000,price:400,cap:2,dur:10,eff:{fun:45},wage:20,star:1,appeal:6,light:[[0.25,-0.45]],desc:'코르크 총으로 경품을 노려라!'},
- massage:{n:'마사지실',tab:'shop',inside:1,img:'massage',fp:2,sc:1,cost:8000,price:1200,cap:2,dur:20,eff:{fatigue:-75,fun:10},wage:70,star:2,appeal:8,light:[[-0.15,-0.45]],desc:'뭉친 어깨를 꾹꾹'},
- pingpong:{n:'탁구장',tab:'shop',img:'pingpong',fp:2,sc:1,cost:5000,price:300,cap:2,dur:14,eff:{fun:50,fatigue:10},wage:25,star:2,appeal:7,light:[[-0.15,-0.45]],desc:'온천 하면 역시 탁구!'},
- nap:{n:'수면실',tab:'shop',inside:1,img:'nap',fp:2,sc:1,cost:10000,price:800,cap:4,dur:30,eff:{fatigue:-90},wage:50,star:3,appeal:8,light:[[-0.15,-0.45]],desc:'뜨끈하게 몸 지지고 한숨 자기'},
- room:{n:'객실 별채',tab:'shop',img:'room',fp:3,sc:1,cost:12000,price:6000,cap:4,dur:0,eff:{fatigue:-100},wage:90,star:2,appeal:10,stay:1,light:[[-0.2,-0.3],[0.25,-0.3],[0,-0.55]],desc:'밤에 묵어가는 손님용 객실'},
- sakura:{tree:1,n:'벚꽃나무',tab:'deco',img:'sakura',fp:2,sc:1.12,cost:1200,beauty:8,star:1,emit:'petal',desc:'꽃잎이 흩날려요'},
- maple:{tree:1,n:'단풍나무',tab:'deco',img:'maple',fp:2,sc:1.12,cost:1200,beauty:8,star:1,emit:'leaf',desc:'붉은 잎이 떨어져요'},
- pine:{tree:1,n:'눈 내린 소나무',tab:'deco',img:'pine',fp:2,sc:1.02,cost:2000,beauty:10,star:2,emit:'snow',desc:'주변에 눈이 내려요'},
- torii:{n:'토리이',tab:'deco',img:'torii',fp:2,fph:1,sc:1.05,cost:2200,beauty:9,star:1,desc:'붉은 토리이, 신성한 입구'},
- bamboo:{n:'대나무 숲 석등',tab:'deco',img:'bamboo',fp:2,fph:1,sc:1.1,cost:1800,beauty:8,star:1,light:[[0,-0.45]],desc:'바람에 사각이는 대숲'},
- sandgarden:{n:'모래 정원',tab:'deco',img:'sandgarden',fp:2,sc:1,cost:4000,beauty:15,star:2,desc:'갈퀴로 다듬은 고요한 가레산스이'},
- bridge:{n:'붉은 아치 다리',tab:'deco',img:'bridge',fp:2,fph:1,sc:1.18,walk:1,sc:1,cost:5000,beauty:16,star:2,desc:'작은 개울 위 다이코바시'},
- waterwheel:{n:'물레방아',tab:'deco',img:'waterwheel',fp:2,sc:1,cost:6000,beauty:18,star:3,desc:'졸졸 물소리와 함께 도는 물레방아'},
- wisteria:{n:'등나무 정자',tab:'deco',img:'wisteria',fp:2,sc:1.05,cost:4500,beauty:16,star:2,desc:'보랏빛 등꽃 아래 돌벤치'},
- ema:{n:'에마 걸이',tab:'deco',img:'ema',fp:1,fph:2,sc:0.95,cost:1500,beauty:7,star:1,desc:'소원을 적은 나무패'},
- jizo:{n:'지장보살',tab:'deco',img:'jizo',fp:1,sc:0.88,cost:1200,beauty:6,star:1,desc:'빨간 모자의 지장님'},
- tanuki:{n:'너구리 상',tab:'deco',img:'tanuki',fp:1,sc:0.92,cost:1400,beauty:7,star:2,desc:'복을 부르는 너구리'},
- iris:{n:'붓꽃 화단',tab:'deco',img:'iris',fp:2,sc:0.92,cost:800,beauty:6,star:1,desc:'보랏빛 붓꽃이 한가득'},
- lanternpath:{n:'등롱 길',tab:'deco',img:'lanternpath',fp:1,fph:2,sc:0.98,cost:1600,beauty:7,star:2,walk:1,light:[[-0.32,-0.4],[0.35,-0.55]],desc:'두 개의 석등이 밝히는 돌길'},
- andon_lantern:{n:'전통 행등 (안돈)',tab:'deco',img:'andon_lantern',fp:1,sc:0.95,cost:450,beauty:6,star:1,light:[[0,-0.52,[255,210,120],1.15]],desc:'한지 너머로 따뜻한 호박빛이 번지는 목조 전통 행등'},
- takeakari:{n:'대나무 통 조명 (타케아카리)',tab:'deco',img:'takeakari',fp:1,sc:0.96,cost:680,beauty:8,star:1,light:[[0,-0.50,[255,218,115],1.25]],desc:'정교하게 타공된 대나무 통 사이로 황금빛 문양이 피어나요'},
- chochin_tower:{n:'축제 제등 기둥 (야구라 제등)',tab:'deco',img:'chochin_tower',fp:2,fph:1,sc:1.0,cost:1100,beauty:11,star:1,light:[[0,-0.68,[255,150,90],1.35],[0,-0.42,[255,208,118],1.25]],desc:'붉고 따뜻한 제등이 층층이 매달려 밤거리를 환히 밝혀요'},
- kagaribi:{n:'화톳불 화로대 (카가리비)',tab:'deco',img:'kagaribi',fp:1,sc:1.02,cost:1650,beauty:13,star:2,fire:1,light:[[0,-0.62,[255,155,60],1.4]],desc:'무쇠 삼각 화로 위에서 장작불과 불티가 타오르는 전통 화톳불'},
- floating_lanterns:{n:'유등 수반 (토로나가시)',tab:'deco',img:'floating_lanterns',fp:2,sc:1.05,cost:2600,beauty:18,star:2,light:[[-0.18,-0.50,[255,212,118],1.2],[0.18,-0.46,[255,195,105],1.2]],desc:'잔잔한 수반 위에 등불이 둥실 떠다니며 수면을 수놓아요'},
- neon_yu:{n:"온천 'ゆ' 네온 입간판",tab:'deco',img:'neon_yu',fp:2,fph:1,sc:0.95,cost:950,beauty:9,star:1,neon:1,light:[[0,-0.56,[255,95,190],1.25],[0,-0.36,[80,235,255],1.15]],desc:'핑크빛 ゆ 글자와 시안색 온천 마크가 빛나는 쇼와풍 입간판'},
- neon_izakaya:{n:'이자카야 네온 사인탑',tab:'deco',img:'neon_izakaya',fp:1,sc:1.02,cost:2100,beauty:14,star:2,neon:1,light:[[0,-0.72,[255,85,130],1.25],[0,-0.42,[80,230,255],1.2]],desc:'온천 골목의 낭만을 더하는 알록달록 복고풍 네온 사인탑'},
- neon_capy:{n:'카피바라 네온 간판',tab:'deco',img:'neon_capy',fp:2,fph:1,sc:1.0,cost:3400,beauty:20,star:3,neon:1,light:[[0,-0.56,[255,175,90],1.3],[0,-0.34,[85,235,255],1.2]],desc:'유자를 얹고 온천욕을 즐기는 카피바라가 반짝이는 시그니처 네온'},
- lantern:{n:'석등롱',tab:'deco',img:'lantern',fp:1,sc:0.95,cost:600,beauty:5,star:1,light:[[0,-0.55,[255,212,130],1.15]],desc:'밤이면 은은히 빛나요'},
- bamboo_bench:{n:'대나무 쉼터 긴의자',tab:'deco',img:'bamboo_bench',fp:2,fph:1,sc:0.95,cost:550,beauty:6,star:1,seat:1,desc:'청량한 대나무를 엮어 만든 시원한 정원 긴의자'},
- wood_bench:{n:'원목 정원 벤치',tab:'deco',img:'wood_bench',fp:2,fph:1,sc:0.95,cost:680,beauty:7,star:1,seat:1,desc:'따뜻한 편백 원목으로 짠 등받이 정원 벤치'},
- engawa_bench:{n:'붉은 모포 다실 벤치 (코시카케)',tab:'deco',img:'engawa_bench',fp:2,fph:1,sc:0.96,cost:880,beauty:9,star:1,seat:1,light:[[-0.28,-0.32,[255,196,110],0.75]],desc:'붉은 모센(모포) 위에 차와 당고를 곁들인 전통 다실 긴의자'},
- stone_bench:{n:'이끼 정원 돌벤치',tab:'deco',img:'stone_bench',fp:2,fph:1,sc:0.95,cost:1150,beauty:10,star:2,seat:1,desc:'이끼가 은은하게 내려앉은 화강암 정원 돌벤치'},
- parasol_table:{n:'파라솔 야외 테이블 의자',tab:'deco',img:'parasol_table',fp:2,sc:1.02,cost:1900,beauty:14,star:2,seat:1,light:[[0,-0.46,[255,212,128],0.85]],desc:'파라솔 그늘 아래 오붓하게 쉬어가는 야외 원목 테이블과 의자 세트'},
- rocks:{n:'정원석',tab:'deco',img:'rocks',fp:2,sc:0.92,cost:400,beauty:4,star:1,desc:'이끼 낀 정원석'},
- shishi:{set:'trad',n:'시시오도시',tab:'theme',img:'shishi',fp:1,sc:0.95,cost:1800,beauty:9,star:1,sound:'shishi',desc:'딱! 대나무 소리가 정원에 울려요'},
- nodate:{set:'trad',n:'노다테 다과석',tab:'theme',img:'nodate',fp:2,sc:0.95,cost:5000,price:500,cap:3,dur:14,eff:{thirst:-40,fun:20},wage:30,star:2,appeal:8,desc:'붉은 양산 아래 말차 한 잔'},
- pagoda:{set:'trad',n:'석탑',tab:'theme',img:'pagoda',fp:1,sc:1.15,cost:2400,beauty:10,star:2,light:[[0,-0.62]],desc:'이끼 낀 오층 석탑'},
- bamboofence:{set:'trad',n:'대나무 울타리',tab:'theme',img:'bamboofence',fp:2,fph:1,sc:0.95,cost:300,beauty:3,star:1,desc:'정갈하게 엮은 대나무'},
- cafe:{set:'modern',n:'카페 스탠드',tab:'theme',img:'cafe',fp:2,sc:0.95,cost:8000,price:700,cap:3,dur:9,eff:{thirst:-60,fun:12},wage:45,star:2,appeal:9,light:[[0.0,-0.45]],desc:'갓 내린 유자 라테'},
- lamppost:{set:'modern',n:'모던 가로등',tab:'theme',img:'lamppost',fp:1,sc:1.08,cost:900,beauty:4,star:2,light:[[0.28,-0.9]],desc:'따뜻한 전구색 가로등'},
- olive:{set:'modern',tree:1,n:'올리브 화분',tab:'theme',img:'olive',fp:1,sc:1.02,cost:1500,beauty:7,star:2,desc:'은빛 잎이 바람에 살랑'},
- lounger:{set:'modern',n:'선베드',tab:'theme',img:'lounger',fp:1,fph:2,sc:0.98,cost:1200,beauty:6,star:3,seat:1,desc:'탕 옆에서 낮잠 한숨'},
- cedar:{set:'forest',tree:1,n:'신목 삼나무',tab:'theme',img:'cedar',fp:2,sc:1.05,cost:3500,beauty:14,star:2,desc:'금줄을 두른 오래된 삼나무'},
- mushroom:{set:'forest',n:'숲 버섯',tab:'theme',img:'mushroom',fp:1,sc:0.92,cost:500,beauty:5,star:1,desc:'밤이면 반딧불이 모여요'},
- fern:{set:'forest',tree:1,n:'고사리 덤불',tab:'theme',img:'fern',fp:2,fph:1,sc:0.95,cost:400,beauty:4,star:1,desc:'촉촉한 숲의 초록'},
- birdhouse:{set:'forest',n:'새집',tab:'theme',img:'birdhouse',fp:1,sc:0.95,cost:800,beauty:5,star:2,desc:'참새가 놀러 와요'},
- snowman:{set:'season',sea:3,n:'눈사람',tab:'theme',img:'snowman',fp:1,sc:0.95,cost:700,beauty:5,star:2,desc:'겨울엔 아름다움 두 배'},
- hydrangea:{set:'season',sea:1,tree:1,n:'수국',tab:'theme',img:'hydrangea',fp:2,fph:1,sc:0.98,cost:900,beauty:6,star:2,desc:'여름엔 아름다움 두 배'},
- tsukimi:{set:'season',sea:2,n:'달맞이 상',tab:'theme',img:'tsukimi',fp:1,sc:0.95,cost:1100,beauty:6,star:3,desc:'가을엔 아름다움 두 배'},
- kadomatsu:{set:'season',sea:0,n:'카도마츠',tab:'theme',img:'kadomatsu',fp:1,sc:0.98,cost:1300,beauty:6,star:3,desc:'봄(새해)엔 아름다움 두 배'},
- banner:{photo:'banner',flutter:1,n:'사진 노보리 깃발',tab:'custom',img:null,ic:'🎏',fp:1,sc:1.05,cost:800,beauty:6,star:1,desc:'내 사진으로 만든 픽셀 깃발'},
- frame:{photo:'frame',n:'사진 액자 이젤',tab:'custom',img:null,ic:'🖼️',fp:1,sc:0.95,cost:1000,beauty:7,star:1,desc:'내 사진을 픽셀 그림으로'},
- noren:{photo:'noren',flutter:1,n:'사진 노렌 문틀',tab:'custom',img:null,ic:'🎐',fp:2,fph:1,sc:0.92,cost:1500,beauty:8,star:1,desc:'바람에 살랑이는 내 사진 노렌'},
- sign:{photo:'sign',n:'사진 간판',tab:'custom',img:null,ic:'🪧',fp:2,fph:1,sc:0.85,cost:1200,beauty:7,star:1,desc:'료칸 앞 나만의 간판'},
- gate:{n:'대문',img:'gate',fp:1,cost:0,star:9,walk:1,gate:1,light:[[-0.33,-0.42],[0.22,-0.3]],desc:'손님이 드나드는 유일한 입구'},
- path:{n:'돌길',tab:'deco',img:null,ic:'🪨',fp:1,cost:50,beauty:1,star:1,isPath:1,desc:'드래그해서 칠하세요'},
- path_wood:{n:'나무 데크길',tab:'deco',img:null,ic:'🪵',fp:1,cost:80,beauty:2,star:1,isPath:1,desc:'따뜻한 나무 데크'},
- path_gravel:{n:'자갈길',tab:'deco',img:null,ic:'⚪',fp:1,cost:30,beauty:1,star:1,isPath:1,desc:'사각사각 자갈길'},
- path_tatami:{n:'다다미 회랑',tab:'deco',img:null,ic:'🟩',fp:1,cost:150,beauty:3,star:2,isPath:1,desc:'료칸 느낌의 회랑'},
- pond:{n:'비단잉어 연못',tab:'deco',img:null,ic:'🐟',fp:3,cost:3000,beauty:14,star:1,flat:1,pond:1,desc:'잉어가 헤엄치고 연잎이 떠 있어요'},
- path_erase:{n:'길 지우기',tab:'deco',img:null,ic:'🧽',fp:1,cost:0,star:1,erase:1,desc:'드래그해서 길 제거 (50% 환불)'},
+ rock:{n:L('바위 노천탕'),tab:'bath',img:'rock',fp:4,sc:1,cost:6000,price:600,cap:5,dur:28,eff:{fatigue:-70,fun:12},wage:60,star:1,bath:1,water:'#8fe3df',appeal:12,desc:L('김이 피어오르는 바위 노천탕')},
+ hinoki:{n:L('히노키 욕조'),tab:'bath',img:'hinoki',fp:2,sc:1,cost:3500,price:450,cap:2,dur:22,eff:{fatigue:-50,fun:8},wage:35,star:1,bath:1,water:'#9fd6e6',appeal:7,desc:L('편백나무 향 가득한 욕조')},
+ sauna:{n:L('사우나'),tab:'bath',inside:1,img:'sauna',fp:2,sc:1,cost:7000,price:700,cap:3,dur:20,eff:{fatigue:-40,fun:25},wage:55,star:2,appeal:8,light:[[0.1,-0.45]],desc:L('땀 빼고 나면 개운!')},
+ milky:{n:L('유백 대욕장'),tab:'bath',img:'milky',fp:4,sc:1,cost:15000,price:1100,cap:6,dur:30,eff:{fatigue:-85,fun:15},wage:110,star:3,bath:1,water:'#f1ede0',appeal:16,desc:L('우윳빛 온천수의 대욕장')},
+ cave:{n:L('동굴탕'),tab:'bath',img:'cave',fp:4,sc:1,cost:15000,price:1100,cap:5,dur:30,eff:{fatigue:-80,fun:18},wage:90,star:3,bath:1,water:'#7fdcd6',appeal:16,light:[[0,-0.5]],desc:L('바위 동굴 속 신비로운 온천')},
+ foot:{n:L('족욕탕'),tab:'bath',img:'foot',fp:2,sc:1,cost:2500,price:250,cap:4,dur:12,eff:{fatigue:-30,fun:10},wage:20,star:1,bath:1,water:'#a6dde8',appeal:5,desc:L('발만 담가도 노곤노곤')},
+ fall:{n:L('폭포탕'),tab:'bath',img:'fall',fp:4,sc:1,cost:22000,price:1400,cap:6,dur:30,eff:{fatigue:-85,fun:25},wage:110,star:4,bath:1,water:'#86e0e6',appeal:20,desc:L('쏟아지는 폭포 아래 노천탕')},
+ fam:{n:L('가족탕'),tab:'bath',inside:1,img:'fam',fp:2,sc:1,cost:12000,price:1600,cap:4,dur:26,eff:{fatigue:-60,fun:20},wage:70,star:3,appeal:10,light:[[0.1,-0.5]],desc:L('가족끼리 오붓한 전세 욕탕')},
+ wine:{n:L('와인탕'),tab:'bath',img:'wine',fp:2,sc:1,cost:18000,price:1500,cap:3,dur:24,eff:{fatigue:-60,fun:30},wage:90,star:4,bath:1,water:'#8a1f3a',appeal:14,desc:L('포도향 가득 레드 와인탕')},
+ dango:{n:L('당고 노점'),tab:'food',img:'dango',fp:2,fph:1,sc:0.96,cost:2000,price:300,cap:2,dur:8,eff:{hunger:-30,fun:10},wage:15,star:1,appeal:4,light:[[0.2,-0.4]],desc:L('달콤한 미타라시 당고')},
+ sake:{n:L('사케 바'),tab:'food',img:'sake',fp:2,sc:1,cost:9000,price:1000,cap:3,dur:16,eff:{hunger:-20,fun:40},wage:60,star:2,appeal:8,light:[[0.15,-0.5],[-0.2,-0.4]],night:1,desc:L('온천 후 한 잔의 사케')},
+ tea:{n:L('찻집'),tab:'food',img:'tea',fp:2,sc:1,cost:6000,price:600,cap:3,dur:18,eff:{hunger:-25,fun:20},wage:40,star:2,appeal:9,light:[[0.1,-0.45]],desc:L('말차와 화과자가 있는 찻집')},
+ ice:{n:L('빙수 가게'),tab:'food',img:'ice',fp:2,fph:1,sc:0.96,cost:3500,price:450,cap:2,dur:10,eff:{hunger:-25,fun:18},wage:25,star:2,appeal:6,desc:L('목욕 후 시원한 빙수')},
+ ramen:{n:L('라멘집'),tab:'food',img:'ramen',fp:2,sc:1,cost:4000,price:900,cap:3,dur:15,eff:{hunger:-70,fun:5},wage:45,star:1,appeal:6,light:[[0.15,-0.55],[0.28,-0.3]],desc:L('유자 시오 라멘이 명물')},
+ teishoku:{n:L('정식당'),tab:'food',img:'teishoku',fp:2,sc:1,cost:9000,price:1600,cap:4,dur:20,eff:{hunger:-90,fun:10},wage:80,star:2,appeal:8,light:[[0.3,-0.35]],desc:L('오늘의 유자 연어 정식')},
+ izakaya:{n:L('이자카야'),tab:'food',img:'izakaya',fp:2,sc:1,cost:16000,price:2200,cap:5,dur:25,eff:{hunger:-50,thirst:-50,fun:40},wage:120,star:3,appeal:10,night:1,light:[[-0.1,-0.6],[0.1,-0.6],[0.3,-0.6]],desc:L('밤에 북적이는 선술집')},
+ milk:{n:L('우유 매점'),tab:'shop',img:'milk',fp:2,sc:1,cost:1500,price:250,cap:3,dur:8,eff:{thirst:-70},wage:20,star:1,appeal:4,desc:L('목욕 후엔 역시 커피우유')},
+ yuzu:{n:L('유자차 매점'),tab:'shop',img:'yuzu',fp:2,sc:1,cost:2500,price:350,cap:3,dur:8,eff:{thirst:-60,fun:8},wage:25,star:1,appeal:6,desc:L('따끈한 유자차 한 잔')},
+ gift:{n:L('기념품 가게'),tab:'shop',img:'gift',fp:2,sc:1,cost:6000,price:1500,cap:3,dur:12,eff:{fun:-0,joy:30},wage:50,star:2,appeal:7,fun:1,light:[[0.2,-0.4]],desc:L('카피바라 인형이 인기')},
+ shoot:{n:L('사격 노점'),tab:'shop',img:'shoot',fp:2,fph:1,sc:0.96,cost:3000,price:400,cap:2,dur:10,eff:{fun:45},wage:20,star:1,appeal:6,light:[[0.25,-0.45]],desc:L('코르크 총으로 경품을 노려라!')},
+ massage:{n:L('마사지실'),tab:'shop',inside:1,img:'massage',fp:2,sc:1,cost:8000,price:1200,cap:2,dur:20,eff:{fatigue:-75,fun:10},wage:70,star:2,appeal:8,light:[[-0.15,-0.45]],desc:L('뭉친 어깨를 꾹꾹')},
+ pingpong:{n:L('탁구장'),tab:'shop',img:'pingpong',fp:2,sc:1,cost:5000,price:300,cap:2,dur:14,eff:{fun:50,fatigue:10},wage:25,star:2,appeal:7,light:[[-0.15,-0.45]],desc:L('온천 하면 역시 탁구!')},
+ nap:{n:L('수면실'),tab:'shop',inside:1,img:'nap',fp:2,sc:1,cost:10000,price:800,cap:4,dur:30,eff:{fatigue:-90},wage:50,star:3,appeal:8,light:[[-0.15,-0.45]],desc:L('뜨끈하게 몸 지지고 한숨 자기')},
+ room:{n:L('객실 별채'),tab:'shop',img:'room',fp:3,sc:1,cost:12000,price:6000,cap:4,dur:0,eff:{fatigue:-100},wage:90,star:2,appeal:10,stay:1,light:[[-0.2,-0.3],[0.25,-0.3],[0,-0.55]],desc:L('밤에 묵어가는 손님용 객실')},
+ sakura:{tree:1,n:L('벚꽃나무'),tab:'deco',img:'sakura',fp:2,sc:1.12,cost:1200,beauty:8,star:1,emit:'petal',desc:L('꽃잎이 흩날려요')},
+ maple:{tree:1,n:L('단풍나무'),tab:'deco',img:'maple',fp:2,sc:1.12,cost:1200,beauty:8,star:1,emit:'leaf',desc:L('붉은 잎이 떨어져요')},
+ pine:{tree:1,n:L('눈 내린 소나무'),tab:'deco',img:'pine',fp:2,sc:1.02,cost:2000,beauty:10,star:2,emit:'snow',desc:L('주변에 눈이 내려요')},
+ torii:{n:L('토리이'),tab:'deco',img:'torii',fp:2,fph:1,sc:1.05,cost:2200,beauty:9,star:1,desc:L('붉은 토리이, 신성한 입구')},
+ bamboo:{n:L('대나무 숲 석등'),tab:'deco',img:'bamboo',fp:2,fph:1,sc:1.1,cost:1800,beauty:8,star:1,light:[[0,-0.45]],desc:L('바람에 사각이는 대숲')},
+ sandgarden:{n:L('모래 정원'),tab:'deco',img:'sandgarden',fp:2,sc:1,cost:4000,beauty:15,star:2,desc:L('갈퀴로 다듬은 고요한 가레산스이')},
+ bridge:{n:L('붉은 아치 다리'),tab:'deco',img:'bridge',fp:2,fph:1,sc:1.18,walk:1,sc:1,cost:5000,beauty:16,star:2,desc:L('작은 개울 위 다이코바시')},
+ waterwheel:{n:L('물레방아'),tab:'deco',img:'waterwheel',fp:2,sc:1,cost:6000,beauty:18,star:3,desc:L('졸졸 물소리와 함께 도는 물레방아')},
+ wisteria:{n:L('등나무 정자'),tab:'deco',img:'wisteria',fp:2,sc:1.05,cost:4500,beauty:16,star:2,desc:L('보랏빛 등꽃 아래 돌벤치')},
+ ema:{n:L('에마 걸이'),tab:'deco',img:'ema',fp:1,fph:2,sc:0.95,cost:1500,beauty:7,star:1,desc:L('소원을 적은 나무패')},
+ jizo:{n:L('지장보살'),tab:'deco',img:'jizo',fp:1,sc:0.88,cost:1200,beauty:6,star:1,desc:L('빨간 모자의 지장님')},
+ tanuki:{n:L('너구리 상'),tab:'deco',img:'tanuki',fp:1,sc:0.92,cost:1400,beauty:7,star:2,desc:L('복을 부르는 너구리')},
+ iris:{n:L('붓꽃 화단'),tab:'deco',img:'iris',fp:2,sc:0.92,cost:800,beauty:6,star:1,desc:L('보랏빛 붓꽃이 한가득')},
+ lanternpath:{n:L('등롱 길'),tab:'deco',img:'lanternpath',fp:1,fph:2,sc:0.98,cost:1600,beauty:7,star:2,walk:1,light:[[-0.32,-0.4],[0.35,-0.55]],desc:L('두 개의 석등이 밝히는 돌길')},
+ andon_lantern:{n:L('전통 행등 (안돈)'),tab:'deco',img:'andon_lantern',fp:1,sc:0.95,cost:450,beauty:6,star:1,light:[[0,-0.52,[255,210,120],1.15]],desc:L('한지 너머로 따뜻한 호박빛이 번지는 목조 전통 행등')},
+ takeakari:{n:L('대나무 통 조명 (타케아카리)'),tab:'deco',img:'takeakari',fp:1,sc:0.96,cost:680,beauty:8,star:1,light:[[0,-0.50,[255,218,115],1.25]],desc:L('정교하게 타공된 대나무 통 사이로 황금빛 문양이 피어나요')},
+ chochin_tower:{n:L('축제 제등 기둥 (야구라 제등)'),tab:'deco',img:'chochin_tower',fp:2,fph:1,sc:1.0,cost:1100,beauty:11,star:1,light:[[0,-0.68,[255,150,90],1.35],[0,-0.42,[255,208,118],1.25]],desc:L('붉고 따뜻한 제등이 층층이 매달려 밤거리를 환히 밝혀요')},
+ kagaribi:{n:L('화톳불 화로대 (카가리비)'),tab:'deco',img:'kagaribi',fp:1,sc:1.02,cost:1650,beauty:13,star:2,fire:1,light:[[0,-0.62,[255,155,60],1.4]],desc:L('무쇠 삼각 화로 위에서 장작불과 불티가 타오르는 전통 화톳불')},
+ floating_lanterns:{n:L('유등 수반 (토로나가시)'),tab:'deco',img:'floating_lanterns',fp:2,sc:1.05,cost:2600,beauty:18,star:2,light:[[-0.18,-0.50,[255,212,118],1.2],[0.18,-0.46,[255,195,105],1.2]],desc:L('잔잔한 수반 위에 등불이 둥실 떠다니며 수면을 수놓아요')},
+ neon_yu:{n:L("온천 'ゆ' 네온 입간판"),tab:'deco',img:'neon_yu',fp:2,fph:1,sc:0.95,cost:950,beauty:9,star:1,neon:1,light:[[0,-0.56,[255,95,190],1.25],[0,-0.36,[80,235,255],1.15]],desc:L('핑크빛 ゆ 글자와 시안색 온천 마크가 빛나는 쇼와풍 입간판')},
+ neon_izakaya:{n:L('이자카야 네온 사인탑'),tab:'deco',img:'neon_izakaya',fp:1,sc:1.02,cost:2100,beauty:14,star:2,neon:1,light:[[0,-0.72,[255,85,130],1.25],[0,-0.42,[80,230,255],1.2]],desc:L('온천 골목의 낭만을 더하는 알록달록 복고풍 네온 사인탑')},
+ neon_capy:{n:L('카피바라 네온 간판'),tab:'deco',img:'neon_capy',fp:2,fph:1,sc:1.0,cost:3400,beauty:20,star:3,neon:1,light:[[0,-0.56,[255,175,90],1.3],[0,-0.34,[85,235,255],1.2]],desc:L('유자를 얹고 온천욕을 즐기는 카피바라가 반짝이는 시그니처 네온')},
+ lantern:{n:L('석등롱'),tab:'deco',img:'lantern',fp:1,sc:0.95,cost:600,beauty:5,star:1,light:[[0,-0.55,[255,212,130],1.15]],desc:L('밤이면 은은히 빛나요')},
+ bamboo_bench:{n:L('대나무 쉼터 긴의자'),tab:'deco',img:'bamboo_bench',fp:2,fph:1,sc:0.95,cost:550,beauty:6,star:1,seat:1,desc:L('청량한 대나무를 엮어 만든 시원한 정원 긴의자')},
+ wood_bench:{n:L('원목 정원 벤치'),tab:'deco',img:'wood_bench',fp:2,fph:1,sc:0.95,cost:680,beauty:7,star:1,seat:1,desc:L('따뜻한 편백 원목으로 짠 등받이 정원 벤치')},
+ engawa_bench:{n:L('붉은 모포 다실 벤치 (코시카케)'),tab:'deco',img:'engawa_bench',fp:2,fph:1,sc:0.96,cost:880,beauty:9,star:1,seat:1,light:[[-0.28,-0.32,[255,196,110],0.75]],desc:L('붉은 모센(모포) 위에 차와 당고를 곁들인 전통 다실 긴의자')},
+ stone_bench:{n:L('이끼 정원 돌벤치'),tab:'deco',img:'stone_bench',fp:2,fph:1,sc:0.95,cost:1150,beauty:10,star:2,seat:1,desc:L('이끼가 은은하게 내려앉은 화강암 정원 돌벤치')},
+ parasol_table:{n:L('파라솔 야외 테이블 의자'),tab:'deco',img:'parasol_table',fp:2,sc:1.02,cost:1900,beauty:14,star:2,seat:1,light:[[0,-0.46,[255,212,128],0.85]],desc:L('파라솔 그늘 아래 오붓하게 쉬어가는 야외 원목 테이블과 의자 세트')},
+ rocks:{n:L('정원석'),tab:'deco',img:'rocks',fp:2,sc:0.92,cost:400,beauty:4,star:1,desc:L('이끼 낀 정원석')},
+ shishi:{set:'trad',n:L('시시오도시'),tab:'theme',img:'shishi',fp:1,sc:0.95,cost:1800,beauty:9,star:1,sound:'shishi',desc:L('딱! 대나무 소리가 정원에 울려요')},
+ nodate:{set:'trad',n:L('노다테 다과석'),tab:'theme',img:'nodate',fp:2,sc:0.95,cost:5000,price:500,cap:3,dur:14,eff:{thirst:-40,fun:20},wage:30,star:2,appeal:8,desc:L('붉은 양산 아래 말차 한 잔')},
+ pagoda:{set:'trad',n:L('석탑'),tab:'theme',img:'pagoda',fp:1,sc:1.15,cost:2400,beauty:10,star:2,light:[[0,-0.62]],desc:L('이끼 낀 오층 석탑')},
+ bamboofence:{set:'trad',n:L('대나무 울타리'),tab:'theme',img:'bamboofence',fp:2,fph:1,sc:0.95,cost:300,beauty:3,star:1,desc:L('정갈하게 엮은 대나무')},
+ cafe:{set:'modern',n:L('카페 스탠드'),tab:'theme',img:'cafe',fp:2,sc:0.95,cost:8000,price:700,cap:3,dur:9,eff:{thirst:-60,fun:12},wage:45,star:2,appeal:9,light:[[0.0,-0.45]],desc:L('갓 내린 유자 라테')},
+ lamppost:{set:'modern',n:L('모던 가로등'),tab:'theme',img:'lamppost',fp:1,sc:1.08,cost:900,beauty:4,star:2,light:[[0.28,-0.9]],desc:L('따뜻한 전구색 가로등')},
+ olive:{set:'modern',tree:1,n:L('올리브 화분'),tab:'theme',img:'olive',fp:1,sc:1.02,cost:1500,beauty:7,star:2,desc:L('은빛 잎이 바람에 살랑')},
+ lounger:{set:'modern',n:L('선베드'),tab:'theme',img:'lounger',fp:1,fph:2,sc:0.98,cost:1200,beauty:6,star:3,seat:1,desc:L('탕 옆에서 낮잠 한숨')},
+ cedar:{set:'forest',tree:1,n:L('신목 삼나무'),tab:'theme',img:'cedar',fp:2,sc:1.05,cost:3500,beauty:14,star:2,desc:L('금줄을 두른 오래된 삼나무')},
+ mushroom:{set:'forest',n:L('숲 버섯'),tab:'theme',img:'mushroom',fp:1,sc:0.92,cost:500,beauty:5,star:1,desc:L('밤이면 반딧불이 모여요')},
+ fern:{set:'forest',tree:1,n:L('고사리 덤불'),tab:'theme',img:'fern',fp:2,fph:1,sc:0.95,cost:400,beauty:4,star:1,desc:L('촉촉한 숲의 초록')},
+ birdhouse:{set:'forest',n:L('새집'),tab:'theme',img:'birdhouse',fp:1,sc:0.95,cost:800,beauty:5,star:2,desc:L('참새가 놀러 와요')},
+ snowman:{set:'season',sea:3,n:L('눈사람'),tab:'theme',img:'snowman',fp:1,sc:0.95,cost:700,beauty:5,star:2,desc:L('겨울엔 아름다움 두 배')},
+ hydrangea:{set:'season',sea:1,tree:1,n:L('수국'),tab:'theme',img:'hydrangea',fp:2,fph:1,sc:0.98,cost:900,beauty:6,star:2,desc:L('여름엔 아름다움 두 배')},
+ tsukimi:{set:'season',sea:2,n:L('달맞이 상'),tab:'theme',img:'tsukimi',fp:1,sc:0.95,cost:1100,beauty:6,star:3,desc:L('가을엔 아름다움 두 배')},
+ kadomatsu:{set:'season',sea:0,n:L('카도마츠'),tab:'theme',img:'kadomatsu',fp:1,sc:0.98,cost:1300,beauty:6,star:3,desc:L('봄(새해)엔 아름다움 두 배')},
+ banner:{photo:'banner',flutter:1,n:L('사진 노보리 깃발'),tab:'custom',img:null,ic:'🎏',fp:1,sc:1.05,cost:800,beauty:6,star:1,desc:L('내 사진으로 만든 픽셀 깃발')},
+ frame:{photo:'frame',n:L('사진 액자 이젤'),tab:'custom',img:null,ic:'🖼️',fp:1,sc:0.95,cost:1000,beauty:7,star:1,desc:L('내 사진을 픽셀 그림으로')},
+ noren:{photo:'noren',flutter:1,n:L('사진 노렌 문틀'),tab:'custom',img:null,ic:'🎐',fp:2,fph:1,sc:0.92,cost:1500,beauty:8,star:1,desc:L('바람에 살랑이는 내 사진 노렌')},
+ sign:{photo:'sign',n:L('사진 간판'),tab:'custom',img:null,ic:'🪧',fp:2,fph:1,sc:0.85,cost:1200,beauty:7,star:1,desc:L('료칸 앞 나만의 간판')},
+ gate:{n:L('대문'),img:'gate',fp:1,cost:0,star:9,walk:1,gate:1,light:[[-0.33,-0.42],[0.22,-0.3]],desc:L('손님이 드나드는 유일한 입구')},
+ path:{n:L('돌길'),tab:'deco',img:null,ic:'🪨',fp:1,cost:50,beauty:1,star:1,isPath:1,desc:L('드래그해서 칠하세요')},
+ path_wood:{n:L('나무 데크길'),tab:'deco',img:null,ic:'🪵',fp:1,cost:80,beauty:2,star:1,isPath:1,desc:L('따뜻한 나무 데크')},
+ path_gravel:{n:L('자갈길'),tab:'deco',img:null,ic:'⚪',fp:1,cost:30,beauty:1,star:1,isPath:1,desc:L('사각사각 자갈길')},
+ path_tatami:{n:L('다다미 회랑'),tab:'deco',img:null,ic:'🟩',fp:1,cost:150,beauty:3,star:2,isPath:1,desc:L('료칸 느낌의 회랑')},
+ pond:{n:L('비단잉어 연못'),tab:'deco',img:null,ic:'🐟',fp:3,cost:3000,beauty:14,star:1,flat:1,pond:1,desc:L('잉어가 헤엄치고 연잎이 떠 있어요')},
+ path_erase:{n:L('길 지우기'),tab:'deco',img:null,ic:'🧽',fp:1,cost:0,star:1,erase:1,desc:L('드래그해서 길 제거 (50% 환불)')},
 };
 // ---- 3~5★ 확장: 새 그림 없이 기존 그림 재활용 ----
 // 탕: like=바탕 탕(좌석·수면 모양 공유), tint=수면에 입히는 물빛, wfx=수면 효과 / 장식: from=원본 그림, recolor=색조 변형 방식
 Object.assign(DEF,{
- sulfur:{n:'유황천 노천탕',tab:'bath',like:'rock',img:'sulfur',wrec:{h:78,sk:0.55,sa:0.05,vk:1.05},fp:4,sc:1,cost:13000,price:1000,cap:5,dur:30,eff:{fatigue:-80,fun:16},wage:90,star:3,bath:1,water:'#cfe0a6',tint:[206,224,150],veil:0.22,appeal:16,desc:'은은한 유황 향의 연둣빛 노천탕'},
- soda:{n:'탄산 히노키탕',tab:'bath',like:'hinoki',img:'soda',wrec:{h:188,sk:0.55,sa:0,vk:1.12},fp:2,sc:1,cost:9000,price:800,cap:2,dur:24,eff:{fatigue:-65,fun:20},wage:60,star:3,bath:1,water:'#aee6ee',tint:[160,226,240],wfx:'bubble',appeal:12,desc:'톡톡 기포가 올라오는 탄산천'},
- iron:{n:'적탕 (철분천)',tab:'bath',like:'cave',img:'iron',wrec:{h:18,sk:0.9,sa:0.15,vk:0.8},fp:4,sc:1,cost:19000,price:1300,cap:5,dur:30,eff:{fatigue:-90,fun:20},wage:120,star:4,bath:1,water:'#b8673f',tint:[184,96,58],appeal:18,light:[[0,-0.5]],desc:'철분이 녹아든 붉은빛 온천'},
- petal:{n:'꽃잎탕',tab:'bath',like:'rock',img:'petal',wrec:{h:345,sk:0.55,sa:0.06,vk:1.08},fp:4,sc:1,cost:20000,price:1400,cap:5,dur:30,eff:{fatigue:-80,fun:30},wage:110,star:4,bath:1,water:'#f3c6d2',tint:[242,176,196],wfx:'petal',appeal:20,desc:'분홍 꽃잎이 둥실 떠다니는 노천탕'},
- matcha:{n:'녹차 대욕장',tab:'bath',like:'milky',img:'matcha',wrec:{h:84,sk:1,sa:0.3,vk:0.9},fp:4,sc:1,cost:26000,price:1700,cap:6,dur:30,eff:{fatigue:-90,fun:28},wage:130,star:5,bath:1,water:'#9fc27a',tint:[150,196,110],veil:0.12,appeal:22,desc:'쌉싸름한 녹차 향이 감도는 대욕장'},
- starlight:{n:'별빛 노천탕',tab:'bath',like:'fall',img:'starlight',wrec:{h:228,sk:0.85,sa:0.15,vk:0.62},fp:4,sc:1,cost:32000,price:2000,cap:6,dur:30,eff:{fatigue:-95,fun:35},wage:140,star:5,bath:1,water:'#3a4f8f',tint:[70,92,170],wfx:'star',appeal:26,desc:'밤이면 수면에 별이 반짝이는 노천탕'},
- ginkgo:{tree:1,n:'은행나무',tab:'deco',img:'ginkgo',from:'maple',recolor:'ginkgo',fp:2,sc:1.12,cost:2400,beauty:10,star:3,emit:'gleaf',desc:'노란 은행잎이 팔랑팔랑 떨어져요'},
- ume:{tree:1,n:'매화나무',tab:'deco',img:'ume',from:'sakura',recolor:'ume',fp:2,sc:1.12,cost:2400,beauty:10,star:3,emit:'ume',desc:'하얀 매화가 소담하게 피었어요'},
- wisteria_w:{n:'흰 등나무 정자',tab:'deco',img:'wisteria_w',from:'wisteria',recolor:'white',fp:2,sc:1.05,cost:7000,beauty:20,star:4,desc:'하얀 등꽃이 늘어진 정자'},
- torii_gold:{n:'금빛 토리이',tab:'deco',img:'torii_gold',from:'torii',recolor:'gold',fp:2,fph:1,sc:1.05,cost:9000,beauty:22,star:5,desc:'노을빛을 머금은 금빛 토리이'},
+ sulfur:{n:L('유황천 노천탕'),tab:'bath',like:'rock',img:'sulfur',wrec:{h:78,sk:0.55,sa:0.05,vk:1.05},fp:4,sc:1,cost:13000,price:1000,cap:5,dur:30,eff:{fatigue:-80,fun:16},wage:90,star:3,bath:1,water:'#cfe0a6',tint:[206,224,150],veil:0.22,appeal:16,desc:L('은은한 유황 향의 연둣빛 노천탕')},
+ soda:{n:L('탄산 히노키탕'),tab:'bath',like:'hinoki',img:'soda',wrec:{h:188,sk:0.55,sa:0,vk:1.12},fp:2,sc:1,cost:9000,price:800,cap:2,dur:24,eff:{fatigue:-65,fun:20},wage:60,star:3,bath:1,water:'#aee6ee',tint:[160,226,240],wfx:'bubble',appeal:12,desc:L('톡톡 기포가 올라오는 탄산천')},
+ iron:{n:L('적탕 (철분천)'),tab:'bath',like:'cave',img:'iron',wrec:{h:18,sk:0.9,sa:0.15,vk:0.8},fp:4,sc:1,cost:19000,price:1300,cap:5,dur:30,eff:{fatigue:-90,fun:20},wage:120,star:4,bath:1,water:'#b8673f',tint:[184,96,58],appeal:18,light:[[0,-0.5]],desc:L('철분이 녹아든 붉은빛 온천')},
+ petal:{n:L('꽃잎탕'),tab:'bath',like:'rock',img:'petal',wrec:{h:345,sk:0.55,sa:0.06,vk:1.08},fp:4,sc:1,cost:20000,price:1400,cap:5,dur:30,eff:{fatigue:-80,fun:30},wage:110,star:4,bath:1,water:'#f3c6d2',tint:[242,176,196],wfx:'petal',appeal:20,desc:L('분홍 꽃잎이 둥실 떠다니는 노천탕')},
+ matcha:{n:L('녹차 대욕장'),tab:'bath',like:'milky',img:'matcha',wrec:{h:84,sk:1,sa:0.3,vk:0.9},fp:4,sc:1,cost:26000,price:1700,cap:6,dur:30,eff:{fatigue:-90,fun:28},wage:130,star:5,bath:1,water:'#9fc27a',tint:[150,196,110],veil:0.12,appeal:22,desc:L('쌉싸름한 녹차 향이 감도는 대욕장')},
+ starlight:{n:L('별빛 노천탕'),tab:'bath',like:'fall',img:'starlight',wrec:{h:228,sk:0.85,sa:0.15,vk:0.62},fp:4,sc:1,cost:32000,price:2000,cap:6,dur:30,eff:{fatigue:-95,fun:35},wage:140,star:5,bath:1,water:'#3a4f8f',tint:[70,92,170],wfx:'star',appeal:26,desc:L('밤이면 수면에 별이 반짝이는 노천탕')},
+ ginkgo:{tree:1,n:L('은행나무'),tab:'deco',img:'ginkgo',from:'maple',recolor:'ginkgo',fp:2,sc:1.12,cost:2400,beauty:10,star:3,emit:'gleaf',desc:L('노란 은행잎이 팔랑팔랑 떨어져요')},
+ ume:{tree:1,n:L('매화나무'),tab:'deco',img:'ume',from:'sakura',recolor:'ume',fp:2,sc:1.12,cost:2400,beauty:10,star:3,emit:'ume',desc:L('하얀 매화가 소담하게 피었어요')},
+ wisteria_w:{n:L('흰 등나무 정자'),tab:'deco',img:'wisteria_w',from:'wisteria',recolor:'white',fp:2,sc:1.05,cost:7000,beauty:20,star:4,desc:L('하얀 등꽃이 늘어진 정자')},
+ torii_gold:{n:L('금빛 토리이'),tab:'deco',img:'torii_gold',from:'torii',recolor:'gold',fp:2,fph:1,sc:1.05,cost:9000,beauty:22,star:5,desc:L('노을빛을 머금은 금빛 토리이')},
 });
 
-const TABS=[['bath','♨️','탕'],['food','🍜','음식'],['shop','🏮','상점'],['deco','🌸','장식'],['theme','🎐','테마'],['custom','📷','사진']];
+const TABS=[['bath','♨️',L('탕')],['food','🍜',L('음식')],['shop','🏮',L('상점')],['deco','🌸',L('장식')],['theme','🎐',L('테마')],['custom','📷',L('사진')]];
 function fpOf(k,rot){const d=DEF[k];if(!d)return[1,1];const w=d.fp||1,h=d.fph||w;return(rot&1)?[h,w]:[w,h]}window.fpOf=fpOf;
-const SETS={trad:['전통','⛩️',['shishi','nodate','pagoda','bamboofence']],modern:['모던','☕',['cafe','lamppost','olive','lounger']],forest:['숲','🌲',['cedar','mushroom','fern','birdhouse']],season:['계절','🍂',['snowman','hydrangea','tsukimi','kadomatsu']]};
+const SETS={trad:[L('전통'),'⛩️',['shishi','nodate','pagoda','bamboofence']],modern:[L('모던'),'☕',['cafe','lamppost','olive','lounger']],forest:[L('숲'),'🌲',['cedar','mushroom','fern','birdhouse']],season:[L('계절'),'🍂',['snowman','hydrangea','tsukimi','kadomatsu']]};
 const setsDone=()=>Object.keys(SETS).filter(k=>SETS[k][2].every(i=>S.objs.some(o=>o.k==i)));
 const bMul=d=>d.sea!=null&&d.sea==season()?2:1;
-const TIPS={bath:'탕은 손님의 피로를 풀어주고 만족도를 높여요.',food:'배고픈 손님은 식당을 찾아가요. 가격은 시설을 눌러 조절하세요.',shop:'목마른 손님은 매점으로 향하고, 밤에는 객실에 묵어가요.',deco:'장식은 주변 분위기를 바꾸고 료칸의 아름다움을 높여요.',custom:'사진을 올리면 픽셀 아트로 변환해 나만의 장식을 만들어요.',theme:'같은 테마 4종을 모두 배치하면 세트 보너스(평판 점수 +15)를 받아요.'};
-const SEASONS=['봄','여름','가을','겨울'],SEMO=['🌸','🌻','🍁','❄️'],STEMP=[16,27,14,-1];
-const NEEDK=['fatigue','hunger','thirst','fun'],NEEDN={fatigue:'피로',hunger:'배고픔',thirst:'목마름',fun:'재미'};
+const TIPS={bath:L('탕은 손님의 피로를 풀어주고 만족도를 높여요.'),food:L('배고픈 손님은 식당을 찾아가요. 가격은 시설을 눌러 조절하세요.'),shop:L('목마른 손님은 매점으로 향하고, 밤에는 객실에 묵어가요.'),deco:L('장식은 주변 분위기를 바꾸고 료칸의 아름다움을 높여요.'),custom:L('사진을 올리면 픽셀 아트로 변환해 나만의 장식을 만들어요.'),theme:L('같은 테마 4종을 모두 배치하면 세트 보너스(평판 점수 +15)를 받아요.')};
+const SEASONS=[L('봄'),L('여름'),L('가을'),L('겨울')],SEMO=['🌸','🌻','🍁','❄️'],STEMP=[16,27,14,-1];
+const NEEDK=['fatigue','hunger','thirst','fun'],NEEDN={fatigue:L('피로'),hunger:L('배고픔'),thirst:L('목마름'),fun:L('재미')};
 // ===== 상태 =====
 let S;let paused=false;
 const SLOT=(()=>{const n=+localStorage.onsenSlot||1;return n>=1&&n<=3?n:1})();const SKEY=SLOT==1?'onsen2':'onsen2_s'+SLOT;
@@ -118,7 +118,7 @@ function fresh(){
  const plots={};plots[START_PLOT.join(',')]=1;
  const o=[];const b=(k,x,y)=>o.push({k,x,y,lv:1,price:DEF[k].price||0,uses:0,earn:0});
  b('rock',22,21);b('lantern',21,26);b('sakura',26,22);b('maple',18,22);b('rocks',20,21);b('lantern',25,26);for(let j=25;j<32;j++)b('path',24,j);for(let i=19;i<30;i++)if(i!=24)b('path',i,28);
- return {layout:16,ryokanName:"유자향 카피바라 료칸",yen:8000,min:8*60+40,plots,objs:o,fin:{inc:0,exp:0,hist:[]},rep:55,t:Date.now(),served:0,ver:2};
+ return {layout:16,ryokanName:L("유자향 카피바라 료칸"),yen:8000,min:8*60+40,plots,objs:o,fin:{inc:0,exp:0,hist:[]},rep:55,t:Date.now(),served:0,ver:2};
 }
 window.fresh=fresh;
 window.applyState=function(newS,ro){
@@ -139,29 +139,29 @@ window.applyState=function(newS,ro){
 };
 function load(){
  if(window.VISIT_SAVE){S=window.VISIT_SAVE;window.READONLY=true;return}
- try{const raw=localStorage[SKEY];let d=null;try{d=JSON.parse(raw||'null')}catch(e){localStorage[SKEY+'_corrupt']=raw;setTimeout(()=>toast('저장 파일이 손상되어 백업 후 새로 시작했어요'),1500)}
+ try{const raw=localStorage[SKEY];let d=null;try{d=JSON.parse(raw||'null')}catch(e){localStorage[SKEY+'_corrupt']=raw;setTimeout(()=>toast(L('저장 파일이 손상되어 백업 후 새로 시작했어요')),1500)}
   if(d&&d.ver==2&&Array.isArray(d.objs)&&d.plots){S=d;d.objs=d.objs.filter(o=>o&&DEF[o.k]);if(!isFinite(S.yen))S.yen=0;
    const off=Math.min((Date.now()-d.t)/1000,8*3600);
    const hr=avgNet();const g=Math.floor(Math.max(0,hr)*(off/3600)*0.5);
-   if(off>60&&g>0){S.yen+=g;setTimeout(()=>toast(`쉬는 동안 ${fmt(g)}엔 벌었어요! (${Math.floor(off/60)}분)`),800)}
+   if(off>60&&g>0){S.yen+=g;setTimeout(()=>toast(L`쉬는 동안 ${fmt(g)}엔 벌었어요! (${Math.floor(off/60)}분)`),800)}
    return}}catch(e){}
  S=fresh();
 }
 // 탭을 숨겨둔 동안: 화면 갱신이 멈춰 게임이 정지하므로, 돌아오면 껐다 켰을 때와 같은 방식(평균 순이익의 50%, 최대 8시간)으로 정산
 let _hidAt=0;document.addEventListener('visibilitychange',()=>{if(window.READONLY||!S)return;if(document.hidden){_hidAt=Date.now();return}if(!_hidAt)return;
  const off=Math.min((Date.now()-_hidAt)/1000,8*3600);_hidAt=0;const g=Math.floor(Math.max(0,avgNet())*(off/3600)*0.5);
- if(off>60&&g>0){S.yen+=g;toast(`쉬는 동안 ${fmt(g)}엔 벌었어요! (${Math.floor(off/60)}분)`);save()}});
+ if(off>60&&g>0){S.yen+=g;toast(L`쉬는 동안 ${fmt(g)}엔 벌었어요! (${Math.floor(off/60)}분)`);save()}});
 function migrateLayout(){if(S.layout==16)return;const old=Object.keys(S.plots).length-1;let ref=0;
  for(const k in S.plots)if(k!='1,1')ref+=12000;S.plots={'1,1':1};S.yen+=ref;
- for(const o of S.objs){o.x=o.x-8+20;o.y=o.y-8+20}S.layout=16;if(ref)setTimeout(()=>toast(`구역이 16×16으로 커졌어요! 추가 구역 비용 ¥${fmt(ref)} 환불`),2000)}
+ for(const o of S.objs){o.x=o.x-8+20;o.y=o.y-8+20}S.layout=16;if(ref)setTimeout(()=>toast(L`구역이 16×16으로 커졌어요! 추가 구역 비용 ¥${fmt(ref)} 환불`),2000)}
 function migrate(){for(const o of S.objs)o.rot=(o.rot|0)&1; // 겹치거나 잠긴 땅의 건물 → 재배치 또는 환불
  const keep=[],m={};let moved=0,refund=0;const fits=(o,x,y)=>{const[fw,fh]=fpOf(o.k,o.rot);for(let i=0;i<fw;i++)for(let j=0;j<fh;j++){if(!tileOpen(x+i,y+j)||m[(x+i)+','+(y+j)])return false}return true};
  const sorted=S.objs.filter(o=>DEF[o.k]).sort((a,b)=>(DEF[b.k].bath?1:0)-(DEF[a.k].bath?1:0)||(DEF[b.k].fp*(DEF[b.k].fph||DEF[b.k].fp))-(DEF[a.k].fp*(DEF[a.k].fph||DEF[a.k].fp)));
  for(const o of sorted){if(o.k=='gate'){keep.push(o);for(const[x,y]of tilesOf(o))m[x+','+y]=1;continue}let ok=fits(o,o.x,o.y);if(!ok&&!DEF[o.k].isPath){let best=null;for(let r=1;r<10&&!best;r++)for(let dx=-r;dx<=r&&!best;dx++)for(let dy=-r;dy<=r;dy++)if(fits(o,o.x+dx,o.y+dy)){best=[o.x+dx,o.y+dy];break}
    if(best){o.x=best[0];o.y=best[1];ok=true;moved++}}
   if(ok){const[fw,fh]=fpOf(o.k,o.rot);for(let i=0;i<fw;i++)for(let j=0;j<fh;j++)m[(o.x+i)+','+(o.y+j)]=1;keep.push(o)}else{refund+=DEF[o.k].cost;S.yen+=DEF[o.k].cost}}
- S.objs=keep;if((moved||refund)&&!window.READONLY)setTimeout(()=>toast(`겹친 건물 정리: ${moved}개 이동${refund?`, ¥${fmt(refund)} 환불`:''}`),1200)}
-function save(){if(window.READONLY||!S)return;S.t=Date.now();try{localStorage[SKEY]=JSON.stringify(S);window.SAVE&&SAVE.mirror(S)}catch(e){if(!save._w){save._w=1;toast('저장 공간이 부족해요 (사진 장식을 줄여보세요)')}}}
+ S.objs=keep;if((moved||refund)&&!window.READONLY)setTimeout(()=>toast(L`겹친 건물 정리: ${moved}개 이동${refund?L`, ¥${fmt(refund)} 환불`:''}`),1200)}
+function save(){if(window.READONLY||!S)return;S.t=Date.now();try{localStorage[SKEY]=JSON.stringify(S);window.SAVE&&SAVE.mirror(S)}catch(e){if(!save._w){save._w=1;toast(L('저장 공간이 부족해요 (사진 장식을 줄여보세요)'))}}}
 const fmt=n=>Math.floor(n).toLocaleString('ko-KR');
 function avgNet(){const h=S.fin.hist;if(!h.length)return 0;const a=h.slice(-24);return a.reduce((s,x)=>s+x,0)/a.length}
 // ===== 에셋 =====
@@ -357,19 +357,19 @@ function ensureGate(){if(gateObj())return;OCC=occ();let sp=null,bd=1e9;for(let x
  if(!sp)return;placeGate(sp);const gi=gateInfo(),b=S.objs.find(o=>DEF[o.k].bath);OCC=occ();if(b){const d=doorTile(b);const p=d&&findPath(gi.m[0],gi.m[1],d[0],d[1]);if(p)for(const[px,py]of p){const x=px|0,y=py|0;if(!OCC[x+','+y])S.objs.push({k:'path',x,y,lv:1,price:0,uses:0,earn:0})}}OCC=occ();groundDirty=true}
 function placeGate(sp){const t=gTiles(sp.x,sp.y,sp.dir);const set=new Set(t.map(p=>p.join(',')));S.objs=S.objs.filter(o=>!(DEF[o.k].isPath&&set.has(o.x+','+o.y)));let g=gateObj();if(!g){g={k:'gate',lv:1,price:0,uses:0,earn:0};S.objs.push(g)}g.x=sp.x;g.y=sp.y;g.dir=sp.dir}
 let OCC={};let ROT=0,lastMouse=null;function syncGhostHover(){if(!ghost||!lastMouse)return;const[a,b]=toTile(lastMouse[0],lastMouse[1]),[gfw,gfh]=fpOf(ghost,moving?moving.rot:ROT);hoverT=[Math.floor(a-(gfw/2-0.5)),Math.floor(b-(gfh/2-0.5))]}
-function rotateObj(o){if(!o||o.k=="gate"||DEF[o.k].isPath)return false;const old=(o.rot|0)&1,ox=o.x,oy=o.y;try{const next=old^1,[fw0,fh0]=fpOf(o.k,old),[fw1,fh1]=fpOf(o.k,next);const wasReach=(fw0!==fh0&&!moving&&DEF[o.k].price)?window.__dbg.reachOK():false;o.rot=next;if(fw0!==fh0&&!moving){const prevM=moving;moving=o;OCC=occ();const cx0=ox+fw0/2,cy0=oy+fh0/2,cands=[];for(let dx=-2;dx<=2;dx++)for(let dy=-2;dy<=2;dy++)cands.push([dx,dy,Math.hypot((ox+dx+fw1/2)-cx0,(oy+dy+fh1/2)-cy0)]);cands.sort((a,b)=>a[2]-b[2]);let placed=false;for(const[dx,dy]of cands)if(canPlace(o.k,ox+dx,oy+dy,next)){o.x=ox+dx;o.y=oy+dy;placed=true;break}moving=prevM;if(!placed){o.rot=old;o.x=ox;o.y=oy;OCC=occ();toast("회전할 공간이 부족해요");return false}clearPaths(o.k,o.x,o.y,next)}OCC=occ();if(wasReach&&!window.__dbg.reachOK()){o.rot=old;o.x=ox;o.y=oy;OCC=occ();toast("그 방향으론 손님이 들어갈 수 없어요");return false}groundDirty=true;guests.forEach(g=>{if(g.cur===o&&g.inBath){const[a,b]=bathSlot(o,g.slot||0);g.x=a;g.y=b}if(g.target===o&&g.st=="walk"){g.target=null;g.path=[]}});if(window.SND&&SND.click)SND.click();if(INFO_O===o)showInfo(o);save();return true}catch(e){console.warn("rotate failed",e);o.rot=old;o.x=ox;o.y=oy;try{OCC=occ()}catch(_){}groundDirty=true;toast("회전하지 못했어요");return false}}
+function rotateObj(o){if(!o||o.k=="gate"||DEF[o.k].isPath)return false;const old=(o.rot|0)&1,ox=o.x,oy=o.y;try{const next=old^1,[fw0,fh0]=fpOf(o.k,old),[fw1,fh1]=fpOf(o.k,next);const wasReach=(fw0!==fh0&&!moving&&DEF[o.k].price)?window.__dbg.reachOK():false;o.rot=next;if(fw0!==fh0&&!moving){const prevM=moving;moving=o;OCC=occ();const cx0=ox+fw0/2,cy0=oy+fh0/2,cands=[];for(let dx=-2;dx<=2;dx++)for(let dy=-2;dy<=2;dy++)cands.push([dx,dy,Math.hypot((ox+dx+fw1/2)-cx0,(oy+dy+fh1/2)-cy0)]);cands.sort((a,b)=>a[2]-b[2]);let placed=false;for(const[dx,dy]of cands)if(canPlace(o.k,ox+dx,oy+dy,next)){o.x=ox+dx;o.y=oy+dy;placed=true;break}moving=prevM;if(!placed){o.rot=old;o.x=ox;o.y=oy;OCC=occ();toast(L("회전할 공간이 부족해요"));return false}clearPaths(o.k,o.x,o.y,next)}OCC=occ();if(wasReach&&!window.__dbg.reachOK()){o.rot=old;o.x=ox;o.y=oy;OCC=occ();toast(L("그 방향으론 손님이 들어갈 수 없어요"));return false}groundDirty=true;guests.forEach(g=>{if(g.cur===o&&g.inBath){const[a,b]=bathSlot(o,g.slot||0);g.x=a;g.y=b}if(g.target===o&&g.st=="walk"){g.target=null;g.path=[]}});if(window.SND&&SND.click)SND.click();if(INFO_O===o)showInfo(o);save();return true}catch(e){console.warn("rotate failed",e);o.rot=old;o.x=ox;o.y=oy;try{OCC=occ()}catch(_){}groundDirty=true;toast(L("회전하지 못했어요"));return false}}
 window.rotateObj=rotateObj;
 function rotateGate(){const g=gateObj();if(!g)return;const cur=gateOut(g.x,g.y,g.dir);const key=d=>d[0]+','+d[1];const order=['0,1','1,0','0,-1','-1,0'];const gm=gTiles(g.x,g.y,g.dir)[1];const save_=[g.x,g.y,g.dir];const wasReach=window.__dbg.reachOK();
  S.objs.splice(S.objs.indexOf(g),1);OCC=occ();let best=null;
  for(let step=1;step<=4&&!best;step++){const want=order[(order.indexOf(key(cur))+step)%4];let bd=1e9;for(let x=0;x<N;x++)for(let y=0;y<N;y++)for(const dir of['x','y']){if(!gateValid(x,y,dir))continue;const o_=gateOut(x,y,dir);if(key(o_)!==want)continue;const m=gTiles(x,y,dir)[1];const dd=Math.hypot(m[0]-gm[0],m[1]-gm[1]);if(dd<bd){bd=dd;best={x,y,dir}}}}
- S.objs.push(g);if(!best){OCC=occ();toast('돌릴 수 있는 다른 가장자리가 없어요');return}
- placeGate(best);OCC=occ();if(wasReach&&!window.__dbg.reachOK()){placeGate({x:save_[0],y:save_[1],dir:save_[2]});OCC=occ();toast('그쪽으로는 길이 이어지지 않아요');return}
+ S.objs.push(g);if(!best){OCC=occ();toast(L('돌릴 수 있는 다른 가장자리가 없어요'));return}
+ placeGate(best);OCC=occ();if(wasReach&&!window.__dbg.reachOK()){placeGate({x:save_[0],y:save_[1],dir:save_[2]});OCC=occ();toast(L('그쪽으로는 길이 이어지지 않아요'));return}
  groundDirty=true;guests.forEach(q=>{if(q.st=='walk'){q.target=null;q.path=[]}});if(window.SND&&SND.click)SND.click();save();if(INFO_O===g)requestAnimationFrame(popPlace)}
 window.rotateGate=rotateGate;setTimeout(()=>{const gb=document.getElementById('ghRot');if(gb){gb.onclick=e=>{e.stopPropagation();ROT^=1;syncGhostHover();if(window.SND&&SND.click)SND.click();gb.blur()};setInterval(()=>{gb.style.display=(ghost&&ghost!='gate'&&DEF[ghost]&&!DEF[ghost].isPath&&!DEF[ghost].erase&&!moving)?'block':'none'},200)}const b=document.getElementById('mvRot');if(b)b.onclick=e=>{e.stopPropagation();if(moving)moving.k=='gate'?rotateGate():rotateObj(moving);syncGhostHover();b.blur()}},0);let moving=null,infoT=null;
 function startMove(o){if(window.READONLY)return;clearTimeout(infoT);if(moving)cancelMove();hideInfo();mode=null;
  guests.forEach(g=>{if(g.cur===o)finish(g);if(g.target===o){g.target=null;g.path=[]}});
- moving=o;o._from=[o.x,o.y,o.dir,o.rot|0];ghost=o.k;OCC=occ();groundDirty=true;$('moveBar').style.display='flex';toast(document.body.classList.contains('phone')?'놓을 곳을 눌러주세요':'놓을 곳을 눌러주세요 · R키로 회전 (Esc·우클릭 취소)')}
-function dropMove(x,y){const o=moving;if(o.k=='gate'){const sp=gateSpot(x,y);if(!sp){toast('대문은 열린 땅의 가장자리에만 놓을 수 있어요');return}endMove();placeGate(sp);OCC=occ();groundDirty=true;guests.forEach(g=>{if(g.st=='walk'){g.target=null;g.path=[]}});save();return}if(!canPlace(o.k,x,y,o.rot)){toast('여기엔 놓을 수 없어요');return}clearPaths(o.k,x,y,o.rot);o.x=x;o.y=y;endMove();anims['o'+S.objs.indexOf(o)]={t:0};
+ moving=o;o._from=[o.x,o.y,o.dir,o.rot|0];ghost=o.k;OCC=occ();groundDirty=true;$('moveBar').style.display='flex';toast(document.body.classList.contains('phone')?L('놓을 곳을 눌러주세요'):L('놓을 곳을 눌러주세요 · R키로 회전 (Esc·우클릭 취소)'))}
+function dropMove(x,y){const o=moving;if(o.k=='gate'){const sp=gateSpot(x,y);if(!sp){toast(L('대문은 열린 땅의 가장자리에만 놓을 수 있어요'));return}endMove();placeGate(sp);OCC=occ();groundDirty=true;guests.forEach(g=>{if(g.st=='walk'){g.target=null;g.path=[]}});save();return}if(!canPlace(o.k,x,y,o.rot)){toast(L('여기엔 놓을 수 없어요'));return}clearPaths(o.k,x,y,o.rot);o.x=x;o.y=y;endMove();anims['o'+S.objs.indexOf(o)]={t:0};
  const[fw,fh]=fpOf(o.k,o.rot);for(let i=0;i<8;i++)parts.push({k:'steam',x:x+fw/2+(Math.random()-0.5)*fw,y:y+fh/2,h:0,vx:0,l:1,L:1,s:2});save()}
 function cancelMove(){if(!moving)return;moving.x=moving._from[0];moving.y=moving._from[1];if(moving._from[2])moving.dir=moving._from[2];if(moving._from[3]!==undefined)moving.rot=moving._from[3];endMove()}
 function endMove(){if(moving)delete moving._from;moving=null;ghost=null;OCC=occ();groundDirty=true;$('moveBar').style.display='none';guests.forEach(g=>{if(g.st=='walk'&&g.target){const t=g.target;g.target=null;g.path=[]}});buildCards()}
@@ -395,10 +395,10 @@ function sunVec(){const h=hour();const t=(h-6)/12;const el=Math.max(0.12,Math.si
 // ===== 손님 =====
 let guests=[],parts=[],floats=[],bubbles=[];
 const THOUGHT={
- good:['물이 정말 좋아~','몸이 사르르 녹아요','유자 향이 좋네','여기 최고예요!','벚꽃이 예뻐요','또 올게요~'],
- pricey:['너무 비싸요…','가격이 좀…','지갑이 울어요'],
- none:{fatigue:'쉴 곳이 없네…',hunger:'뭐 먹을 데 없나…',thirst:'목말라요…',fun:'좀 심심하다'},
- want:{fatigue:'온천 하고 싶다',hunger:'배고파요',thirst:'우유 마시고 싶다',fun:'구경하고 싶어요'}};
+ good:[L('물이 정말 좋아~'),L('몸이 사르르 녹아요'),L('유자 향이 좋네'),L('여기 최고예요!'),L('벚꽃이 예뻐요'),L('또 올게요~')],
+ pricey:[L('너무 비싸요…'),L('가격이 좀…'),L('지갑이 울어요')],
+ none:{fatigue:L('쉴 곳이 없네…'),hunger:L('뭐 먹을 데 없나…'),thirst:L('목말라요…'),fun:L('좀 심심하다')},
+ want:{fatigue:L('온천 하고 싶다'),hunger:L('배고파요'),thirst:L('우유 마시고 싶다'),fun:L('구경하고 싶어요')}};
 function entrance(){const s=START_PLOT;return[s[0]*PS+PS/2,s[1]*PS+PS]}
 function wageNow(h){const nt=(h%24)>=23||(h%24)<6;return Math.round(S.objs.reduce((s,o)=>{const d=DEF[o.k];if(!d.wage)return s;const w=d.wage*(1+0.5*(o.lv-1))*(0.35+0.65*Math.min(1,(o.hu||0)/2));o.hu=0;return s+(nt&&!d.stay&&!d.night?w*0.3:w)},0)+S.objs.filter(o=>!DEF[o.k].isPath&&!DEF[o.k].wage).length*4)}
 function capTotal(){return S.objs.reduce((a,o)=>{const d=DEF[o.k];return a+(d.cap&&!d.stay?capOf(o):0)},0)}
@@ -429,7 +429,7 @@ function pickBy(g,list,nk){const sc=new Map(),kinds=g.kinds||(g.kinds=new Set())
 const ctr=o=>{const[fw,fh]=fpOf(o.k,o.rot);return[o.x+fw/2,o.y+fh/2]};
 const dist=(g,o)=>{const[a,b]=ctr(o);return Math.hypot(a-g.x,b-g.y)};
 // 말풍선: 화면 안 손님만, 불만은 동시에 1개까지, 탭(force)한 손님은 항상 표시
-const NEG=new Set([...Object.values(THOUGHT.none),...THOUGHT.pricey,'자리가 없네…','길이 막혔어요…']);
+const NEG=new Set([...Object.values(THOUGHT.none),...THOUGHT.pricey,L('자리가 없네…'),L('길이 막혔어요…')]);
 function onScr(g){const[X,Y]=toScreenT(g.x,g.y);return X>-60&&X<VW+60&&Y>-90&&Y<VH+40}
 function think(g,t,force){if(!t)return;(window.__thinks=window.__thinks||{})[t]=(window.__thinks[t]||0)+1;if(window.__norender&&!force)return;bubbles=bubbles.filter(b=>b.g!==g);
  if(!force&&!onScr(g))return;const neg=NEG.has(t);if(neg&&!force&&bubbles.some(b=>b.neg))return;
@@ -496,30 +496,30 @@ function updGuest(g,dt){
 // 산책·감상: 급한 욕구가 없을 때 아직 안 본 장식(벚꽃·석등·연못·도리이 등)을 찾아가 잠시 바라봄 → 기분↑, 재미 욕구↓
 // 구경 말풍선: 장식 종류별 대사, 같은 종류가 주변(반경 6칸)에 3개 이상이면 '가득' 대사, 등불은 밤·낮을 나눔
 const LOOKS=[
- [/^maple/,{one:['단풍이 참 곱네요','빨갛게 물들었어요'],many:['단풍이 정말 가득해요','단풍길이 너무 예뻐요','온통 붉게 물들었네요']}],
- [/^ginkgo/,{one:['은행잎이 노랗게 물들었어요','황금빛 나무네요'],many:['노란 은행잎 길이에요','온통 황금빛이네요']}],
- [/^ume/,{one:['매화 향이 은은해요','하얀 꽃이 피었네요'],many:['매화밭이 고와요']}],
- [/^torii_gold/,{one:['금빛 토리이가 반짝여요','왠지 복이 올 것 같아요']}],
- [/^sakura/,{one:['벚꽃이 참 예뻐요','꽃잎이 흩날려요'],many:['벚꽃 터널 같아요','온통 벚꽃이네요']}],
- [/^(pine|cedar)/,{one:['솔향이 좋아요','나무가 늠름하네요'],many:['숲속에 온 것 같아요','나무 그늘이 시원해요']}],
- [/^(bamboo|bamboofence)/,{one:['대나무 소리가 좋아요','사각사각 소리가 나요'],many:['대나무 숲길이네요']}],
- [/^wisteria_w/,{one:['하얀 등꽃이 늘어졌어요','눈처럼 하얀 꽃이네요']}],
- [/^wisteria/,{one:['등나무 꽃이 늘어졌어요','보랏빛이 예뻐요']}],
- [/^(hydrangea|iris|olive|fern|tsukimi)/,{one:['꽃 색이 고와요','싱그럽네요'],many:['꽃밭이 예뻐요']}],
- [/^mushroom/,{one:['버섯이 귀여워요']}],
- [/^birdhouse/,{one:['새가 살고 있을까?']}],
- [/^(lantern|andon|takeakari|chochin|kagaribi|lanternpath|lamppost)/,{one:['석등이 운치 있네요','등이 예쁘네요'],night:['불빛이 따뜻해요','은은하니 좋네요'],many:['등불이 이어져 있어요']}],
- [/^floating/,{one:['물 위에 등이 떠 있어요'],night:['유등이 반짝여요']}],
- [/^neon/,{one:['간판이 레트로하네요'],night:['네온이 반짝반짝해요']}],
- [/^(pond)/,{one:['잉어가 헤엄쳐요','물소리가 좋아요']}],
- [/^bridge/,{one:['다리가 참 예쁘네요']}],[/^waterwheel/,{one:['물레방아가 돌아가요']}],[/^shishi/,{one:['딱— 소리가 좋아요']}],
- [/^sandgarden/,{one:['모래 무늬가 차분해요']}],[/^tanuki/,{one:['너구리 상이 귀여워요']}],
- [/^(torii|jizo|ema|pagoda)/,{one:['마음이 편안해져요','소원을 빌어볼까']}],
- [/^rocks/,{one:['이끼가 예쁘게 앉았어요','고즈넉하네요']}],
- [/(bench|parasol|lounger|nodate|cafe)/,{one:['잠깐 쉬어갈까','여기 앉으면 좋겠다']}]];
+ [/^maple/,{one:[L('단풍이 참 곱네요'),L('빨갛게 물들었어요')],many:[L('단풍이 정말 가득해요'),L('단풍길이 너무 예뻐요'),L('온통 붉게 물들었네요')]}],
+ [/^ginkgo/,{one:[L('은행잎이 노랗게 물들었어요'),L('황금빛 나무네요')],many:[L('노란 은행잎 길이에요'),L('온통 황금빛이네요')]}],
+ [/^ume/,{one:[L('매화 향이 은은해요'),L('하얀 꽃이 피었네요')],many:[L('매화밭이 고와요')]}],
+ [/^torii_gold/,{one:[L('금빛 토리이가 반짝여요'),L('왠지 복이 올 것 같아요')]}],
+ [/^sakura/,{one:[L('벚꽃이 참 예뻐요'),L('꽃잎이 흩날려요')],many:[L('벚꽃 터널 같아요'),L('온통 벚꽃이네요')]}],
+ [/^(pine|cedar)/,{one:[L('솔향이 좋아요'),L('나무가 늠름하네요')],many:[L('숲속에 온 것 같아요'),L('나무 그늘이 시원해요')]}],
+ [/^(bamboo|bamboofence)/,{one:[L('대나무 소리가 좋아요'),L('사각사각 소리가 나요')],many:[L('대나무 숲길이네요')]}],
+ [/^wisteria_w/,{one:[L('하얀 등꽃이 늘어졌어요'),L('눈처럼 하얀 꽃이네요')]}],
+ [/^wisteria/,{one:[L('등나무 꽃이 늘어졌어요'),L('보랏빛이 예뻐요')]}],
+ [/^(hydrangea|iris|olive|fern|tsukimi)/,{one:[L('꽃 색이 고와요'),L('싱그럽네요')],many:[L('꽃밭이 예뻐요')]}],
+ [/^mushroom/,{one:[L('버섯이 귀여워요')]}],
+ [/^birdhouse/,{one:[L('새가 살고 있을까?')]}],
+ [/^(lantern|andon|takeakari|chochin|kagaribi|lanternpath|lamppost)/,{one:[L('석등이 운치 있네요'),L('등이 예쁘네요')],night:[L('불빛이 따뜻해요'),L('은은하니 좋네요')],many:[L('등불이 이어져 있어요')]}],
+ [/^floating/,{one:[L('물 위에 등이 떠 있어요')],night:[L('유등이 반짝여요')]}],
+ [/^neon/,{one:[L('간판이 레트로하네요')],night:[L('네온이 반짝반짝해요')]}],
+ [/^(pond)/,{one:[L('잉어가 헤엄쳐요'),L('물소리가 좋아요')]}],
+ [/^bridge/,{one:[L('다리가 참 예쁘네요')]}],[/^waterwheel/,{one:[L('물레방아가 돌아가요')]}],[/^shishi/,{one:[L('딱— 소리가 좋아요')]}],
+ [/^sandgarden/,{one:[L('모래 무늬가 차분해요')]}],[/^tanuki/,{one:[L('너구리 상이 귀여워요')]}],
+ [/^(torii|jizo|ema|pagoda)/,{one:[L('마음이 편안해져요'),L('소원을 빌어볼까')]}],
+ [/^rocks/,{one:[L('이끼가 예쁘게 앉았어요'),L('고즈넉하네요')]}],
+ [/(bench|parasol|lounger|nodate|cafe)/,{one:[L('잠깐 쉬어갈까'),L('여기 앉으면 좋겠다')]}]];
 function lookLine(o){const k=o.k,pick=a=>a[Math.random()*a.length|0];for(const[re,L]of LOOKS){if(!re.test(k))continue;
   if(L.many){const[cx_,cy_]=ctr(o);let n=0;for(const q of S.objs)if(q.k.replace(/_.*$/,'')==k.replace(/_.*$/,'')&&Math.hypot(ctr(q)[0]-cx_,ctr(q)[1]-cy_)<6)n++;if(n>=3&&Math.random()<0.65)return pick(L.many)}
-  if(L.night&&light().night>0.5)return pick(L.night);return pick(L.one)}return '정말 예쁘다~'}
+  if(L.night&&light().night>0.5)return pick(L.night);return pick(L.one)}return L('정말 예쁘다~')}
 function stroll(g){if((g.strolls||0)>=3||g.leaving)return false;const seen=g.seen||(g.seen=new Set()),c=[];
  for(const o of S.objs){const d=DEF[o.k];if(!d||!(d.beauty>0)||d.isPath||seen.has(o)||o===moving)continue;c.push([dist(g,o)+Math.random()*5-Math.min(8,d.beauty*0.25),o])}
  if(!c.length)return false;c.sort((a,b)=>a[0]-b[0]);const pick=c[Math.random()*Math.min(4,c.length)|0][1];seen.add(pick);
@@ -533,12 +533,12 @@ function decide(g){
  if(o&&Math.random()<0.3&&stroll(g))return;
  if(!o){if(Math.random()<0.75&&stroll(g))return;if(NEEDK.every(k=>g.need[k]<35)||Math.random()<0.4){leave(g);return}
   for(let i=0;i<3;i++){const x=(g.x|0)+((Math.random()*9)|0)-4,y=(g.y|0)+((Math.random()*9)|0)-4;if(walkable(x,y)&&goTo(g,x,y))return}leave(g);return}
- const pp=pathToObj(g,o);if(pp)g.path=pp;if(!pp){if(!g.blocked)g.blocked=new Set();if(!g.blocked.size){think(g,'길이 막혔어요…');g.happy-=4}voice(g,'path',o);g.blocked.add(o);g.path=[];return}g.target=o;}
+ const pp=pathToObj(g,o);if(pp)g.path=pp;if(!pp){if(!g.blocked)g.blocked=new Set();if(!g.blocked.size){think(g,L('길이 막혔어요…'));g.happy-=4}voice(g,'path',o);g.blocked.add(o);g.path=[];return}g.target=o;}
 function arrive(g){g.ax=g.x;g.ay=g.y;const o=g.target;if(!o||!DEF[o.k]){g.target=null;g.st='walk';if(_pb-->0)decide(g);return}const d=DEF[o.k];g.target=null;o.users=o.users||0;
  if(!S.objs.includes(o)){decide(g);return}
- const cap=capOf(o);if(o.users>=cap){if(!g.waited){g.waited=1;(window.__thinks=window.__thinks||{})['자리가 날 때까지 기다릴게요']=(window.__thinks['자리가 날 때까지 기다릴게요']||0)+1;voice(g,'full',o);g.st='wait';g.t=5;g.target=o;const w=waitSpot(g,o);g.wx=w[0];g.wy=w[1];return}g.waited=0;think(g,'자리가 없네…');voice(g,'full',o);g.happy-=3;(g.used=g.used||[]).push(o);return}
+ const cap=capOf(o);if(o.users>=cap){if(!g.waited){g.waited=1;(window.__thinks=window.__thinks||{})[L('자리가 날 때까지 기다릴게요')]=(window.__thinks[L('자리가 날 때까지 기다릴게요')]||0)+1;voice(g,'full',o);g.st='wait';g.t=5;g.target=o;const w=waitSpot(g,o);g.wx=w[0];g.wy=w[1];return}g.waited=0;think(g,L('자리가 없네…'));voice(g,'full',o);g.happy-=3;(g.used=g.used||[]).push(o);return}
  const fair=fairPrice(o)*(0.8+g.happy/150);
- if(o.price>g.budget){think(g,'다음에 또 올게요');leave(g);return}
+ if(o.price>g.budget){think(g,L('다음에 또 올게요'));leave(g);return}
  g.budget-=o.price;S.yen+=o.price;S.fin.inc+=o.price;o.earn=(o.earn||0)+o.price;o.uses=(o.uses||0)+1;o.hu=(o.hu||0)+1;S.served++;BUS.emit('pay',o,g,o.price);
  const[sx,sy]=toScreenT(...ctr(o));floats.push({x:ctr(o)[0],y:ctr(o)[1],t:'+¥'+fmt(o.price),l:1.6});
  o.users++;g.cur=o;g.st='use';g.t=d.stay?Math.max(30,((30-hour()+24)%24+7)*60/120):d.dur*(1+o.lv*0.1)*(TUNE.dur||1);(g.kinds||(g.kinds=new Set())).add(o.k);
@@ -553,7 +553,7 @@ function freeSlot(o){const used=guests.filter(x=>x.cur===o&&x.inBath).map(x=>x.s
 function finish(g){const o=g.cur;if(g.ax!=null){g.x=g.ax;g.y=g.ay}if(o)o.users=Math.max(0,o.users-1);(g.used=g.used||[]).push(o);if(g.used.length>3)g.used.shift();
  g.cur=null;g.hide=false;const[a,b]=door(o);g.x=a;g.y=b;g.inBath=false;g.st='walk';g.tx=g.x;g.ty=g.y;g.path=[]}
 function leave(g){if(!g.leaving)BUS.emit('leave',g);g.leaving=true;g.target=null;g.view=null;if(g.st=='look')g.st='walk';const gi=gateInfo();if(!gi){g.dead=1;return}const[mx,my]=gi.m,[ox,oy]=gi.o;if(!goTo(g,mx,my))g.path=[[mx+0.5,my+0.5]];g.path.push([mx+0.5+ox*1.5,my+0.5+oy*1.5],[mx+0.5+ox*4,my+0.5+oy*4]);
- S.rep=S.rep*0.97+g.happy*0.03;if(g.happy>70&&Math.random()<0.5)think(g,'또 올게요~');}
+ S.rep=S.rep*0.97+g.happy*0.03;if(g.happy>70&&Math.random()<0.5)think(g,L('또 올게요~'));}
 const toScreenT=(x,y)=>{const[a,b]=iso(x,y);return toScreen(a,b)};
 let SHK=0,SHKo=[0,0];
 function stepBuild(dt){cam.x-=SHKo[0];cam.y-=SHKo[1];SHKo=[0,0];
@@ -868,13 +868,13 @@ function drawText(t,lt){ // 고해상도 텍스트 레이어
  for(const s of (document.body.classList.contains('zen')||window.READONLY)?[]:window._signs||[]){const[X,Y]=toScreen(s.X,s.Y);const fs=Math.max(9,Math.min(15,3.2*cam.z));tx.font=`700 ${fs}px Pretendard`;const t_='¥'+fmt(s.price);const isz=fs>12?32:16;const w=tx.measureText(t_).width+22+isz;tx.fillStyle='#f7efdc';tx.strokeStyle='#6b4024';tx.lineWidth=2;rr(tx,X-w/2,Y-fs,w,fs*2,5);tx.fill();tx.stroke();if(window.ICURL){const im=LOCKIMG||(LOCKIMG=Object.assign(new Image(),{src:ICURL('lock')}));tx.imageSmoothingEnabled=false;tx.drawImage(im,Math.round(X-w/2+6),Math.round(Y-isz/2),isz,isz)}tx.fillStyle='#2b1d14';tx.fillText(t_,X+isz/2+2,Y+1);}
  const ZN=document.body.classList.contains('zen');for(const f of ZN?[]:floats){const[X,Y]=toScreenT(f.x,f.y);const a=Math.min(1,f.l);tx.globalAlpha=a;tx.font='800 15px Pretendard';tx.lineWidth=3;tx.strokeStyle='#6b4310';const yy=Y-40-(1.6-f.l)*30;tx.strokeText(f.t,X,yy);tx.fillStyle='#ffd65a';tx.fillText(f.t,X,yy)}
  tx.globalAlpha=1;
- if(paint&&paintCursor){const{t,cost}=paintPlan();const s_=(DEF[ghost].erase?'환불 ':'')+`${t.length}칸 · ¥${fmt(Math.abs(cost))}`;tx.font='700 14px Pretendard';const w=tx.measureText(s_).width+20;tx.fillStyle='rgba(74,51,32,0.92)';rr(tx,paintCursor[0]+14,paintCursor[1]-34,w,26,8);tx.fill();tx.fillStyle='#fff';tx.textAlign='left';tx.fillText(s_,paintCursor[0]+24,paintCursor[1]-21);tx.textAlign='center'}
+ if(paint&&paintCursor){const{t,cost}=paintPlan();const s_=(DEF[ghost].erase?L('환불 '):'')+L`${t.length}칸 · ¥${fmt(Math.abs(cost))}`;tx.font='700 14px Pretendard';const w=tx.measureText(s_).width+20;tx.fillStyle='rgba(74,51,32,0.92)';rr(tx,paintCursor[0]+14,paintCursor[1]-34,w,26,8);tx.fill();tx.fillStyle='#fff';tx.textAlign='left';tx.fillText(s_,paintCursor[0]+24,paintCursor[1]-21);tx.textAlign='center'}
  // 만석 팻말(D3)·기다리는 손님 머리 위 김 아이콘(D5)
  if(!ZN&&window.ICURL){const st_=icImg('steam');tx.imageSmoothingEnabled=false;
   for(const o of S.objs){const d=DEF[o.k];if(!d.bath||o===moving||(o.users||0)<capOf(o))continue;const G=objGeom(o);let[X,Y]=toScreen(G.X,G.Y-G.H*0.82);Y=Math.max(18,Y);
-   const fs=Math.max(10,Math.min(13,2.6*cam.z));tx.font=`700 ${fs}px Pretendard`;const isz=16,w=tx.measureText('만석').width+isz+16;
+   const fs=Math.max(10,Math.min(13,2.6*cam.z));tx.font=`700 ${fs}px Pretendard`;const isz=16,w=tx.measureText(L('만석')).width+isz+16;
    tx.fillStyle='#f7efdc';tx.strokeStyle='#6b4024';tx.lineWidth=2;rr(tx,X-w/2,Y-fs+1,w,fs*2-2,5);tx.fill();tx.stroke();
-   if(st_.complete)tx.drawImage(st_,Math.round(X-w/2+5),Math.round(Y-isz/2),isz,isz);tx.fillStyle='#2b1d14';tx.fillText('만석',X+isz/2+1,Y+1)}
+   if(st_.complete)tx.drawImage(st_,Math.round(X-w/2+5),Math.round(Y-isz/2),isz,isz);tx.fillStyle='#2b1d14';tx.fillText(L('만석'),X+isz/2+1,Y+1)}
   if(st_.complete){const isz=cam.z>=2.5?32:16;for(const g of guests){if(g.st!='wait'||g.hide||g.inBath||bubbles.some(b=>b.g===g))continue;const[X0,Y0]=toScreenT(g.x,g.y);const Y=Y0-26*cam.z-isz/2-2+Math.sin(t/260+g.bob)*2;
    tx.globalAlpha=0.95;tx.drawImage(st_,Math.round(X0-isz/2),Math.round(Y-isz/2),isz,isz);tx.globalAlpha=1}}}
  BUS.emit('text',tx);
@@ -891,36 +891,36 @@ function buildTabs(){$('tabs').innerHTML=TABS.map(([k,i,n])=>`<div class="tab ${
  document.querySelectorAll('.tab').forEach(e=>e.onclick=()=>{tab=e.dataset.k;buildTabs();buildCards();$('tip').textContent=TIPS[tab]});buildCards()}
 const SUBCATS={
  bath:[
-  ['bath_basic','기본·실내 온천탕','bath',['foot','hinoki','sauna','fam']],
-  ['bath_nature','자연·노천 온천탕','steam',['rock','cave','fall','sulfur','iron','starlight']],
-  ['bath_special','이색·특수 온천탕','sakura',['milky','wine','soda','petal','matcha']]
+  ['bath_basic',L('기본·실내 온천탕'),'bath',['foot','hinoki','sauna','fam']],
+  ['bath_nature',L('자연·노천 온천탕'),'steam',['rock','cave','fall','sulfur','iron','starlight']],
+  ['bath_special',L('이색·특수 온천탕'),'sakura',['milky','wine','soda','petal','matcha']]
  ],
  food:[
-  ['food_snack','간식·노점·찻집','food',['dango','ice','tea']],
-  ['food_meal','식당·주점','lantern',['ramen','sake','teishoku','izakaya']]
+  ['food_snack',L('간식·노점·찻집'),'food',['dango','ice','tea']],
+  ['food_meal',L('식당·주점'),'lantern',['ramen','sake','teishoku','izakaya']]
  ],
  shop:[
-  ['shop_stall','매점·노점·기념품','gift',['milk','yuzu','shoot','gift']],
-  ['shop_rest','휴식·오락·숙박 시설','home',['pingpong','massage','room','nap']]
+  ['shop_stall',L('매점·노점·기념품'),'gift',['milk','yuzu','shoot','gift']],
+  ['shop_rest',L('휴식·오락·숙박 시설'),'home',['pingpong','massage','room','nap']]
  ],
  deco:[
-  ['deco_bench','벤치·의자·쉼터','bench',['bamboo_bench','wood_bench','engawa_bench','stone_bench','parasol_table','lounger']],
-  ['deco_light','일본 전통 조명','andon',['andon_lantern','takeakari','chochin_tower','lantern','bamboo','kagaribi','floating_lanterns','lanternpath']],
-  ['deco_neon','온천·레트로 네온 간판','neon',['neon_yu','neon_izakaya','neon_capy']],
-  ['deco_path','길·다리','bridge',['path_erase','path_gravel','path','path_wood','path_tatami','bridge']],
-  ['deco_garden','정원·수경 장식','pond',['rocks','iris','pond','sandgarden','wisteria','waterwheel','wisteria_w']],
-  ['deco_statue','전통 조형물','gate',['jizo','ema','torii','tanuki','torii_gold']],
-  ['deco_tree','계절 나무','tree',['sakura','maple','pine','ginkgo','ume']]
+  ['deco_bench',L('벤치·의자·쉼터'),'bench',['bamboo_bench','wood_bench','engawa_bench','stone_bench','parasol_table','lounger']],
+  ['deco_light',L('일본 전통 조명'),'andon',['andon_lantern','takeakari','chochin_tower','lantern','bamboo','kagaribi','floating_lanterns','lanternpath']],
+  ['deco_neon',L('온천·레트로 네온 간판'),'neon',['neon_yu','neon_izakaya','neon_capy']],
+  ['deco_path',L('길·다리'),'bridge',['path_erase','path_gravel','path','path_wood','path_tatami','bridge']],
+  ['deco_garden',L('정원·수경 장식'),'pond',['rocks','iris','pond','sandgarden','wisteria','waterwheel','wisteria_w']],
+  ['deco_statue',L('전통 조형물'),'gate',['jizo','ema','torii','tanuki','torii_gold']],
+  ['deco_tree',L('계절 나무'),'tree',['sakura','maple','pine','ginkgo','ume']]
  ],
  theme:[
-  ['theme_trad','전통 세트','gate',['shishi','nodate','pagoda','bamboofence'],'trad'],
-  ['theme_modern','모던 세트','food',['cafe','lamppost','olive','lounger'],'modern'],
-  ['theme_forest','숲 세트','zen',['cedar','mushroom','fern','birdhouse'],'forest'],
-  ['theme_season','계절 세트','star',['snowman','hydrangea','tsukimi','kadomatsu'],'season']
+  ['theme_trad',L('전통 세트'),'gate',['shishi','nodate','pagoda','bamboofence'],'trad'],
+  ['theme_modern',L('모던 세트'),'food',['cafe','lamppost','olive','lounger'],'modern'],
+  ['theme_forest',L('숲 세트'),'zen',['cedar','mushroom','fern','birdhouse'],'forest'],
+  ['theme_season',L('계절 세트'),'star',['snowman','hydrangea','tsukimi','kadomatsu'],'season']
  ],
  custom:[
-  ['custom_hang','현수막·노렌 장식','photo',['banner','noren']],
-  ['custom_board','액자·입간판 장식','scroll',['frame','sign']]
+  ['custom_hang',L('현수막·노렌 장식'),'photo',['banner','noren']],
+  ['custom_board',L('액자·입간판 장식'),'scroll',['frame','sign']]
  ]
 };
 function sortSubItems(items,st){
@@ -932,26 +932,26 @@ function sortSubItems(items,st){
  });
 }
 function buildCards(){_stC.k='';const st=stars();
- const card=([k,d])=>{const fw=d.fp||1,fh=d.fph||fw,fpBadge=d.erase?'':`<span class="fpb">${fw}×${fh}</span>`,src=d.img?(TIERED.includes(d.img)?d.img+'_lv1':d.img):null;return`<div class="card ${ghost==k?'sel':''} ${(d.star||1)>st?'lock':''}" data-k="${k}" data-need="${d.star}★ 필요" title="${d.desc} (${fw}×${fh}칸)">${fpBadge}${src?`<img src="${SPRURL(src,k)}" style="${d.filter?'filter:'+d.filter:''}">`:`<div class="c-thumb" style="height:56px;display:flex;align-items:center;justify-content:center;font-size:30px">${d.ic||'🪨'}</div>`}<b>${d.n}</b><span class="p">${d.erase?'50% 환불':d.isPath?'¥'+fmt(d.cost)+'/칸':'¥'+fmt(d.cost)}</span></div>`};
+ const card=([k,d])=>{const fw=d.fp||1,fh=d.fph||fw,fpBadge=d.erase?'':`<span class="fpb">${fw}×${fh}</span>`,src=d.img?(TIERED.includes(d.img)?d.img+'_lv1':d.img):null;return L`<div class="card ${ghost==k?'sel':''} ${(d.star||1)>st?'lock':''}" data-k="${k}" data-need="${d.star}★ 필요" title="${d.desc} (${fw}×${fh}칸)">${fpBadge}${src?`<img src="${SPRURL(src,k)}" style="${d.filter?'filter:'+d.filter:''}">`:`<div class="c-thumb" style="height:56px;display:flex;align-items:center;justify-content:center;font-size:30px">${d.ic||'🪨'}</div>`}<b>${d.n}</b><span class="p">${d.erase?L('50% 환불'):d.isPath?'¥'+fmt(d.cost)+L('/칸'):'¥'+fmt(d.cost)}</span></div>`};
  const done=setsDone(),subs=SUBCATS[tab]||[],seen=new Set();
  const blocks=subs.map(([id,title,icKey,keys,sk])=>{
   const raw=keys.filter(k=>DEF[k]).map(k=>{seen.add(k);return[k,DEF[k]]});
   if(!raw.length)return'';
   const sorted=sortSubItems(raw,st),openCnt=sorted.filter(([,d])=>(d.star||1)<=st).length;
   if(sk&&SETS[sk]){const has=done.includes(sk);const cnt=SETS[sk][2].filter(i=>S.objs.some(o=>o.k==i)).length;
-   return`<div class="sethd" data-sub="${id}"><b>${title}</b><span class="subcnt">${has?'세트 완성':`${cnt}/4 · 3종 배치 시 평판+15`}</span></div>`+sorted.map(card).join('')}
-  return`<div class="sethd" data-sub="${id}"><b>${title}</b><span class="subcnt">건설 가능 ${openCnt}/${sorted.length}</span></div>`+sorted.map(card).join('');
+   return`<div class="sethd" data-sub="${id}"><b>${title}</b><span class="subcnt">${has?L('세트 완성'):L`${cnt}/4 · 3종 배치 시 평판+15`}</span></div>`+sorted.map(card).join('')}
+  return L`<div class="sethd" data-sub="${id}"><b>${title}</b><span class="subcnt">건설 가능 ${openCnt}/${sorted.length}</span></div>`+sorted.map(card).join('');
  });
  const rest=sortSubItems(Object.entries(DEF).filter(([k,d])=>d.tab==tab&&!seen.has(k)),st);
- if(rest.length)blocks.push(`<div class="sethd" data-sub="etc"><b>기타</b><span class="subcnt">건설 가능 ${rest.filter(([,d])=>(d.star||1)<=st).length}/${rest.length}</span></div>`+rest.map(card).join(''));
+ if(rest.length)blocks.push(L`<div class="sethd" data-sub="etc"><b>기타</b><span class="subcnt">건설 가능 ${rest.filter(([,d])=>(d.star||1)<=st).length}/${rest.length}</span></div>`+rest.map(card).join(''));
  $('cards').innerHTML=blocks.join('');if(window.ICFIX)ICFIX($('cards'));
- document.querySelectorAll('.card').forEach(e=>e.onclick=()=>{const k=e.dataset.k;if(moving)cancelMove();if(DEF[k].star>stars())return toast(`료칸 등급 ${DEF[k].star}★ 에서 해금돼요`);ghost=ghost==k?null:k;mode=null;$('tDel').classList.remove('on');buildCards();if(ghost&&!document.body.classList.contains('phone'))toast(DEF[ghost].isPath||DEF[ghost].erase?'드래그해서 칠하세요 · Shift+드래그 = 사각형 (Esc 취소)':'놓을 곳을 눌러주세요 (Esc 취소)')})}
+ document.querySelectorAll('.card').forEach(e=>e.onclick=()=>{const k=e.dataset.k;if(moving)cancelMove();if(DEF[k].star>stars())return toast(L`료칸 등급 ${DEF[k].star}★ 에서 해금돼요`);ghost=ghost==k?null:k;mode=null;$('tDel').classList.remove('on');buildCards();if(ghost&&!document.body.classList.contains('phone'))toast(DEF[ghost].isPath||DEF[ghost].erase?L('드래그해서 칠하세요 · Shift+드래그 = 사각형 (Esc 취소)'):L('놓을 곳을 눌러주세요 (Esc 취소)'))})}
 let lastStars=0;
-function hud(){const lt=light();$('yen').textContent=fmt(S.yen);const n=S.fin.hist.length?avgNet():(S.fin._h||0);$('ihr').textContent=(n>=0?'+':'')+fmt(n)+' ¥/시';
- const h=hour(),m=Math.floor(S.min%60);$('time').textContent=`${h<12?'오전':'오후'} ${String(Math.floor(h%12)||12).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+function hud(){const lt=light();$('yen').textContent=fmt(S.yen);const n=S.fin.hist.length?avgNet():(S.fin._h||0);$('ihr').textContent=(n>=0?'+':'')+fmt(n)+L(' ¥/시');
+ const h=hour(),m=Math.floor(S.min%60);{const ap=h<12?L('오전'):L('오후'),hm=`${String(Math.floor(h%12)||12).padStart(2,'0')}:${String(m).padStart(2,'0')}`;$('time').textContent=window.LANG=='en'?`${hm} ${ap}`:`${ap} ${hm}`}
  $('dayn').textContent='Day '+dayN();$('season').textContent=SEASONS[season()];
- $('temp').textContent=`· ${STEMP[season()]+Math.round(Math.sin((h-9)/24*6.28)*4)}°C · 손님 ${guests.length}명`;
- const s=stars();$('stars').innerHTML='★'.repeat(s)+'<span class="st-off">'+'★'.repeat(5-s)+'</span>';if(s!=lastStars){if(lastStars&&s>lastStars)toast(`🎉 료칸 등급 ${s}★ 달성! 새 시설이 해금됐어요`);lastStars=s;buildCards()}
+ $('temp').textContent=L`· ${STEMP[season()]+Math.round(Math.sin((h-9)/24*6.28)*4)}°C · 손님 ${guests.length}명`;
+ const s=stars();$('stars').innerHTML='★'.repeat(s)+'<span class="st-off">'+'★'.repeat(5-s)+'</span>';if(s!=lastStars){if(lastStars&&s>lastStars)toast(L`🎉 료칸 등급 ${s}★ 달성! 새 시설이 해금됐어요`);lastStars=s;buildCards()}
  if(document.activeElement!==$('zs'))$('zs').value=cam.z;}
 function placeInfo_old(){const el=$('info'),q=$('quest');if(innerWidth>700){const r=q&&getComputedStyle(q).display!='none'&&q.offsetHeight?q.getBoundingClientRect():null;el.style.top=(r&&r.left<280?Math.round(r.bottom+8):70)+'px';el.style.maxHeight=`calc(100vh - ${parseInt(el.style.top)+150}px)`;el.style.overflow='auto'}else{el.style.top='';el.style.maxHeight=''}}
 // ===== 정확한 클릭 판정: 스프라이트 알파 + 풋프린트 + 여유 패딩, 깊이상 맨 위 우선 =====
@@ -971,56 +971,56 @@ function popPlace(){const el=$('info');if(!INFO_O||el.style.display=='none')retu
  if(y<64){y=by+10;below=true}if(y+h>VH-8)y=Math.max(64,VH-8-h);x=Math.max(8,Math.min(VW-w-8,x));el.style.left=x+'px';el.style.top=y+'px';el.classList.toggle('below',below);el.style.setProperty('--ax',Math.max(14,Math.min(w-14,ax-x))+'px')}
 BUS.on('frame',popPlace);
 function showInfo(o){const el=$('info');if(INFO_O!==o)POPSEC=null;INFO_O=o;el.classList.add('pop');el.style.right='auto';el.style.bottom='auto';el.style.maxHeight='';el.style.display='block';
- if(o.k=='gate'){el.innerHTML=`<div class="ph"><b>대문</b><button class="px" id="iCl">✕</button></div><div class="pdesc">손님이 드나드는 유일한 입구예요. 열린 땅 가장자리로 이동만 할 수 있어요.</div><div class="pacts"><button class="pa" id="iMove"><i>이동</i></button><button class="pa" id="iRot"><i>회전</i></button></div>`;$('iMove').onclick=()=>startMove(o);$('iRot').onclick=e=>{e.stopPropagation();rotateGate()};$('iCl').onclick=()=>hideInfo();requestAnimationFrame(popPlace);return}
+ if(o.k=='gate'){el.innerHTML=L`<div class="ph"><b>대문</b><button class="px" id="iCl">✕</button></div><div class="pdesc">손님이 드나드는 유일한 입구예요. 열린 땅 가장자리로 이동만 할 수 있어요.</div><div class="pacts"><button class="pa" id="iMove"><i>이동</i></button><button class="pa" id="iRot"><i>회전</i></button></div>`;$('iMove').onclick=()=>startMove(o);$('iRot').onclick=e=>{e.stopPropagation();rotateGate()};$('iCl').onclick=()=>hideInfo();requestAnimationFrame(popPlace);return}
  const d=DEF[o.k];const up=Math.round(d.cost*Math.pow(1.7,o.lv));const users=guests.filter(g=>g.cur===o).length;
- const gauge=d.price?(()=>{const fr=fairPrice(o),r=o.price/fr;const [c,t]=r<0.9?["#5f9e5a","저렴 · 손님 만족 ↑"]:r<1.15?["#3f6aa0","적정가"]:r<1.4?["#c98a2c","조금 비쌈 · 만족 ↓"]:["#c0442e","비쌈 · 만족 ↓"];const pos=Math.max(0,Math.min(100,(r-0.6)/1.0*100));return `<div class="pfb"><div class="pbar"><i style="left:${pos}%;background:${c}"></i></div><small style="color:${c}">${t}</small><small style="opacity:.7"> · 추천 ¥${fmt(Math.round(fr*1.1/10)*10)}</small></div>`})():'';
+ const gauge=d.price?(()=>{const fr=fairPrice(o),r=o.price/fr;const [c,t]=r<0.9?["#5f9e5a",L("저렴 · 손님 만족 ↑")]:r<1.15?["#3f6aa0",L("적정가")]:r<1.4?["#c98a2c",L("조금 비쌈 · 만족 ↓")]:["#c0442e",L("비쌈 · 만족 ↓")];const pos=Math.max(0,Math.min(100,(r-0.6)/1.0*100));return L`<div class="pfb"><div class="pbar"><i style="left:${pos}%;background:${c}"></i></div><small style="color:${c}">${t}</small><small style="opacity:.7"> · 추천 ¥${fmt(Math.round(fr*1.1/10)*10)}</small></div>`})():'';
  const stars='◆'.repeat(o.lv)+'◇'.repeat(5-o.lv);
- el.innerHTML=`<div class="ph"><b>${d.n}</b><span class="lv" title="Lv.${o.lv}">${d.price?`Lv.${o.lv}`:''}</span><button class="px" id="iCl" aria-label="닫기">✕</button></div>
- <div class="pq">${d.price?`<span>요금 ¥${fmt(o.price)}</span><span>이용 ${users}/${capOf(o)}</span>`:`<span>아름다움 +${d.beauty}</span>`}</div>
- <div class="pacts"><button class="pa${POPSEC=='info'?' on':''}" data-s="info"><i>정보</i></button>${o.lv<5&&d.price?`<button class="pa up" id="iUp"><i>업그레이드<small>¥${fmt(up)}</small></i></button>`:''}<button class="pa" id="iMove"><i>이동</i></button><button class="pa" id="iRot"><i>회전</i></button>${d.price?`<button class="pa${POPSEC=='price'?' on':''}" data-s="price"><i>가격</i></button>`:''}<button class="pa del" id="iDel"><i>철거</i></button></div>
- <div class="psec" data-sec="info" ${POPSEC=='info'?'':'hidden'}><div class="pdesc">${d.desc}</div>${d.price?`<div class="row"><span>이용 중</span><b>${users}/${capOf(o)}</b></div><div class="row"><span>누적 이용</span><b>${o.uses||0}회</b></div><div class="row"><span>누적 매출</span><b>¥${fmt(o.earn||0)}</b></div><div class="row"><span>직원 급여</span><b>¥${fmt(d.wage*(1+0.5*(o.lv-1)))}/시</b></div>`:`<div class="row"><span>아름다움</span><b>+${d.beauty}</b></div>`}<div class="row"><span>철거 환급</span><b>¥${fmt(Math.floor(d.cost*0.4))}</b></div></div>
- ${d.price?`<div class="psec" data-sec="price" ${POPSEC=='price'?'':'hidden'}><div class="row"><span>이용 요금</span><b>¥${fmt(o.price)}</b></div>${gauge}<div class="prow"><button class="b g" data-p="-0.1">−10%</button><button class="b g" data-p="0.1">+10%</button><button class="b g" data-p="0">기본</button><button class="b g" data-p="rec">추천가</button></div></div>`:''}`;
+ el.innerHTML=L`<div class="ph"><b>${d.n}</b><span class="lv" title="Lv.${o.lv}">${d.price?`Lv.${o.lv}`:''}</span><button class="px" id="iCl" aria-label="닫기">✕</button></div>
+ <div class="pq">${d.price?L`<span>요금 ¥${fmt(o.price)}</span><span>이용 ${users}/${capOf(o)}</span>`:L`<span>아름다움 +${d.beauty}</span>`}</div>
+ <div class="pacts"><button class="pa${POPSEC=='info'?' on':''}" data-s="info"><i>정보</i></button>${o.lv<5&&d.price?L`<button class="pa up" id="iUp"><i>업그레이드<small>¥${fmt(up)}</small></i></button>`:''}<button class="pa" id="iMove"><i>이동</i></button><button class="pa" id="iRot"><i>회전</i></button>${d.price?L`<button class="pa${POPSEC=='price'?' on':''}" data-s="price"><i>가격</i></button>`:''}<button class="pa del" id="iDel"><i>철거</i></button></div>
+ <div class="psec" data-sec="info" ${POPSEC=='info'?'':'hidden'}><div class="pdesc">${d.desc}</div>${d.price?L`<div class="row"><span>이용 중</span><b>${users}/${capOf(o)}</b></div><div class="row"><span>누적 이용</span><b>${o.uses||0}회</b></div><div class="row"><span>누적 매출</span><b>¥${fmt(o.earn||0)}</b></div><div class="row"><span>직원 급여</span><b>¥${fmt(d.wage*(1+0.5*(o.lv-1)))}/시</b></div>`:L`<div class="row"><span>아름다움</span><b>+${d.beauty}</b></div>`}<div class="row"><span>철거 환급</span><b>¥${fmt(Math.floor(d.cost*0.4))}</b></div></div>
+ ${d.price?L`<div class="psec" data-sec="price" ${POPSEC=='price'?'':'hidden'}><div class="row"><span>이용 요금</span><b>¥${fmt(o.price)}</b></div>${gauge}<div class="prow"><button class="b g" data-p="-0.1">−10%</button><button class="b g" data-p="0.1">+10%</button><button class="b g" data-p="0">기본</button><button class="b g" data-p="rec">추천가</button></div></div>`:''}`;
  el.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{POPSEC=POPSEC==b.dataset.s?null:b.dataset.s;showInfo(o)});
  el.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{if(b.dataset.p=='rec'){o.price=Math.round(fairPrice(o)*1.1/10)*10;o.rej=0;showInfo(o);return}const p=+b.dataset.p;o.price=p==0?d.price:Math.max(50,Math.round(o.price*(1+p)/10)*10);showInfo(o)});
- if($('iUp'))$('iUp').onclick=()=>{if(S.yen<up)return toast('엔이 부족해요');S.yen-=up;S.fin.exp+=up;o.lv++;o.build={t:0,h:0};hideInfo();toast(`${d.n} Lv.${o.lv}!`);showInfo(o);save()};
- $('iDel').onclick=()=>{const b=$('iDel');if(!b.classList.contains('confirm')){b.classList.add('confirm');b.querySelector('i').textContent='한번 더';return}remove(o)};$('iMove').onclick=()=>{hideInfo();startMove(o)};$('iRot').onclick=e=>{e.stopPropagation();rotateObj(o)};$('iCl').onclick=()=>hideInfo();BUS.emit('info',o,el);requestAnimationFrame(popPlace)}
+ if($('iUp'))$('iUp').onclick=()=>{if(S.yen<up)return toast(L('엔이 부족해요'));S.yen-=up;S.fin.exp+=up;o.lv++;o.build={t:0,h:0};hideInfo();toast(`${d.n} Lv.${o.lv}!`);showInfo(o);save()};
+ $('iDel').onclick=()=>{const b=$('iDel');if(!b.classList.contains('confirm')){b.classList.add('confirm');b.querySelector('i').textContent=L('한번 더');return}remove(o)};$('iMove').onclick=()=>{hideInfo();startMove(o)};$('iRot').onclick=e=>{e.stopPropagation();rotateObj(o)};$('iCl').onclick=()=>hideInfo();BUS.emit('info',o,el);requestAnimationFrame(popPlace)}
 function hideInfo(){$('info').style.display='none';INFO_O=null}
-function remove(o){if(window.READONLY)return;if(o.k=='gate')return toast('대문은 철거할 수 없어요. 이동만 가능해요');if(S.objs.length<=1)return;S.yen+=Math.floor(DEF[o.k].cost*0.4);guests.forEach(g=>{if(g.cur===o)finish(g);if(g.target===o)g.target=null});S.objs.splice(S.objs.indexOf(o),1);OCC=occ();groundDirty=true;$('info').style.display='none';save()}
+function remove(o){if(window.READONLY)return;if(o.k=='gate')return toast(L('대문은 철거할 수 없어요. 이동만 가능해요'));if(S.objs.length<=1)return;S.yen+=Math.floor(DEF[o.k].cost*0.4);guests.forEach(g=>{if(g.cur===o)finish(g);if(g.target===o)g.target=null});S.objs.splice(S.objs.indexOf(o),1);OCC=occ();groundDirty=true;$('info').style.display='none';save()}
 function modalFin(){const m=$('modal');const up=S.objs.filter(o=>!DEF[o.k].isPath&&!DEF[o.k].wage).length*4,wages=S.objs.reduce((a,o)=>a+(DEF[o.k].wage||0)*(1+0.5*(o.lv-1)),0);
  const rows=S.objs.filter(o=>DEF[o.k].price).sort((a,b)=>(b.earn||0)-(a.earn||0)).slice(0,8).map(o=>`<div class="row"><span>${DEF[o.k].n} Lv.${o.lv}</span><b>¥${fmt(o.earn||0)}</b></div>`).join('');
- m.innerHTML=`<h3>재정 현황</h3><div class="row"><span>보유 자금</span><b>¥${fmt(S.yen)}</b></div><div class="row"><span>평균 순이익</span><b>¥${fmt(avgNet())}/시</b></div><div class="row"><span>오늘 수입</span><b>¥${fmt(S.fin.inc)}</b></div><div class="row"><span>오늘 지출</span><b>¥${fmt(S.fin.exp)}</b></div>
+ m.innerHTML=L`<h3>재정 현황</h3><div class="row"><span>보유 자금</span><b>¥${fmt(S.yen)}</b></div><div class="row"><span>평균 순이익</span><b>¥${fmt(avgNet())}/시</b></div><div class="row"><span>오늘 수입</span><b>¥${fmt(S.fin.inc)}</b></div><div class="row"><span>오늘 지출</span><b>¥${fmt(S.fin.exp)}</b></div>
  <div class="row"><span>직원 급여</span><b>¥${fmt(wages)}/시</b></div><div class="row"><span>시설 유지비</span><b>¥${fmt(up)}/시</b></div><h3 style="margin-top:10px">시설별 매출</h3>${rows}<div style="text-align:right"><button class="b" onclick="this.closest('.panel').style.display='none'">닫기</button></div>`;m.style.display='block'}
 function modalRank(){const m=$('modal');const st=stars(),sc=Math.floor(starScore()),pl=Object.keys(S.plots).length,sv=S.served||0,rep=Math.round(S.rep||0);
  let ap=0,bt=0;for(const o of S.objs){const d=DEF[o.k];if(!d)continue;ap+=(d.appeal||0)*(1+0.35*((o.lv||1)-1))*0.4;bt+=(d.beauty||0)*bMul(d)}
  const repPt=Math.round((S.rep||0)*0.5),apPt=Math.round(ap),btPt=Math.round(Math.sqrt(bt)*3),plPt=pl*4,setPt=setsDone().length*15;
  const reqRow=(label,cur,req,unit,color)=>{const ok=cur>=req,pct=Math.min(100,Math.round(cur/Math.max(1,req)*100));
-  return`<div class="rk-req"><div class="row"><span>${label}</span><span><b>${fmt(cur)}${unit}</b> / ${fmt(req)}${unit} <span class="rk-badge ${ok?'ok':'go'}">${ok?'✓ 달성':`미달 (${fmt(req-cur)}${unit} 남음)`}</span></span></div><div class="bar"><i style="width:${pct}%;background:${ok?'#5fa855':color}"></i></div></div>`};
+  return`<div class="rk-req"><div class="row"><span>${label}</span><span><b>${fmt(cur)}${unit}</b> / ${fmt(req)}${unit} <span class="rk-badge ${ok?'ok':'go'}">${ok?L('✓ 달성'):L`미달 (${fmt(req-cur)}${unit} 남음)`}</span></span></div><div class="bar"><i style="width:${pct}%;background:${ok?'#5fa855':color}"></i></div></div>`};
  let nextHtml='';
  if(st<5){const[rq,rsv,rpl]=STAR_REQ[st+1];
-  nextHtml=`<div class="rk-next"><div style="font-weight:800;font-size:14px;margin-bottom:4px">다음 등급 (${st+1}★ ${['','동네 온천','인기 온천','명소 료칸','전통 명문 료칸','전설의 카피바라 료칸'][st+1]}) 승급 조건</div>
-   ${reqRow('종합 명성 점수 (평판·매력·조경)',sc,rq,'점','#e0a92e')}
+  nextHtml=L`<div class="rk-next"><div style="font-weight:800;font-size:14px;margin-bottom:4px">다음 등급 (${st+1}★ ${['',L('동네 온천'),L('인기 온천'),L('명소 료칸'),L('전통 명문 료칸'),L('전설의 카피바라 료칸')][st+1]}) 승급 조건</div>
+   ${reqRow(L('종합 명성 점수 (평판·매력·조경)'),sc,rq,L('점'),'#e0a92e')}
    <div style="font-size:11px;color:var(--txt-sec);margin:-2px 0 5px">↳ 현재 명성 구성: 평판(${rep}) <b>+${repPt}점</b> · 시설 매력 <b>+${apPt}점</b> · 조경 아름다움 <b>+${btPt}점</b> · 구역·세트 <b>+${plPt+setPt}점</b></div>
-   ${reqRow('누적 이용 손님 수',sv,rsv,'회','#5a8fd9')}
-   ${reqRow('열린 구역 수 (확장 구역)',pl,rpl,'구역','#8a9a6a')}
+   ${reqRow(L('누적 이용 손님 수'),sv,rsv,L('회'),'#5a8fd9')}
+   ${reqRow(L('열린 구역 수 (확장 구역)'),pl,rpl,L('구역'),'#8a9a6a')}
   </div>`;
  }else{
-  nextHtml=`<div class="rk-next"><div style="font-weight:800;font-size:14px;color:var(--jade)">최고 등급 (5★ 전설의 카피바라 료칸) 달성 완료!</div><div style="font-size:12px;color:var(--txt-sec);margin-top:3px">모든 시설과 장식이 해금되었어요. 명성 점수 <b>${fmt(sc)}점</b> · 누적 손님 <b>${fmt(sv)}회</b> · 열린 구역 <b>${pl}구역</b></div></div>`;
+  nextHtml=L`<div class="rk-next"><div style="font-weight:800;font-size:14px;color:var(--jade)">최고 등급 (5★ 전설의 카피바라 료칸) 달성 완료!</div><div style="font-size:12px;color:var(--txt-sec);margin-top:3px">모든 시설과 장식이 해금되었어요. 명성 점수 <b>${fmt(sc)}점</b> · 누적 손님 <b>${fmt(sv)}회</b> · 열린 구역 <b>${pl}구역</b></div></div>`;
  }
- const rankNames=['','1★ 시작의 온천','2★ 인기 온천 료칸','3★ 명소 온천 료칸','4★ 전통 명문 료칸','5★ 전설의 카피바라 료칸'];
+ const rankNames=['',L('1★ 시작의 온천'),L('2★ 인기 온천 료칸'),L('3★ 명소 온천 료칸'),L('4★ 전통 명문 료칸'),L('5★ 전설의 카피바라 료칸')];
  const chip=([k,d])=>{const src=d.img?(TIERED.includes(d.img)?d.img+'_lv1':d.img):null;return`<span class="rk-chip">${src?`<img src="${SPRURL(src,k)}" alt="">`:`${d.ic||'🌸'}`}<span>${d.n}</span></span>`};
  const rankCards=[1,2,3,4,5].map(r=>{
   const done=r<=st,isNext=r===st+1;
   const[rq,rsv,rpl]=STAR_REQ[r]||[0,0,1];
-  const cond=r===1?'기본 시작 등급 (초기 해금)':`조건: 명성 <b>${fmt(rq)}점</b> 이상 · 누적 손님 <b>${fmt(rsv)}회</b> 이상 · 열린 구역 <b>${rpl}곳</b> 이상`;
+  const cond=r===1?L('기본 시작 등급 (초기 해금)'):L`조건: 명성 <b>${fmt(rq)}점</b> 이상 · 누적 손님 <b>${fmt(rsv)}회</b> 이상 · 열린 구역 <b>${rpl}곳</b> 이상`;
   const unlocks=Object.entries(DEF).filter(([k,d])=>d.tab&&!d.erase&&(d.star||1)===r);
-  const badge=done?`<span class="rk-badge ok">✓ 달성 완료</span>`:isNext?`<span class="rk-badge go">진행 중</span>`:`<span class="rk-badge lock">잠김</span>`;
+  const badge=done?L`<span class="rk-badge ok">✓ 달성 완료</span>`:isNext?L`<span class="rk-badge go">진행 중</span>`:L`<span class="rk-badge lock">잠김</span>`;
   return`<div class="rk-box ${r===st?'cur':isNext?'next':done?'done':''}">
    <div class="rk-hd"><b>${rankNames[r]}</b>${badge}</div>
    <div class="rk-cond">${cond}</div>
-   <div class="rk-items">${unlocks.length?unlocks.map(chip).join(''):'<span style="font-size:11px;color:var(--txt-sec)">모든 상위 시설을 자유롭게 운영하고 최고 명성을 누려보세요!</span>'}</div>
+   <div class="rk-items">${unlocks.length?unlocks.map(chip).join(''):L('<span style="font-size:11px;color:var(--txt-sec)">모든 상위 시설을 자유롭게 운영하고 최고 명성을 누려보세요!</span>')}</div>
   </div>`;
  }).join('');
- m.innerHTML=`<h3>료칸 등급 · 승급 조건</h3>
+ m.innerHTML=L`<h3>료칸 등급 · 승급 조건</h3>
   <div class="rk-cur">
    <div><span style="font-size:12px;color:var(--txt-sec)">현재 료칸 등급</span><br><b class="stars">${'★'.repeat(st)}<span style="color:rgba(255,255,255,0.2)">${'★'.repeat(5-st)}</span></b> <b>(${st}성 료칸)</b></div>
    <div style="text-align:right;font-size:12px">명성 점수 <b>${fmt(sc)}점</b> <small>(평판 ${rep})</small><br>누적 손님 <b>${fmt(sv)}회</b> · 구역 <b>${pl}곳</b></div>
@@ -1034,15 +1034,15 @@ function modalRank(){const m=$('modal');const st=stars(),sc=Math.floor(starScore
   <div style="text-align:right;margin-top:6px"><button class="b" onclick="this.closest('.panel').style.display='none'">닫기</button></div>`;
  m.style.display='block';if(window.ICFIX)ICFIX(m)}
 window.modalRank=modalRank;
-const VTXT={full:o=>`${DEF[o.k].n}에 자리가 더 있으면 좋겠어요`,path:o=>`${DEF[o.k].n}에 가는 길이 이어지면 좋겠어요`,fatigue:()=>'쉴 수 있는 탕이 더 있으면 좋겠어요',hunger:()=>'먹을 곳이 있으면 좋겠어요',thirst:()=>'마실 것을 파는 곳이 있으면 좋겠어요',fun:()=>'구경할 거리가 더 있으면 좋겠어요'};
+const VTXT={full:o=>L`${DEF[o.k].n}에 자리가 더 있으면 좋겠어요`,path:o=>L`${DEF[o.k].n}에 가는 길이 이어지면 좋겠어요`,fatigue:()=>L('쉴 수 있는 탕이 더 있으면 좋겠어요'),hunger:()=>L('먹을 곳이 있으면 좋겠어요'),thirst:()=>L('마실 것을 파는 곳이 있으면 좋겠어요'),fun:()=>L('구경할 거리가 더 있으면 좋겠어요')};
 const VTAB={fatigue:'bath',hunger:'food',thirst:'shop',fun:'deco'};
 function voices(){const since=S.min-1440,m=new Map();for(const v of VOICE){if(v.m<since||!VTXT[v.k])continue;if(v.o&&!S.objs.includes(v.o))continue;const key=v.k+'|'+(v.o?S.objs.indexOf(v.o):'');let e=m.get(key);if(!e)m.set(key,e={k:v.k,o:v.o,gs:new Set()});e.gs.add(v.g)}
  return[...m.values()].map(e=>({k:e.k,o:e.o,n:e.gs.size})).sort((a,b)=>b.n-a.n).slice(0,3)}
 function openBuildTab(k){if($('build').style.display=='none')$('bOpen').onclick();if(k){tab=k;buildTabs();buildCards();$('tip').textContent=TIPS[tab]||''}}
 function modalGuest(){const m=$('modal');const vs=voices();const n=guests.length||1;const avg=k=>guests.reduce((s,g)=>s+g.need[k],0)/n;const hp=guests.reduce((s,g)=>s+g.happy,0)/n;
  const bar=(l,v,c)=>`<div class="row" style="border:0"><span>${l}</span><b>${Math.round(v)}</b></div><div class="bar"><i style="width:${v}%;background:${c}"></i></div>`;
- m.innerHTML=`<h3>손님 · 만족도</h3><div class="row"><span>현재 손님</span><b>${guests.length}명</b></div><div class="row"><span>누적 이용</span><b>${fmt(S.served)}회</b></div>${bar('평판',S.rep,'#e0a92e')}${bar('현재 손님 기분',guests.length?hp:0,'#7fbf6a')}
- <h3 style="margin-top:8px">손님들의 한마디</h3>${vs.length?vs.map((v,i)=>`<button class="b g" data-v="${i}" style="display:flex;width:100%;justify-content:space-between;gap:8px;margin:3px 0;text-align:left"><span>${VTXT[v.k](v.o)}</span><b>${v.n}명</b></button>`).join(''):'<div class="row" style="border:0"><span>손님들이 모두 편안해 보여요</span></div>'}
+ m.innerHTML=L`<h3>손님 · 만족도</h3><div class="row"><span>현재 손님</span><b>${guests.length}명</b></div><div class="row"><span>누적 이용</span><b>${fmt(S.served)}회</b></div>${bar(L('평판'),S.rep,'#e0a92e')}${bar(L('현재 손님 기분'),guests.length?hp:0,'#7fbf6a')}
+ <h3 style="margin-top:8px">손님들의 한마디</h3>${vs.length?vs.map((v,i)=>L`<button class="b g" data-v="${i}" style="display:flex;width:100%;justify-content:space-between;gap:8px;margin:3px 0;text-align:left"><span>${VTXT[v.k](v.o)}</span><b>${v.n}명</b></button>`).join(''):L('<div class="row" style="border:0"><span>손님들이 모두 편안해 보여요</span></div>')}
  <h3 style="margin-top:8px">평균 욕구 (높을수록 필요)</h3>${NEEDK.map(k=>bar(NEEDN[k],guests.length?avg(k):0,'#d98a5a')).join('')}
  <div style="font-size:12px;color:var(--txt-sec)">팁: 욕구에 맞는 시설이 없으면 기분이 떨어져요. 장식 근처를 걸으면 기분이 좋아져요.</div><div style="text-align:right"><button class="b" onclick="this.closest('.panel').style.display='none'">닫기</button></div>`;m.style.display='block';
  m.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{const v=vs[+b.dataset.v];m.style.display='none';if(v.o&&S.objs.includes(v.o)){const c=ctr(v.o);focus(c[0],c[1],Math.max(cam.z,2.5));showInfo(v.o)}else openBuildTab(VTAB[v.k])})}
@@ -1051,11 +1051,11 @@ const ptrs=new Map();let drag=null,pinch=null,lp=null,lastTap={};
 function onTap(sx,sy){const[fx,fy]=toTile(sx,sy);const x=Math.floor(fx),y=Math.floor(fy);
  for(const s of window._signs||[]){const[X,Y]=toScreen(s.X,s.Y);if(Math.abs(sx-X)<16*cam.z/1.5+10&&Math.abs(sy-Y)<10*cam.z/1.5+8){unlock(s);return}}
  if(!ghost&&!moving&&window.AMB&&AMB.tap(fx,fy,sx,sy))return;
- if(ghost){if(!canPlace(ghost,x,y))return toast(tileOpen(x,y)?'여기엔 지을 수 없어요':'잠긴 구역이에요. 표지판을 눌러 열어주세요');const d=DEF[ghost];if(S.yen<d.cost)return toast('엔이 부족해요');
+ if(ghost){if(!canPlace(ghost,x,y))return toast(tileOpen(x,y)?L('여기엔 지을 수 없어요'):L('잠긴 구역이에요. 표지판을 눌러 열어주세요'));const d=DEF[ghost];if(S.yen<d.cost)return toast(L('엔이 부족해요'));
   S.yen-=d.cost;S.fin.exp+=d.cost;S.objs.push({k:ghost,x,y,lv:1,rot:DEF[ghost].isPath?0:ROT,price:d.price||0,uses:0,earn:0});anims['o'+(S.objs.length-1)]={t:0};OCC=occ();groundDirty=true;
   const[fw,fh]=fpOf(ghost,ROT);for(let i=0;i<10;i++)parts.push({k:'steam',x:x+fw/2+(Math.random()-0.5)*fw,y:y+fh/2+(Math.random()-0.5)*fh,h:0,vx:0,l:1,L:1,s:2});if(ghost=='path'){}else if(!ev.shift){ghost=null;buildCards()}save();return}
  const o=pickObj(sx,sy);if(o&&!DEF[o.k].isPath){if(mode=='del'){remove(o);return}clearTimeout(infoT);infoT=setTimeout(()=>{if(!moving)showInfo(o)},230)}else hideInfo()}
-function unlock(s){const k=s.px+','+s.py;if(S.yen<s.price)return toast(`구역 확장에 ¥${fmt(s.price)} 필요해요`);S.yen-=s.price;S.fin.exp+=s.price;S.plots[k]=1;groundDirty=true;BUS.emit('unlock',k);anims['p'+k]={t:0};toast('🎉 새 구역이 열렸어요!');
+function unlock(s){const k=s.px+','+s.py;if(S.yen<s.price)return toast(L`구역 확장에 ¥${fmt(s.price)} 필요해요`);S.yen-=s.price;S.fin.exp+=s.price;S.plots[k]=1;groundDirty=true;BUS.emit('unlock',k);anims['p'+k]={t:0};toast(L('🎉 새 구역이 열렸어요!'));
  for(let i=0;i<40;i++)parts.push({k:'petal',x:s.px*PS+Math.random()*PS,y:s.py*PS+Math.random()*PS,h:20+Math.random()*30,l:3,L:3,ph:Math.random()*6});save()}
 const ev={shift:false};
 function initInput(){
@@ -1079,7 +1079,7 @@ function initInput(){
  $('zs').min=zmin().toFixed(2);$('zs').oninput=e=>{zoomTarget=null;cam.tz=+e.target.value};$('zIn').onclick=()=>{zoomTarget=null;cam.tz=Math.min(8,cam.tz*1.3)};$('zOut').onclick=()=>{zoomTarget=null;cam.tz=Math.max(zmin(),cam.tz/1.3)};
  $('zHome').onclick=()=>{const b=S.objs.find(o=>DEF[o.k].bath)||S.objs[0];homeAnim={t:0,from:{...cam},to:b}};
  $('tFin').onclick=modalFin;$('tGuest').onclick=modalGuest;if($('bRank'))$('bRank').onclick=modalRank;if($('stars'))$('stars').onclick=modalRank;
- $('tDel').onclick=()=>{mode=mode=='del'?null:'del';ghost=null;$('tDel').classList.toggle('on',mode=='del');buildCards();if(mode)toast('철거할 시설을 눌러주세요 (40% 환불)')};
+ $('tDel').onclick=()=>{mode=mode=='del'?null:'del';ghost=null;$('tDel').classList.toggle('on',mode=='del');buildCards();if(mode)toast(L('철거할 시설을 눌러주세요 (40% 환불)'))};
  $('bSpeed').onclick=()=>{speed=speed==1?3:speed==3?10:1;$('bSpeed').textContent=speed+'x'};
  $('bClose').onclick=()=>{$('build').classList.add('hide');$('build').style.display='none';$('bOpen').style.display='flex';$('tools').classList.add('low')};
  $('bOpen').onclick=()=>{$('build').classList.remove('hide');$('build').style.display='';$('bOpen').style.display='none';$('tools').classList.remove('low')};
@@ -1090,13 +1090,13 @@ function paintTiles(p){const out=[];if(p.area){for(let x=Math.min(p.x0,p.x1);x<=
  if(p.y1!=p.y0){const sy=Math.sign(p.y1-p.y0);for(let y=p.y0+sy;;y+=sy){out.push([p.x1,y]);if(y==p.y1)break}}return out}
 function paintPlan(){const k=ghost,er=DEF[k].erase;const t=paintTiles(paint).filter(([x,y])=>{if(!tileOpen(x,y))return false;const o=OCC[x+','+y];return er?(o&&DEF[o.k].isPath):(!o||(DEF[o.k].isPath&&o.k!=k))});
  return{t,cost:er?-t.reduce((s,[x,y])=>s+Math.floor(DEF[OCC[x+','+y].k].cost/2),0):t.length*DEF[k].cost}}
-function applyPaint(){const k=ghost,{t,cost}=paintPlan();if(!t.length)return;if(cost>S.yen)return toast(`엔이 부족해요 (¥${fmt(cost)} 필요)`);
+function applyPaint(){const k=ghost,{t,cost}=paintPlan();if(!t.length)return;if(cost>S.yen)return toast(L`엔이 부족해요 (¥${fmt(cost)} 필요)`);
  const set=new Set(t.map(p=>p.join(',')));S.objs=S.objs.filter(o=>!(DEF[o.k].isPath&&set.has(o.x+','+o.y)));
  if(!DEF[k].erase)for(const[x,y]of t)S.objs.push({k,x,y,lv:1,price:0,uses:0,earn:0});S.yen-=cost;if(cost>0)S.fin.exp+=cost;if(!DEF[k].erase)BUS.emit('paint',k,t.length);
  for(const[x,y]of t.slice(0,30))parts.push({k:'dust',x:x+0.5,y:y+0.5,vx:(Math.random()-0.5),vy:(Math.random()-0.5),h:1,l:0.6,L:0.6});
- OCC=occ();groundDirty=true;guests.forEach(g=>{if(g.st=='walk'&&g.target){const tg=g.target;const d=doorTile(tg);if(d)goTo(g,d[0],d[1])}});toast(DEF[k].erase?`길 ${t.length}칸 제거 (+¥${fmt(-cost)})`:`${DEF[k].n} ${t.length}칸 · ¥${fmt(cost)}`);save()}
+ OCC=occ();groundDirty=true;guests.forEach(g=>{if(g.st=='walk'&&g.target){const tg=g.target;const d=doorTile(tg);if(d)goTo(g,d[0],d[1])}});toast(DEF[k].erase?L`길 ${t.length}칸 제거 (+¥${fmt(-cost)})`:L`${DEF[k].n} ${t.length}칸 · ¥${fmt(cost)}`);save()}
 function placeAt(){const[x,y]=hoverT;const[sx,sy]=toScreenT(x+0.5,y+0.5);onTapPlace(x,y)}
-function onTapPlace(x,y){if(window.READONLY)return;if(moving)return dropMove(x,y);if(!canPlace(ghost,x,y))return toast(tileOpen(x,y)?'여기엔 지을 수 없어요':'잠긴 구역이에요. 표지판을 눌러 열어주세요');const d=DEF[ghost];if(S.yen<d.cost)return toast('엔이 부족해요');
+function onTapPlace(x,y){if(window.READONLY)return;if(moving)return dropMove(x,y);if(!canPlace(ghost,x,y))return toast(tileOpen(x,y)?L('여기엔 지을 수 없어요'):L('잠긴 구역이에요. 표지판을 눌러 열어주세요'));const d=DEF[ghost];if(S.yen<d.cost)return toast(L('엔이 부족해요'));
  S.yen-=d.cost;S.fin.exp+=d.cost;clearPaths(ghost,x,y);S.objs.push({k:ghost,x,y,lv:1,rot:DEF[ghost].isPath?0:ROT,price:d.price||0,uses:0,earn:0});BUS.emit('build',S.objs[S.objs.length-1]);anims['o'+(S.objs.length-1)]={t:0};OCC=occ();groundDirty=true;
  const[fw,fh]=fpOf(ghost,ROT);for(let i=0;i<10;i++)parts.push({k:'steam',x:x+fw/2+(Math.random()-0.5)*fw,y:y+fh/2+(Math.random()-0.5)*fh,h:0,vx:0,l:1,L:1,s:2});
  if(ghost!='path'&&!ev.shift){ghost=null;buildCards()}save()}
@@ -1106,11 +1106,11 @@ let last=0,acc=0,hourAcc=0,saveAcc=0;
 // 인기 시설 알림: 10게임분마다 만석 여부 기록(최근 3시간), 매시 확인해 하루 1번만 부드럽게 안내
 const POPS=new WeakMap();let popDay=-1;
 function samplePop(){for(const o of S.objs){const d=DEF[o.k];if(!d.price||!d.cap||d.stay)continue;let a=POPS.get(o);if(!a)POPS.set(o,a=[]);a.push((o.users||0)>=capOf(o)?1:0);if(a.length>18)a.shift()}}
-function josa(w,a,b){const c=w.charCodeAt(w.length-1);return(c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28)?a:b}
+function josa(w,a,b){if(window.LANG&&LANG!='ko')return '';const c=w.charCodeAt(w.length-1);return(c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28)?a:b}
 function popCheck(){if(window.READONLY)return;const day=Math.floor(S.min/1440);if(day===popDay)return;let best=null,br=0;
  for(const o of S.objs){const a=POPS.get(o);if(!a||a.length<12)continue;const r=a.reduce((s,x)=>s+x,0)/a.length;if(r>br){br=r;best=o}}
  if(!best||br<0.4)return;popDay=day;const d=DEF[best.k],n=d.n;window.__pops=(window.__pops||0)+1;
- toast(`${n}${josa(n,'이','가')} 인기 만점이에요! ${best.lv<5?'업그레이드하면':'하나 더 지으면'} 더 많은 손님이 ${d.bath?'쉴':'들를'} 수 있어요`)}
+ const jo=josa(n,L('이'),L('가'));toast(best.lv<5?(d.bath?L`${n}${jo} 인기 만점이에요! 업그레이드하면 더 많은 손님이 쉴 수 있어요`:L`${n}${jo} 인기 만점이에요! 업그레이드하면 더 많은 손님이 들를 수 있어요`):(d.bath?L`${n}${jo} 인기 만점이에요! 하나 더 지으면 더 많은 손님이 쉴 수 있어요`:L`${n}${jo} 인기 만점이에요! 하나 더 지으면 더 많은 손님이 들를 수 있어요`))}
 // 방문·쇼케이스: 들어가자마자 손님들이 이미 탕·상점·산책을 즐기고 있도록 렌더 없이 미리 진행
 // (최소 게임 1.5시간, 손님이 최대치의 75%가 될 때까지 최대 6시간) — 시각·잔고·손님 수·평판·재정 표시는 원래 값으로 되돌림
 function warmUp(){const keep={min:S.min,yen:S.yen,served:S.served,rep:S.rep,fin:JSON.stringify(S.fin||{}),meta:S.meta?JSON.stringify(S.meta):null},nr=window.__norender;
@@ -1122,7 +1122,7 @@ function step(dt){if(_pb<=0)_pb=2;
  const gm=dt*2; // 실시간 1초 = 게임 2분
  const prevH=Math.floor(S.min/60);S.min+=gm;const nowH=Math.floor(S.min/60);
  if(Math.floor(S.min/10)!=Math.floor((S.min-gm)/10))samplePop();
- if(nowH!=prevH){popCheck();const wages=wageNow(nowH);const pay=Math.min(wages,Math.max(0,S.yen)),unpaid=wages-pay;S.yen-=pay;if(unpaid>0){if(!S._wt||S.min-S._wt>600){S._wt=S.min;toast('잔고가 조금 부족해요. 손님을 맞이하면 금방 채워져요')}}BUS.emit('hour',nowH);if(nowH%24==0)BUS.emit('day',Math.floor(nowH/24)+1);S.fin.exp+=pay;
+ if(nowH!=prevH){popCheck();const wages=wageNow(nowH);const pay=Math.min(wages,Math.max(0,S.yen)),unpaid=wages-pay;S.yen-=pay;if(unpaid>0){if(!S._wt||S.min-S._wt>600){S._wt=S.min;toast(L('잔고가 조금 부족해요. 손님을 맞이하면 금방 채워져요'))}}BUS.emit('hour',nowH);if(nowH%24==0)BUS.emit('day',Math.floor(nowH/24)+1);S.fin.exp+=pay;
   S.fin.hist.push((S.fin._h||0)-wages);S.fin._h=0;if(S.fin.hist.length>48)S.fin.hist.shift();if(nowH%24==0){S.fin.inc=0;S.fin.exp=0}}
  const before=S.yen;
  {const mg=maxGuests(),fill=1+(TUNE.fill||0)*Math.max(0,1-guests.length/mg); // 빈자리가 많을수록 손님이 조금 더 빨리 들어옴
@@ -1145,7 +1145,7 @@ function _objReach(o,gen){for(const[x,y]of tilesOf(o)){if((x+1<N&&_rSeen[y*N+x+1
 function checkReach(){const w=$('warn');const gen=_bfsGate();if(!gen){w.style.display='none';return}
  const bad=S.objs.filter(o=>DEF[o.k].price&&o!==moving&&!_objReach(o,gen));
  window._unreach=null;if(bad.length){const a=[];for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(tileOpen(x,y)&&walkable(x,y)&&_rSeen[y*N+x]!==gen)a.push([x,y]);window._unreach=a}
- if(bad.length){w.textContent='⚠️ 대문에서 갈 수 없는 시설: '+[...new Set(bad.map(o=>DEF[o.k].n))].join(', ');w.style.display='block'}else w.style.display='none'}
+ if(bad.length){w.textContent=L('⚠️ 대문에서 갈 수 없는 시설: ')+[...new Set(bad.map(o=>DEF[o.k].n))].join(', ');w.style.display='block'}else w.style.display='none'}
 let _ferr=0,_pb=8;function frame(now){_pb=8;try{frame_(now)}catch(e){if(_ferr++<5)console.error('frame error',e);if(window.DIAG&&_ferr<50)DIAG.log('frame',e.message,{stack:(e.stack||'').slice(0,600)})}requestAnimationFrame(frame)}
 function frame_(now){warnAcc+=1;if(warnAcc%90==1)checkReach();const dt=Math.min(0.1,(now-last)/1000||0);last=now;
  if(!paused&&!window.READONLY)for(let i=0;i<speed;i++)step(dt);else if(window.READONLY&&!paused)step(dt);
@@ -1154,8 +1154,8 @@ function frame_(now){warnAcc+=1;if(warnAcc%90==1)checkReach();const dt=Math.min(
   const z=lerp(homeAnim.from.z,VW>820?5.2:3.6,k);cam.z=z;cam.tz=z;const[wx,wy]=iso(homeAnim.to.x+fw/2,homeAnim.to.y+fh/2);const tx_=VW*(VW>820?0.42:0.5)-wx*z,ty_=VH*(VW>820?0.5:0.33)-wy*z;
   cam.x=lerp(homeAnim.from.x,tx_,k);cam.y=lerp(homeAnim.from.y,ty_,k);if(homeAnim.t>=1)homeAnim=null}
  stepBuild(dt);BUS.emit('frame',dt,now);if(!window.__norender&&(!window.GFX_LOW||!window.FPS30||(frameN++&1)==0)){render(now);hud()}saveAcc+=dt;if(saveAcc>5){saveAcc=0;save()}}
-async function boot(){resize();addEventListener('resize',resize);if(window.VISIT_PROMISE){try{window.VISIT_SAVE=await window.VISIT_PROMISE}catch(e){window.VISIT_SAVE=null;setTimeout(()=>toast('방문 링크가 올바르지 않아요'),1200)}}load();S.objs.forEach(o=>o.users=0);migrateLayout();migrate();OCC=occ();ensureGate();OCC=occ();
- await Promise.all([loadImgs(),Promise.race([Promise.all([document.fonts.load('700 14px Pretendard',window.FONT_GLYPHS||'가'),document.fonts.ready]).catch(e=>console.warn('[font]',e)),new Promise(r=>setTimeout(r,4000))])]); // 폰트 조각 일부가 실패하거나 느려도 시스템 폰트로 시작
+async function boot(){resize();addEventListener('resize',resize);if(window.VISIT_PROMISE){try{window.VISIT_SAVE=await window.VISIT_PROMISE}catch(e){window.VISIT_SAVE=null;setTimeout(()=>toast(L('방문 링크가 올바르지 않아요')),1200)}}load();S.objs.forEach(o=>o.users=0);migrateLayout();migrate();OCC=occ();ensureGate();OCC=occ();
+ await Promise.all([loadImgs(),Promise.race([Promise.all([document.fonts.load('700 14px Pretendard',(window.FONT_GLYPHS||'가')+(window.FONT_GLYPHS_X||'')),document.fonts.ready]).catch(e=>console.warn('[font]',e)),new Promise(r=>setTimeout(r,4000))])]); // 폰트 조각 일부가 실패하거나 느려도 시스템 폰트로 시작
  makeVariants();
  if(IMG.gate){variants('gate',IMG.gate);const flip=src=>{const c=mk(src.width,src.height),g=c.getContext('2d');g.translate(c.width,0);g.scale(-1,1);g.drawImage(src,0,0);return c};const gf=flip(IMG.gate);variants('gate_f',gf);gf.width=gf.height=0;
   const L=splitLayers(IMG.gate,GATE_MASKS);for(const n in L){variants('gate_'+n,L[n]);const fn=flip(L[n]);variants('gate_f_'+n,fn);fn.width=fn.height=0;L[n].width=L[n].height=0}}
