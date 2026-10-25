@@ -608,7 +608,7 @@ body.phone #top .box{font-size:12.5px;padding:5px 9px;border-radius:10px}
 body.phone #top .hud-lbl,body.phone #top .clock .sub,body.phone #bMute,body.phone #bInvite,body.phone #bPause{display:none}
 body.phone #top .sp{display:block;flex:1}
 body.phone #top .clock{display:flex;align-items:center}
-@media (max-width:420px){body.phone #top>.box:nth-child(2){display:none}body.phone #top .coin{display:none}}
+@media (max-width:420px){body.phone #top>.box:nth-child(2){display:none}body.phone #top .coin{padding:1px 5px;font-size:11.5px;border-radius:5px;margin-right:4px}}
 @media (max-width:420px){body.phone #dayn,body.phone .dsep{display:none}}
 body.phone #top .clock{white-space:nowrap}
 body.phone #quest{top:50px;left:8px;width:auto;max-width:min(250px,62vw);font-size:12px;padding:8px 11px;border-radius:12px}
@@ -673,3 +673,45 @@ body.phone-land #build{top:calc(50px + env(safe-area-inset-top));right:calc(8px 
 body.phone #tools.open{left:0;padding-left:calc(12px + env(safe-area-inset-left));padding-right:calc(12px + env(safe-area-inset-right))}
 body.phone-land #tools.open{left:auto;right:calc(8px + env(safe-area-inset-right))}
 #zenHint{bottom:calc(28px + env(safe-area-inset-bottom))}
+
+/* ===== 휴대폰 도구 아이콘 (흰색 심볼, CSS 마스크) ===== */
+[data-ic="guest"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%229%22%20cy%3D%228%22%20r%3D%223.2%22/%3E%3Cpath%20d%3D%22M3%2019.5c0-3.3%202.7-5.5%206-5.5s6%202.2%206%205.5%22/%3E%3Ccircle%20cx%3D%2216.5%22%20cy%3D%229%22%20r%3D%222.6%22/%3E%3Cpath%20d%3D%22M15.5%2014.2c3%20.2%205.5%202.1%205.5%205.3%22/%3E%3C/svg%3E")}
+[data-ic="quest"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%225%22%20y%3D%223.5%22%20width%3D%2214%22%20height%3D%2217%22%20rx%3D%222.5%22/%3E%3Cpath%20d%3D%22M8.5%209l1.5%201.5%203-3%22/%3E%3Cpath%20d%3D%22M8.5%2015h7%22/%3E%3Cpath%20d%3D%22M14%209.5h1.5%22/%3E%3C/svg%3E")}
+[data-ic="menu"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%224%22%20y%3D%224%22%20width%3D%226.5%22%20height%3D%226.5%22%20rx%3D%221.8%22/%3E%3Crect%20x%3D%2213.5%22%20y%3D%224%22%20width%3D%226.5%22%20height%3D%226.5%22%20rx%3D%221.8%22/%3E%3Crect%20x%3D%224%22%20y%3D%2213.5%22%20width%3D%226.5%22%20height%3D%226.5%22%20rx%3D%221.8%22/%3E%3Crect%20x%3D%2213.5%22%20y%3D%2213.5%22%20width%3D%226.5%22%20height%3D%226.5%22%20rx%3D%221.8%22/%3E%3C/svg%3E")}
+[data-ic="fin"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%228.5%22/%3E%3Cpath%20d%3D%22M8.5%207.5l3.5%205%203.5-5%22/%3E%3Cpath%20d%3D%22M12%2012.5V17%22/%3E%3Cpath%20d%3D%22M9%2012.8h6M9%2015h6%22/%3E%3C/svg%3E")}
+[data-ic="del"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4.5%207h15%22/%3E%3Cpath%20d%3D%22M9.5%207V4.8h5V7%22/%3E%3Cpath%20d%3D%22M6.5%207l1%2012.5h9l1-12.5%22/%3E%3Cpath%20d%3D%22M10.3%2011v5M13.7%2011v5%22/%3E%3C/svg%3E")}
+[data-ic="book"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%206.5c-2-1.6-4.8-2-8-1.5v13c3.2-.5%206%200%208%201.5%202-1.5%204.8-2%208-1.5V5c-3.2-.5-6-.1-8%201.5z%22/%3E%3Cpath%20d%3D%22M12%206.5v13%22/%3E%3C/svg%3E")}
+[data-ic="review"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%203.8l2.5%205.1%205.6.8-4%203.9.9%205.6-5-2.6-5%202.6.9-5.6-4-3.9%205.6-.8z%22/%3E%3C/svg%3E")}
+[data-ic="mail"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%223.5%22%20y%3D%225.5%22%20width%3D%2217%22%20height%3D%2213%22%20rx%3D%222.5%22/%3E%3Cpath%20d%3D%22M4.5%207l7.5%206%207.5-6%22/%3E%3C/svg%3E")}
+[data-ic="invite"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2217.5%22%20cy%3D%226%22%20r%3D%222.5%22/%3E%3Ccircle%20cx%3D%226.5%22%20cy%3D%2212%22%20r%3D%222.5%22/%3E%3Ccircle%20cx%3D%2217.5%22%20cy%3D%2218%22%20r%3D%222.5%22/%3E%3Cpath%20d%3D%22M8.7%2010.8l6.6-3.6M8.7%2013.2l6.6%203.6%22/%3E%3C/svg%3E")}
+[data-ic="fx"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M11%203.5l1.6%204.4%204.4%201.6-4.4%201.6L11%2015.5l-1.6-4.4L5%209.5l4.4-1.6z%22/%3E%3Cpath%20d%3D%22M18%2014l.8%202.2%202.2.8-2.2.8L18%2020l-.8-2.2-2.2-.8%202.2-.8z%22/%3E%3C/svg%3E")}
+[data-ic="zen"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2.5%2012s3.5-6.5%209.5-6.5S21.5%2012%2021.5%2012s-3.5%206.5-9.5%206.5S2.5%2012%202.5%2012z%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%223%22/%3E%3C/svg%3E")}
+[data-ic="home"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%227.5%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%222.5%22/%3E%3Cpath%20d%3D%22M12%202.5v3M12%2018.5v3M2.5%2012h3M18.5%2012h3%22/%3E%3C/svg%3E")}
+[data-ic="sound"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%209.5h3.5L12%205.5v13l-4.5-4H4z%22/%3E%3Cpath%20d%3D%22M15.5%209a4%204%200%20010%206M18%206.5a7.5%207.5%200%20010%2011%22/%3E%3C/svg%3E")}
+[data-ic="pause"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226.5%22%20y%3D%225%22%20width%3D%223.8%22%20height%3D%2214%22%20rx%3D%221.2%22/%3E%3Crect%20x%3D%2213.7%22%20y%3D%225%22%20width%3D%223.8%22%20height%3D%2214%22%20rx%3D%221.2%22/%3E%3C/svg%3E")}
+[data-ic="build"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M13.5%206.5l4%204%22/%3E%3Cpath%20d%3D%22M14.8%205.2l2-2%204%204-2%202%22/%3E%3Cpath%20d%3D%22M13.5%206.5L4%2016a2.1%202.1%200%20003%203l9.5-9.5%22/%3E%3C/svg%3E")}
+[data-ic="close"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%206l12%2012M18%206L6%2018%22/%3E%3C/svg%3E")}
+body.phone #tools .tool[data-ic]{position:relative}
+body.phone #tools .tool[data-ic]::before,body.phone #bOpen::before{content:'';display:block;width:22px;height:22px;flex:none;background:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
+body.phone #tools>.tool[data-ic]{flex-direction:column;gap:3px;width:56px;height:54px;padding:6px 0 5px;color:#f4efe6;border-radius:16px}
+body.phone #tools>.tool[data-ic] i{font-size:10.5px;font-weight:600;line-height:1;letter-spacing:-.02em;color:rgba(244,239,230,.86)}
+body.phone #tools.open>.tool[data-ic]{width:100%;height:62px}
+body.phone #tools.open>#tMenu{flex-direction:row;height:46px;gap:6px;color:var(--ink-dark)}
+body.phone #tools.open>#tMenu i{font-size:14px;color:var(--ink-dark)}
+body.phone #bOpen{gap:7px;height:54px;border-radius:16px;padding:0 18px;color:var(--ink-dark)}
+body.phone #bOpen::before{width:20px;height:20px}
+/* 달성 배지 */
+.tool[data-badge]::after{content:attr(data-badge);position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#eb6b64;color:#fff;font:700 11px/18px Pretendard,sans-serif;text-align:center;box-shadow:0 0 0 2px rgba(14,17,23,.9);animation:bdg 1.6s ease-in-out infinite}
+@keyframes bdg{50%{transform:scale(1.15)}}
+/* 퀘스트 달성 카드 */
+#quest.ready{border-color:rgba(232,196,104,.75);box-shadow:0 0 0 1px rgba(232,196,104,.35),0 0 22px rgba(232,196,104,.35)}
+#quest.ready #qClaim,#quest.ready #qOpen{animation:qbtn 1.4s ease-in-out infinite}
+@keyframes qbtn{0%,100%{box-shadow:0 0 0 0 rgba(232,196,104,.6)}50%{box-shadow:0 0 0 6px rgba(232,196,104,0)}}
+#quest.pop{animation:qpop .6s var(--ease)}
+@keyframes qpop{30%{transform:scale(1.06)}60%{transform:scale(.98)}}
+body.phone #quest.qmin.ready>.qf{display:flex}
+body.phone #quest.qmin.ready>.qf span{display:none}
+
+body.phone-land #tools.open{grid-template-columns:repeat(5,1fr);max-height:calc(100vh - 16px);overflow:auto;padding:10px}
+body.phone-land #tools.open>.tool[data-ic]{height:50px}
+body.phone-land #tools.open>#tMenu{height:40px}
