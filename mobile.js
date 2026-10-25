@@ -28,7 +28,7 @@
  if(q){q.classList.toggle('qmin',qmin);q.addEventListener('click',e=>{if(!document.body.classList.contains('phone')||!e.target.closest('.qh'))return;q.classList.toggle('qmin');try{localStorage.onsenQmin=q.classList.contains('qmin')?'1':'0'}catch(e){}})}
  // 아이콘 이름 붙이기 (나중에 추가되는 버튼도 있어 여러 번 실행)
  const IC={'재정':'fin','손님':'guest','철거':'del','퀘스트':'quest','도감':'book','리뷰':'review','엽서':'mail','초대·방문':'invite','연출':'fx','감상':'zen','중앙':'home','사운드':'sound','음소거':'sound','일시정지':'pause'};
- const tagIcons=()=>{for(const b of tools.querySelectorAll('.tool')){if(b.dataset.ic||b===menu)continue;const t=b.textContent.trim();for(const k in IC)if(t.startsWith(k)||t.startsWith(window.L?L(k):k)){b.dataset.ic=IC[k];break}}};
+ const tagIcons=()=>{for(const b of tools.querySelectorAll('.tool[data-ic]'))b.dataset.tip=(b.textContent||'').replace(/\d+$/,'').trim();for(const b of tools.querySelectorAll('.tool')){if(b.dataset.ic||b===menu)continue;const t=b.textContent.trim();for(const k in IC)if(t.startsWith(k)||t.startsWith(window.L?L(k):k)){b.dataset.ic=IC[k];break}}};
  menu.dataset.ic='menu';const bo=$('bOpen');if(bo)bo.dataset.ic='build';
  for(const [id,ic] of [['bMute','sound'],['bInvite','invite'],['bPause','pause']]){const e=$(id);if(e)e.dataset.ic=ic}
  tagIcons();let tn=0;const ti=setInterval(()=>{tagIcons();if(++tn>20)clearInterval(ti)},500);
