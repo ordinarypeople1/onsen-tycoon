@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "io.github.ordinarypeople1.capyonsen"
+    namespace = "com.poiesis.capyonsen"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "io.github.ordinarypeople1.capyonsen"
+        applicationId "com.poiesis.capyonsen"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode (System.getenv('VERSION_CODE') ?: '1').toInteger()

@@ -1,4 +1,4 @@
-package io.github.ordinarypeople1.capyonsen;
+package com.poiesis.capyonsen;
 
 import com.getcapacitor.BridgeActivity;
 
