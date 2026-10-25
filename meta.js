@@ -44,7 +44,7 @@ const QX=(()=>{
   el.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{const r=milesReady().find(x=>x.id==b.dataset.m);if(!r)return;m.ms.push(r.id);reward(r.rw,'마일스톤');modalQuest()})}
  // ----- 도감 -----
  const GKINDS=[['cw1','파란 유카타'],['cw2','분홍 유카타'],['cw3','초록 유카타'],['cw4','베이지 유카타'],['vip','VIP 손님']];
- function modalBook(){const m=M(),el=$('modal');const cell=(img,name,got,sub,filter,ic)=>`<div class="bk ${got?'':'no'}">${img?`<img src="assets/${img}.png" style="${filter?'filter:'+filter:''}">`:`<div class="ph">${ic||'?'}</div>`}<b>${got?name:'???'}</b><small>${got?sub||'':''}</small></div>`;
+ function modalBook(){const m=M(),el=$('modal');const cell=(img,name,got,sub,filter,ic)=>`<div class="bk ${got?'':'no'}">${img?`<img src="${window.SPRURL?SPRURL(img):'assets/'+img+'.png'}" style="${filter?'filter:'+filter:''}">`:`<div class="ph">${ic||'?'}</div>`}<b>${got?name:'???'}</b><small>${got?sub||'':''}</small></div>`;
   const items=Object.entries(DEF).filter(([k,d])=>d.tab&&!d.erase);const gotI=items.filter(([k])=>m.col.i[k]).length;
   el.innerHTML=`<h3>도감</h3><b>손님 (${GKINDS.filter(([k])=>m.col.g[k]).length+REGS.filter(([n])=>m.regs[n]).length}/${GKINDS.length+REGS.length})</b><div class="bkg">${GKINDS.map(([k,n])=>cell(k=='vip'?'cw1':k,n,m.col.g[k],'',k=='vip'?'sepia(1) saturate(3) hue-rotate(-10deg)':'')).join('')}${REGS.map(([n,img,d])=>cell(img,'단골 '+n,m.regs[n],m.regs[n]?`${d} · ${m.regs[n].v}회 방문`:'')).join('')}</div>
   <b style="display:block;margin-top:8px">시설·장식 (${gotI}/${items.length})</b><div class="bkg">${items.map(([k,d])=>{const lv=m.col.i[k]||0;const bi=d.img;const img=bi?(TIERED.includes(bi)?bi+'_lv'+(lv>=5?5:lv>=3?3:1):bi):null;return cell(img,d.n,lv,d.price?`최고 Lv.${lv}`:'',d.filter,d.ic)}).join('')}</div>
