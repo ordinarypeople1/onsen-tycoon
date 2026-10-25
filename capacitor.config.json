@@ -1,0 +1,12 @@
+{
+  "appId": "io.github.ordinarypeople1.capyonsen",
+  "appName": "카피바라 온센",
+  "webDir": "www",
+  "backgroundColor": "#0e1117",
+  "android": { "backgroundColor": "#0e1117" },
+  "ios": { "backgroundColor": "#0e1117", "contentInset": "never", "scrollEnabled": false },
+  "plugins": {
+    "SplashScreen": { "launchAutoHide": false, "backgroundColor": "#0e1117", "showSpinner": false },
+    "StatusBar": { "overlaysWebView": true, "style": "DARK" }
+  }
+}

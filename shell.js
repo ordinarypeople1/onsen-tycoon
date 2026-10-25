@@ -311,7 +311,7 @@ const SHELL=(()=>{
   if(!S.ryokanName)S.ryokanName='유자향 카피바라 료칸';
   let code='';
   try{code=await SAVE.codec.encode(S)}catch(e){toast('초대 코드를 만들지 못했어요');return}
-  let link=location.origin+location.pathname+'#visit='+code;
+  let link=(window.WEB_BASE||location.origin+location.pathname)+'#visit='+code;
   const stCount=window.stars?stars():1;
   const dNum=window.dayN?dayN():1;
   const svNum=S.served||0;
@@ -396,7 +396,7 @@ const SHELL=(()=>{
    nameInp.value=v;S.ryokanName=v;save();
    try{
     code=await SAVE.codec.encode(S);
-    link=location.origin+location.pathname+'#visit='+code;
+    link=(window.WEB_BASE||location.origin+location.pathname)+'#visit='+code;
     o.querySelector('#shL').value=link;
     o.querySelector('#shC').value=code;
     drawQrBadge(o.querySelector('#invQr'),code);
