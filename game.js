@@ -373,7 +373,7 @@ function pickTarget(g){
  const order=NEEDK.slice().sort((a,b)=>g.need[b]-g.need[a]);
  for(const nk of order){if(g.need[nk]<30)break;
   const c=S.objs.filter(o=>{const d=DEF[o.k];return d.eff&&!d.stay&&(d.eff[nk]<0||(nk=='fun'&&(d.fun||d.eff.fun>15)))&&!g.used?.includes(o)&&!(g.blocked&&g.blocked.has(o))});
-  if(!c.length){think(g,THOUGHT.none[nk]);g.happy-=6;g.need[nk]-=15;continue}
+  if(!c.length){think(g,THOUGHT.none[nk]);voice(g,nk,null);g.happy-=2;g.need[nk]-=15;continue}
   return pickBy(g,c,nk)}
  return null}
 // 혼잡도: 이용 중 + 이 시설로 가는 중 + 대기 중인 손님 수. 꽉 찰 시설은 빈자리 있는 시설보다 뒤로 (모두 차면 가장 가까운 곳에서 대기)
@@ -382,7 +382,15 @@ function pickBy(g,list,nk){const sc=new Map();for(const o of list){const full=lo
  if(Math.random()<0.25)think(g,THOUGHT.want[nk]||'');return o}
 const ctr=o=>{const[fw,fh]=fpOf(o.k,o.rot);return[o.x+fw/2,o.y+fh/2]};
 const dist=(g,o)=>{const[a,b]=ctr(o);return Math.hypot(a-g.x,b-g.y)};
-function think(g,t){if(!t)return;(window.__thinks=window.__thinks||{})[t]=(window.__thinks[t]||0)+1;bubbles=bubbles.filter(b=>b.g!==g);if(bubbles.length>=4)return;bubbles.push({g,t,l:3.2})}
+// 말풍선: 화면 안 손님만, 불만은 동시에 1개까지, 탭(force)한 손님은 항상 표시
+const NEG=new Set([...Object.values(THOUGHT.none),...THOUGHT.pricey,'자리가 없네…','길이 막혔어요…']);
+function onScr(g){const[X,Y]=toScreenT(g.x,g.y);return X>-60&&X<VW+60&&Y>-90&&Y<VH+40}
+function think(g,t,force){if(!t)return;(window.__thinks=window.__thinks||{})[t]=(window.__thinks[t]||0)+1;if(window.__norender&&!force)return;bubbles=bubbles.filter(b=>b.g!==g);
+ if(!force&&!onScr(g))return;const neg=NEG.has(t);if(neg&&!force&&bubbles.some(b=>b.neg))return;
+ if(bubbles.length>=4){let i=bubbles.findIndex(b=>!onScr(b.g));if(i<0&&force)i=bubbles.findIndex(b=>!b.force);if(i<0)return;bubbles.splice(i,1)}
+ bubbles.push({g,t,l:3.2,neg,force:!!force})}
+// 손님들의 한마디: 최근 24게임시간 동안의 아쉬운 점 (메모리에만 보관, 저장하지 않음)
+const VOICE=[];function voice(g,k,o){VOICE.push({m:S.min,g,k,o});if(VOICE.length>5000)VOICE.splice(0,1000)}
 function walkable(x,y){if(!tileOpen(x,y))return false;const o=OCC[x+','+y];return !o||!!DEF[o.k].walk||!!DEF[o.k].isPath||DEF[o.k].fp==1&&!!DEF[o.k].isPath}
 function fairPrice(o){return DEF[o.k].price*(1+o.lv*0.12)}
 function doorTile(o){const[fw,fh]=fpOf(o.k,o.rot);const sides=[[o.x+(fw>>1),o.y+fh],[o.x+fw,o.y+(fh>>1)],[o.x+(fw>>1),o.y-1],[o.x-1,o.y+(fh>>1)]];const r=(o.rot|0)&1;const c=[sides[r],sides[(r+1)&3],sides[(r+3)&3],sides[(r+2)&3]];for(let i=0;i<fw;i++)c.push([o.x+i,o.y+fh],[o.x+i,o.y-1]);for(let j=0;j<fh;j++)c.push([o.x+fw,o.y+j],[o.x-1,o.y+j]);
@@ -441,12 +449,11 @@ function decide(g){
  if(g.life>220||g.budget<200||g.happy<15){leave(g);return}
  const o=pickTarget(g);if(!o){if(NEEDK.every(k=>g.need[k]<35)||Math.random()<0.4){leave(g);return}
   for(let i=0;i<3;i++){const x=(g.x|0)+((Math.random()*9)|0)-4,y=(g.y|0)+((Math.random()*9)|0)-4;if(walkable(x,y)&&goTo(g,x,y))return}leave(g);return}
- const pp=pathToObj(g,o);if(pp)g.path=pp;if(!pp){if(!g.blocked)g.blocked=new Set();if(!g.blocked.size){think(g,'길이 막혔어요…');g.happy-=4}g.blocked.add(o);g.path=[];return}g.target=o;}
+ const pp=pathToObj(g,o);if(pp)g.path=pp;if(!pp){if(!g.blocked)g.blocked=new Set();if(!g.blocked.size){think(g,'길이 막혔어요…');g.happy-=4}voice(g,'path',o);g.blocked.add(o);g.path=[];return}g.target=o;}
 function arrive(g){g.ax=g.x;g.ay=g.y;const o=g.target;if(!o||!DEF[o.k]){g.target=null;g.st='walk';if(_pb-->0)decide(g);return}const d=DEF[o.k];g.target=null;o.users=o.users||0;
  if(!S.objs.includes(o)){decide(g);return}
- const cap=capOf(o);if(o.users>=cap){if(!g.waited){g.waited=1;if(Math.random()<0.5)think(g,'자리가 날 때까지 기다릴게요');g.st='wait';g.t=5;g.target=o;const w=waitSpot(g,o);g.wx=w[0];g.wy=w[1];return}g.waited=0;think(g,'자리가 없네…');g.happy-=3;(g.used=g.used||[]).push(o);return}
+ const cap=capOf(o);if(o.users>=cap){if(!g.waited){g.waited=1;(window.__thinks=window.__thinks||{})['자리가 날 때까지 기다릴게요']=(window.__thinks['자리가 날 때까지 기다릴게요']||0)+1;voice(g,'full',o);g.st='wait';g.t=5;g.target=o;const w=waitSpot(g,o);g.wx=w[0];g.wy=w[1];return}g.waited=0;think(g,'자리가 없네…');voice(g,'full',o);g.happy-=3;(g.used=g.used||[]).push(o);return}
  const fair=fairPrice(o)*(0.8+g.happy/150);
- if(o.price>fair*1.45){think(g,THOUGHT.pricey[Math.random()*3|0]);g.happy-=9;o.rej=(o.rej||0)+1;(g.used=g.used||[]).push(o);return}
  if(o.price>g.budget){think(g,'다음에 또 올게요');leave(g);return}
  g.budget-=o.price;S.yen+=o.price;S.fin.inc+=o.price;o.earn=(o.earn||0)+o.price;o.uses=(o.uses||0)+1;o.hu=(o.hu||0)+1;S.served++;BUS.emit('pay',o,g,o.price);
  const[sx,sy]=toScreenT(...ctr(o));floats.push({x:ctr(o)[0],y:ctr(o)[1],t:'+¥'+fmt(o.price),l:1.6});
@@ -604,6 +611,7 @@ function drawGrid(){const P=N/PS;
  if(ghost||mode=='del'){cx.lineWidth=0.6;cx.strokeStyle='rgba(255,255,255,0.55)';cx.beginPath();
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){if(!tileOpen(x,y))continue;const[X,Y]=iso(x,y);cx.moveTo(X,Y);cx.lineTo(X+16,Y+8);cx.lineTo(X,Y+16);cx.lineTo(X-16,Y+8);cx.closePath()}cx.stroke();
   cx.fillStyle='rgba(240,90,80,0.22)';for(const k in OCC){const[x,y]=k.split(',').map(Number);if(DEF[OCC[k].k].isPath)continue;const[X,Y]=iso(x,y);cx.beginPath();cx.moveTo(X,Y);cx.lineTo(X+16,Y+8);cx.lineTo(X,Y+16);cx.lineTo(X-16,Y+8);cx.fill()}}
+ if((ghost||mode=='del')&&window._unreach&&_unreach.length){cx.fillStyle='rgba(255,150,70,0.30)';for(const[x,y]of _unreach){const[X,Y]=iso(x,y);cx.beginPath();cx.moveTo(X,Y);cx.lineTo(X+16,Y+8);cx.lineTo(X,Y+16);cx.lineTo(X-16,Y+8);cx.fill()}}
  cx.save();cx.setLineDash([3,2]);cx.lineWidth=1;cx.strokeStyle='rgba(255,248,220,0.8)';cx.beginPath();
  for(let py=0;py<P;py++)for(let px=0;px<P;px++){if(!plotOpen(px,py))continue;const x0=px*PS,y0=py*PS;
   const E=[[[x0,y0],[x0+PS,y0],!plotOpen(px,py-1)],[[x0+PS,y0],[x0+PS,y0+PS],!plotOpen(px+1,py)],[[x0+PS,y0+PS],[x0,y0+PS],!plotOpen(px,py+1)],[[x0,y0+PS],[x0,y0],!plotOpen(px-1,py)]];
@@ -768,11 +776,20 @@ function drawText(t,lt){ // 고해상도 텍스트 레이어
  const ZN=document.body.classList.contains('zen');for(const f of ZN?[]:floats){const[X,Y]=toScreenT(f.x,f.y);const a=Math.min(1,f.l);tx.globalAlpha=a;tx.font='800 15px Pretendard';tx.lineWidth=3;tx.strokeStyle='#6b4310';const yy=Y-40-(1.6-f.l)*30;tx.strokeText(f.t,X,yy);tx.fillStyle='#ffd65a';tx.fillText(f.t,X,yy)}
  tx.globalAlpha=1;
  if(paint&&paintCursor){const{t,cost}=paintPlan();const s_=(DEF[ghost].erase?'환불 ':'')+`${t.length}칸 · ¥${fmt(Math.abs(cost))}`;tx.font='700 14px Pretendard';const w=tx.measureText(s_).width+20;tx.fillStyle='rgba(74,51,32,0.92)';rr(tx,paintCursor[0]+14,paintCursor[1]-34,w,26,8);tx.fill();tx.fillStyle='#fff';tx.textAlign='left';tx.fillText(s_,paintCursor[0]+24,paintCursor[1]-21);tx.textAlign='center'}
+ // 만석 팻말(D3)·기다리는 손님 머리 위 김 아이콘(D5)
+ if(!ZN&&window.ICURL){const st_=icImg('steam');tx.imageSmoothingEnabled=false;
+  for(const o of S.objs){const d=DEF[o.k];if(!d.bath||o===moving||(o.users||0)<capOf(o))continue;const G=objGeom(o);let[X,Y]=toScreen(G.X,G.Y-G.H*0.82);Y=Math.max(18,Y);
+   const fs=Math.max(10,Math.min(13,2.6*cam.z));tx.font=`700 ${fs}px Pretendard`;const isz=16,w=tx.measureText('만석').width+isz+16;
+   tx.fillStyle='#f7efdc';tx.strokeStyle='#6b4024';tx.lineWidth=2;rr(tx,X-w/2,Y-fs+1,w,fs*2-2,5);tx.fill();tx.stroke();
+   if(st_.complete)tx.drawImage(st_,Math.round(X-w/2+5),Math.round(Y-isz/2),isz,isz);tx.fillStyle='#2b1d14';tx.fillText('만석',X+isz/2+1,Y+1)}
+  if(st_.complete){const isz=cam.z>=2.5?32:16;for(const g of guests){if(g.st!='wait'||g.hide||g.inBath||bubbles.some(b=>b.g===g))continue;const[X0,Y0]=toScreenT(g.x,g.y);const Y=Y0-26*cam.z-isz/2-2+Math.sin(t/260+g.bob)*2;
+   tx.globalAlpha=0.95;tx.drawImage(st_,Math.round(X0-isz/2),Math.round(Y-isz/2),isz,isz);tx.globalAlpha=1}}}
  BUS.emit('text',tx);
  const placed=[];for(const b of ZN?[]:bubbles){const g=b.g;const[X0,Y0]=toScreenT(g.x,g.y);let Y=Y0-(g.inBath?14:26)*cam.z-8;tx.font='600 13px Pretendard';const w=tx.measureText(b.t).width+16;
   for(let k=0;k<6;k++){const hit=placed.find(p=>Math.abs(p[0]-X0)<(p[2]+w)/2+4&&Math.abs(p[1]-Y)<28);if(!hit)break;Y=hit[1]-30}placed.push([X0,Y,w]);
   tx.globalAlpha=Math.min(1,b.l*2);tx.fillStyle='rgba(255,252,244,0.96)';tx.strokeStyle='#b89366';tx.lineWidth=1.5;rr(tx,X0-w/2,Y-13,w,24,10);tx.fill();tx.stroke();
   tx.beginPath();tx.moveTo(X0-4,Y+11);tx.lineTo(X0,Y+17);tx.lineTo(X0+4,Y+11);tx.fill();tx.fillStyle='#4a3320';tx.fillText(b.t,X0,Y);tx.globalAlpha=1}}
+const ICIMG={};function icImg(n){return ICIMG[n]||(ICIMG[n]=Object.assign(new Image(),{src:window.ICURL?ICURL(n):''}))}
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
 // ===== UI =====
 let tab='bath',speed=1;
@@ -863,7 +880,7 @@ BUS.on('frame',popPlace);
 function showInfo(o){const el=$('info');if(INFO_O!==o)POPSEC=null;INFO_O=o;el.classList.add('pop');el.style.right='auto';el.style.bottom='auto';el.style.maxHeight='';el.style.display='block';
  if(o.k=='gate'){el.innerHTML=`<div class="ph"><b>대문</b><button class="px" id="iCl">✕</button></div><div class="pdesc">손님이 드나드는 유일한 입구예요. 열린 땅 가장자리로 이동만 할 수 있어요.</div><div class="pacts"><button class="pa" id="iMove"><i>이동</i></button><button class="pa" id="iRot"><i>회전</i></button></div>`;$('iMove').onclick=()=>startMove(o);$('iRot').onclick=e=>{e.stopPropagation();rotateGate()};$('iCl').onclick=()=>hideInfo();requestAnimationFrame(popPlace);return}
  const d=DEF[o.k];const up=Math.round(d.cost*Math.pow(1.7,o.lv));const users=guests.filter(g=>g.cur===o).length;
- const gauge=d.price?(()=>{const fr=fairPrice(o),r=o.price/fr;const [c,t]=r<0.9?["#5f9e5a","저렴 · 손님 만족 ↑"]:r<1.15?["#3f6aa0","적정가"]:r<1.4?["#c98a2c","조금 비쌈 · 만족 ↓"]:["#c0442e","너무 비쌈 · 손님이 거절해요"];const pos=Math.max(0,Math.min(100,(r-0.6)/1.0*100));return `<div class="pfb"><div class="pbar"><i style="left:${pos}%;background:${c}"></i></div><small style="color:${c}">${t}</small><small style="opacity:.7"> · 추천 ¥${fmt(Math.round(fr*1.1/10)*10)}${o.rej?` · 거절 ${o.rej}회`:""}</small></div>`})():'';
+ const gauge=d.price?(()=>{const fr=fairPrice(o),r=o.price/fr;const [c,t]=r<0.9?["#5f9e5a","저렴 · 손님 만족 ↑"]:r<1.15?["#3f6aa0","적정가"]:r<1.4?["#c98a2c","조금 비쌈 · 만족 ↓"]:["#c0442e","비쌈 · 만족 ↓"];const pos=Math.max(0,Math.min(100,(r-0.6)/1.0*100));return `<div class="pfb"><div class="pbar"><i style="left:${pos}%;background:${c}"></i></div><small style="color:${c}">${t}</small><small style="opacity:.7"> · 추천 ¥${fmt(Math.round(fr*1.1/10)*10)}</small></div>`})():'';
  const stars='◆'.repeat(o.lv)+'◇'.repeat(5-o.lv);
  el.innerHTML=`<div class="ph"><b>${d.n}</b><span class="lv" title="Lv.${o.lv}">${d.price?`Lv.${o.lv}`:''}</span><button class="px" id="iCl" aria-label="닫기">✕</button></div>
  <div class="pq">${d.price?`<span>요금 ¥${fmt(o.price)}</span><span>이용 ${users}/${capOf(o)}</span>`:`<span>아름다움 +${d.beauty}</span>`}</div>
@@ -924,11 +941,18 @@ function modalRank(){const m=$('modal');const st=stars(),sc=Math.floor(starScore
   <div style="text-align:right;margin-top:6px"><button class="b" onclick="this.closest('.panel').style.display='none'">닫기</button></div>`;
  m.style.display='block';if(window.ICFIX)ICFIX(m)}
 window.modalRank=modalRank;
-function modalGuest(){const m=$('modal');const n=guests.length||1;const avg=k=>guests.reduce((s,g)=>s+g.need[k],0)/n;const hp=guests.reduce((s,g)=>s+g.happy,0)/n;
+const VTXT={full:o=>`${DEF[o.k].n}에 자리가 더 있으면 좋겠어요`,path:o=>`${DEF[o.k].n}에 가는 길이 이어지면 좋겠어요`,fatigue:()=>'쉴 수 있는 탕이 더 있으면 좋겠어요',hunger:()=>'먹을 곳이 있으면 좋겠어요',thirst:()=>'마실 것을 파는 곳이 있으면 좋겠어요',fun:()=>'구경할 거리가 더 있으면 좋겠어요'};
+const VTAB={fatigue:'bath',hunger:'food',thirst:'shop',fun:'deco'};
+function voices(){const since=S.min-1440,m=new Map();for(const v of VOICE){if(v.m<since||!VTXT[v.k])continue;if(v.o&&!S.objs.includes(v.o))continue;const key=v.k+'|'+(v.o?S.objs.indexOf(v.o):'');let e=m.get(key);if(!e)m.set(key,e={k:v.k,o:v.o,gs:new Set()});e.gs.add(v.g)}
+ return[...m.values()].map(e=>({k:e.k,o:e.o,n:e.gs.size})).sort((a,b)=>b.n-a.n).slice(0,3)}
+function openBuildTab(k){if($('build').style.display=='none')$('bOpen').onclick();if(k){tab=k;buildTabs();buildCards();$('tip').textContent=TIPS[tab]||''}}
+function modalGuest(){const m=$('modal');const vs=voices();const n=guests.length||1;const avg=k=>guests.reduce((s,g)=>s+g.need[k],0)/n;const hp=guests.reduce((s,g)=>s+g.happy,0)/n;
  const bar=(l,v,c)=>`<div class="row" style="border:0"><span>${l}</span><b>${Math.round(v)}</b></div><div class="bar"><i style="width:${v}%;background:${c}"></i></div>`;
  m.innerHTML=`<h3>손님 · 만족도</h3><div class="row"><span>현재 손님</span><b>${guests.length}명</b></div><div class="row"><span>누적 이용</span><b>${fmt(S.served)}회</b></div>${bar('평판',S.rep,'#e0a92e')}${bar('현재 손님 기분',guests.length?hp:0,'#7fbf6a')}
+ <h3 style="margin-top:8px">손님들의 한마디</h3>${vs.length?vs.map((v,i)=>`<button class="b g" data-v="${i}" style="display:flex;width:100%;justify-content:space-between;gap:8px;margin:3px 0;text-align:left"><span>${VTXT[v.k](v.o)}</span><b>${v.n}명</b></button>`).join(''):'<div class="row" style="border:0"><span>손님들이 모두 편안해 보여요</span></div>'}
  <h3 style="margin-top:8px">평균 욕구 (높을수록 필요)</h3>${NEEDK.map(k=>bar(NEEDN[k],guests.length?avg(k):0,'#d98a5a')).join('')}
- <div style="font-size:12px;color:var(--txt-sec)">팁: 욕구에 맞는 시설이 없으면 기분이 떨어져요. 장식 근처를 걸으면 기분이 좋아져요.</div><div style="text-align:right"><button class="b" onclick="this.closest('.panel').style.display='none'">닫기</button></div>`;m.style.display='block'}
+ <div style="font-size:12px;color:var(--txt-sec)">팁: 욕구에 맞는 시설이 없으면 기분이 떨어져요. 장식 근처를 걸으면 기분이 좋아져요.</div><div style="text-align:right"><button class="b" onclick="this.closest('.panel').style.display='none'">닫기</button></div>`;m.style.display='block';
+ m.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{const v=vs[+b.dataset.v];m.style.display='none';if(v.o&&S.objs.includes(v.o)){const c=ctr(v.o);focus(c[0],c[1],Math.max(cam.z,2.5));showInfo(v.o)}else openBuildTab(VTAB[v.k])})}
 // ===== 입력 =====
 const ptrs=new Map();let drag=null,pinch=null,lp=null,lastTap={};
 function onTap(sx,sy){const[fx,fy]=toTile(sx,sy);const x=Math.floor(fx),y=Math.floor(fy);
@@ -984,10 +1008,19 @@ function onTapPlace(x,y){if(window.READONLY)return;if(moving)return dropMove(x,y
 let zoomTarget=null,homeAnim=null;
 // ===== 루프 =====
 let last=0,acc=0,hourAcc=0,saveAcc=0;
+// 인기 시설 알림: 10게임분마다 만석 여부 기록(최근 3시간), 매시 확인해 하루 1번만 부드럽게 안내
+const POPS=new WeakMap();let popDay=-1;
+function samplePop(){for(const o of S.objs){const d=DEF[o.k];if(!d.price||!d.cap||d.stay)continue;let a=POPS.get(o);if(!a)POPS.set(o,a=[]);a.push((o.users||0)>=capOf(o)?1:0);if(a.length>18)a.shift()}}
+function josa(w,a,b){const c=w.charCodeAt(w.length-1);return(c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28)?a:b}
+function popCheck(){if(window.READONLY)return;const day=Math.floor(S.min/1440);if(day===popDay)return;let best=null,br=0;
+ for(const o of S.objs){const a=POPS.get(o);if(!a||a.length<12)continue;const r=a.reduce((s,x)=>s+x,0)/a.length;if(r>br){br=r;best=o}}
+ if(!best||br<0.4)return;popDay=day;const d=DEF[best.k],n=d.n;window.__pops=(window.__pops||0)+1;
+ toast(`${n}${josa(n,'이','가')} 인기 만점이에요! ${best.lv<5?'업그레이드하면':'하나 더 지으면'} 더 많은 손님이 ${d.bath?'쉴':'들를'} 수 있어요`)}
 function step(dt){if(_pb<=0)_pb=2;
  const gm=dt*2; // 실시간 1초 = 게임 2분
  const prevH=Math.floor(S.min/60);S.min+=gm;const nowH=Math.floor(S.min/60);
- if(nowH!=prevH){const wages=wageNow(nowH);const pay=Math.min(wages,Math.max(0,S.yen)),unpaid=wages-pay;S.yen-=pay;if(unpaid>0){S.rep=Math.max(0,S.rep-1.5);if(!S._wt||S.min-S._wt>600){S._wt=S.min;toast('⚠️ 자금 부족! 직원 급여를 다 못 줘서 평판이 떨어지고 있어요')}}BUS.emit('hour',nowH);if(nowH%24==0)BUS.emit('day',Math.floor(nowH/24)+1);S.fin.exp+=pay;
+ if(Math.floor(S.min/10)!=Math.floor((S.min-gm)/10))samplePop();
+ if(nowH!=prevH){popCheck();const wages=wageNow(nowH);const pay=Math.min(wages,Math.max(0,S.yen)),unpaid=wages-pay;S.yen-=pay;if(unpaid>0){if(!S._wt||S.min-S._wt>600){S._wt=S.min;toast('잔고가 조금 부족해요. 손님을 맞이하면 금방 채워져요')}}BUS.emit('hour',nowH);if(nowH%24==0)BUS.emit('day',Math.floor(nowH/24)+1);S.fin.exp+=pay;
   S.fin.hist.push((S.fin._h||0)-wages);S.fin._h=0;if(S.fin.hist.length>48)S.fin.hist.shift();if(nowH%24==0){S.fin.inc=0;S.fin.exp=0}}
  const before=S.yen;
  if(Math.random()<dt*spawnRate()*3&&guests.length<maxGuests())spawn();
@@ -1008,6 +1041,7 @@ function _bfsGate(){const gi=gateInfo();if(!gi)return 0;const gen=++_rGen,[gx,gy
 function _objReach(o,gen){for(const[x,y]of tilesOf(o)){if((x+1<N&&_rSeen[y*N+x+1]===gen)||(x>0&&_rSeen[y*N+x-1]===gen)||((y+1)<N&&_rSeen[(y+1)*N+x]===gen)||(y>0&&_rSeen[(y-1)*N+x]===gen))return true}return false}
 function checkReach(){const w=$('warn');const gen=_bfsGate();if(!gen){w.style.display='none';return}
  const bad=S.objs.filter(o=>DEF[o.k].price&&o!==moving&&!_objReach(o,gen));
+ window._unreach=null;if(bad.length){const a=[];for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(tileOpen(x,y)&&walkable(x,y)&&_rSeen[y*N+x]!==gen)a.push([x,y]);window._unreach=a}
  if(bad.length){w.textContent='⚠️ 대문에서 갈 수 없는 시설: '+[...new Set(bad.map(o=>DEF[o.k].n))].join(', ');w.style.display='block'}else w.style.display='none'}
 let _ferr=0,_pb=8;function frame(now){_pb=8;try{frame_(now)}catch(e){if(_ferr++<5)console.error('frame error',e);if(window.DIAG&&_ferr<50)DIAG.log('frame',e.message,{stack:(e.stack||'').slice(0,600)})}requestAnimationFrame(frame)}
 function frame_(now){warnAcc+=1;if(warnAcc%90==1)checkReach();const dt=Math.min(0.1,(now-last)/1000||0);last=now;
