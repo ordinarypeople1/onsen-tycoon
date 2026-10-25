@@ -1,0 +1,47 @@
+name: Android 출시용 AAB
+
+# Actions 탭에서 수동 실행. 결과 AAB를 Play Console에 업로드
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: '버전 이름 (예: 1.0.0)'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  aab:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: |
+          npm ci
+          npm run build:www
+          npx cap sync android
+      - name: 업로드 키 복원
+        run: echo "${{ secrets.ANDROID_UPLOAD_KEYSTORE_B64 }}" | base64 -d > $RUNNER_TEMP/upload.jks
+      - name: 서명된 AAB 빌드
+        working-directory: android
+        env:
+          UPLOAD_KEYSTORE: ${{ runner.temp }}/upload.jks
+          UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+          VERSION_CODE: ${{ github.run_number }}
+          VERSION_NAME: ${{ inputs.version_name }}
+        run: |
+          chmod +x gradlew
+          ./gradlew bundleRelease --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: capybara-onsen-${{ inputs.version_name }}-${{ github.run_number }}-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 90
