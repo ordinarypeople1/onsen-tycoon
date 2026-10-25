@@ -8,7 +8,11 @@ const SaveCodec={
   return this.PFX+'j.'+b64u(bytes)},
  async decode(code){code=String(code).trim().replace(/\s+/g,'');if(!code.startsWith('CAPY1.')&&!code.startsWith('YUZU1.'))throw new Error('형식이 달라요');const[kind,data]=[code.slice(6,7),code.slice(8)];let bytes=unb64u(data);
   if(kind=='z'){if(!window.DecompressionStream)throw new Error('이 브라우저는 압축 해제를 지원하지 않아요');const ds=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));bytes=new Uint8Array(await new Response(ds).arrayBuffer())}
-  const obj=JSON.parse(new TextDecoder().decode(bytes));if(!obj||obj.ver!==2||!Array.isArray(obj.objs)||!obj.plots)throw new Error('저장 데이터가 아니에요');return obj}};
+  const obj=JSON.parse(new TextDecoder().decode(bytes));if(!obj||obj.ver!==2||!Array.isArray(obj.objs)||!obj.plots)throw new Error('저장 데이터가 아니에요');return cleanSave(obj)}};
+// 남이 보낸 코드·링크로 들어온 저장 데이터 정리: 이름의 HTML 문자 제거, 사진 장식은 data:image만 허용
+function cleanSave(o){const txt=v=>String(v==null?'':v).replace(/[<>&"'`]/g,'').slice(0,40);if('ryokanName'in o)o.ryokanName=txt(o.ryokanName);
+ if(o.pics&&typeof o.pics=='object'){for(const k in o.pics){const e=o.pics[k];if(!e||typeof e.d!='string'||!/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(e.d)||!/^[a-z0-9]+$/i.test(k))delete o.pics[k];else e.kind=txt(e.kind)}}else o.pics={};
+ o.objs=o.objs.filter(x=>x&&typeof x.k=='string'&&/^[a-z0-9_]+$/.test(x.k));return o}
 function b64u(u8){let s='';for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 function unb64u(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
 class LocalAdapter{constructor(){this.name='local'}key(n){return n==1?'onsen2':'onsen2_s'+n}
