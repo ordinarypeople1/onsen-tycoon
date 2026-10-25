@@ -116,6 +116,7 @@ window.applyState=function(newS,ro){
  groundDirty=true;ghost=null;moving=null;paint=null;hideInfo();
  guests=[];parts=[];floats=[];bubbles=[];
  for(let i=0;i<5;i++)spawn();guests.forEach((g,i)=>{g.x-=i*0.3});
+ if(ro)warmUp();
  const b=S.objs.find(o=>DEF[o.k].bath)||S.objs[0];
  if(b){const[bfw,bfh]=fpOf(b.k,b.rot);focus(b.x+bfw/2,b.y+bfh/2,VW>820?5.2:3.6)}
  buildTabs();buildCards();hud();
@@ -808,7 +809,7 @@ const ICIMG={};function icImg(n){return ICIMG[n]||(ICIMG[n]=Object.assign(new Im
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
 // ===== UI =====
 let tab='bath',speed=1;
-function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t.h);t.h=setTimeout(()=>t.style.display='none',2600)}
+function toast(m){if(window.__warm)return;const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t.h);t.h=setTimeout(()=>t.style.display='none',2600)}
 function buildTabs(){$('tabs').innerHTML=TABS.map(([k,i,n])=>`<div class="tab ${k==tab?'on':''}" data-k="${k}">${n}</div>`).join('');
  document.querySelectorAll('.tab').forEach(e=>e.onclick=()=>{tab=e.dataset.k;buildTabs();buildCards();$('tip').textContent=TIPS[tab]});buildCards()}
 const SUBCATS={
@@ -1033,6 +1034,13 @@ function popCheck(){if(window.READONLY)return;const day=Math.floor(S.min/1440);i
  for(const o of S.objs){const a=POPS.get(o);if(!a||a.length<12)continue;const r=a.reduce((s,x)=>s+x,0)/a.length;if(r>br){br=r;best=o}}
  if(!best||br<0.4)return;popDay=day;const d=DEF[best.k],n=d.n;window.__pops=(window.__pops||0)+1;
  toast(`${n}${josa(n,'이','가')} 인기 만점이에요! ${best.lv<5?'업그레이드하면':'하나 더 지으면'} 더 많은 손님이 ${d.bath?'쉴':'들를'} 수 있어요`)}
+// 방문·쇼케이스: 들어가자마자 손님들이 이미 탕·상점·산책을 즐기고 있도록 렌더 없이 미리 진행
+// (최소 게임 1.5시간, 손님이 최대치의 75%가 될 때까지 최대 6시간) — 시각·잔고·손님 수·평판·재정 표시는 원래 값으로 되돌림
+function warmUp(){const keep={min:S.min,yen:S.yen,served:S.served,rep:S.rep,fin:JSON.stringify(S.fin||{}),meta:S.meta?JSON.stringify(S.meta):null},nr=window.__norender;
+ window.__warm=1;window.__norender=1;const target=Math.max(6,Math.round(maxGuests()*0.75));
+ try{for(let i=0;i<1800&&(i<450||guests.length<target);i++)step(0.1)}catch(e){console.warn('[warm]',e)}
+ S.min=keep.min;S.yen=keep.yen;S.served=keep.served;S.rep=keep.rep;S.fin=JSON.parse(keep.fin);if(keep.meta)S.meta=JSON.parse(keep.meta);
+ floats=[];bubbles=[];window.__norender=nr;window.__warm=0}
 function step(dt){if(_pb<=0)_pb=2;
  const gm=dt*2; // 실시간 1초 = 게임 2분
  const prevH=Math.floor(S.min/60);S.min+=gm;const nowH=Math.floor(S.min/60);
@@ -1075,6 +1083,7 @@ async function boot(){resize();addEventListener('resize',resize);if(window.VISIT
  for(const k in OVER){if(!IMG[k])continue;const L=splitLayers(IMG[k],[['over',(g,W,H)=>g.rect(0,0,W,H*OVER[k])]]);variants(k+'_over',L.over);for(const n in L)L[n].width=L[n].height=0}
  const b=S.objs.find(o=>DEF[o.k].bath)||S.objs[0];const[bfw,bfh]=fpOf(b.k,b.rot);focus(b.x+bfw/2,b.y+bfh/2,VW>820?5.2:3.6);
  for(let i=0;i<5;i++)spawn();guests.forEach((g,i)=>{g.x-=i*0.3});
+ if(window.READONLY)warmUp();
  buildTabs();initInput();window.__ready=true;requestAnimationFrame(t=>{last=t;frame(t)})}
 // 시설 표시용 키 매핑 (milk는 yuzu 이미지에 필터)
 const _drawSprite=drawSprite;
