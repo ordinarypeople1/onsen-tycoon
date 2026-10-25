@@ -505,9 +505,9 @@ const SHELL=(()=>{
  // ---- 크레딧 ----
  function credits(){const o=overlay('ovCred',`<div class="m-head"><div class="m-head-left"><span class="m-eyebrow">CREDITS</span><h2>${T('cred')}</h2></div><button class="m-close-x" data-x>${T('close')}</button></div><div class="cred">
   <p><b>카피바라 온센 · 료칸 타이쿤</b><br>CAPYBARA ONSEN · v3.0</p>
-  <p><b>기획 · 개발</b><br>ordinarypeople1 & Grok Bot</p>
+  <p><b>기획 · 개발 · 문의</b><br><a href="mailto:youkim.official@gmail.com">youkim.official@gmail.com</a></p>
   <p><b>아트</b><br>이미지 생성 후 수작업 파이프라인(크로마키·디스필·박스 축소·팔레트 정리)으로 픽셀화</p>
-  <p><b>사운드</b><br>WebAudio 절차적 합성 — 물소리, 풍경, 고토풍 선율</p>
+  <p><b>사운드</b><br>배경음악 — Suno로 제작<br>효과음·환경음 — WebAudio 절차적 합성 (물소리, 풍경)</p>
   <p><b>폰트</b><br>Pretendard — © Kil Hyung-jin, <a href="https://github.com/orioncactus/pretendard" target="_blank" rel="noopener">github.com/orioncactus/pretendard</a><br>SIL Open Font License 1.1 (<a href="assets/fonts/LICENSE.txt" target="_blank">전문</a>)</p>
   <p><b>특별히 감사</b><br>느긋한 모든 카피바라에게</p></div><div class="btns"><button class="mb sec" data-x>${T('close')}</button></div>`);o.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>close('ovCred'))}
 
