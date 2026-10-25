@@ -16,7 +16,7 @@ const SND=(()=>{let ac=null,master=null,amb=null,bgmOn=false,muted=localStorage.
   (function chime(){if(!ac)return;const sc=[1318.5,1568,1760,2093,2349.3,2637];const n=1+(Math.random()*3|0);for(let i=0;i<n;i++){const f=sc[Math.random()*sc.length|0];tone(f,'sine',2.4,0.022,i*0.12,ambB);tone(f*2.76,'sine',0.8,0.008,i*0.12,ambB)}setTimeout(chime,4000+Math.random()*7000)})()}
  // BGM: 6곡 플레이리스트(캐논풍 3곡 → 기존 3곡, 반복), 3초 크로스페이드, 2곡째부터는 필요할 때 로드
  const TRACKS=['assets/bgm/canon1.mp3','assets/bgm/canon2.mp3','assets/bgm/canon3.mp3','assets/bgm/track1.mp3','assets/bgm/track2.mp3','assets/bgm/track3.mp3'],XF=3;let cur=-1,players=[];
- function player(i){if(players[i])return players[i];const a=new Audio();a.preload=i==0?'auto':'none';a.src=TRACKS[i];a.crossOrigin='anonymous';let node=null,g=ac.createGain();g.gain.value=0;g.connect(bgB);
+ function player(i){if(players[i])return players[i];const a=new Audio();a.preload=i==0?'auto':'none';a.src=TRACKS[i];a.crossOrigin='anonymous';let node=null,g=ac.createGain();g.gain.value=0;g.connect(bgB);a.addEventListener('ended',()=>{const q=players[i];if(cur===i&&q&&!q.fading){q.fading=true;playTrack((i+1)%TRACKS.length)}});
   try{node=ac.createMediaElementSource(a);node.connect(g)}catch(e){}return players[i]={a,g,fading:false}}
  function playTrack(i){const p=player(i);const t=ac.currentTime;p.fading=false;p.a.currentTime=0;p.g.gain.cancelScheduledValues(t);p.g.gain.setValueAtTime(0.0001,t);p.g.gain.linearRampToValueAtTime(0.55,t+XF);
   const pr=p.a.play();if(pr&&pr.catch)pr.catch(()=>{});const prev=players[cur];if(prev&&prev!==p){prev.g.gain.cancelScheduledValues(t);prev.g.gain.setValueAtTime(prev.g.gain.value,t);prev.g.gain.linearRampToValueAtTime(0.0001,t+XF);const pa=prev.a;setTimeout(()=>pa.pause(),XF*1000+200)}cur=i}
@@ -35,6 +35,6 @@ const SND=(()=>{let ac=null,master=null,amb=null,bgmOn=false,muted=localStorage.
  api.quest=()=>{if(!ac)return;[784,988,1175,1568].forEach((f,i)=>{tone(f,'sine',1.2,0.05,i*0.09);tone(f*2,'sine',0.5,0.01,i*0.09)})};
  api.unlock=()=>{if(!ac)return;[392,523,659,784,1046].forEach((f,i)=>tone(f,'triangle',0.6,0.06,i*0.1))};
  api.toggle=()=>{muted=!muted;localStorage.onsenMute=muted?'1':'0';applyVol();return muted};
- api.muted=()=>muted;api._bgm=()=>({cur,players});api.applyVol=applyVol;api.suspend=on=>{if(ac)on?ac.suspend():ac.resume()};document.addEventListener('visibilitychange',()=>{if(!ac)return;const p=players[cur];if(document.hidden){ac.suspend();if(p)p.a.pause()}else{ac.resume();if(p&&bgmOn){const r=p.a.play();if(r&&r.catch)r.catch(()=>{})}}});
+ api.muted=()=>muted;api._bgm=()=>({cur,players});api.applyVol=applyVol;api.suspend=on=>{if(ac)on?ac.suspend():ac.resume()};document.addEventListener('visibilitychange',()=>{if(!ac)return;const p=players[cur];const phone=matchMedia('(pointer:coarse)').matches;if(document.hidden){if(phone){ac.suspend();if(p)p.a.pause()}}else{ac.resume();if(p&&bgmOn&&p.a.paused){const r=p.a.play();if(r&&r.catch)r.catch(()=>{})}}});
  return api})();
 addEventListener('pointerdown',()=>SND.init(),{once:false,capture:true});
