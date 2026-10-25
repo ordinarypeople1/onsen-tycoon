@@ -749,3 +749,8 @@ body.phone #tools:not(.open)>.tool[data-ic]::before{width:25px;height:25px}
 /* PC: 마우스를 올리면 이름 */
 body:not(.phone) #tools>.tool[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);white-space:nowrap;background:rgba(12,15,21,.94);color:var(--txt-pri);border:1px solid var(--border-glass);border-radius:8px;padding:5px 9px;font:600 12.5px Pretendard,sans-serif;pointer-events:none;z-index:20;animation:none}
 body:not(.phone) #tools>.tool[data-tip][data-badge]:hover::after{content:attr(data-tip);top:auto;right:auto;min-width:0;height:auto;line-height:normal;box-shadow:none}
+/* '시설 건설'은 아이콘만 (글자는 숨기고 title로 이름 제공) */
+#bOpen[data-ic]{font-size:0!important;gap:0!important;padding:0!important;justify-content:center;align-items:center}
+body:not(.phone) #bOpen[data-ic]{width:48px;height:48px;border-radius:14px}
+body.phone #bOpen[data-ic]{width:54px;height:54px;border-radius:16px}
+#bOpen[data-ic]::before{width:24px!important;height:24px!important}
