@@ -30,7 +30,15 @@ jobs:
           npm run build:www
           npx cap sync android
       - name: 업로드 키 복원
-        run: echo "${{ secrets.ANDROID_UPLOAD_KEYSTORE_B64 }}" | base64 -d > $RUNNER_TEMP/upload.jks
+        run: echo "${{ secrets.ANDROID_UPLOAD_KEYSTORE_B64 }}" | tr -d ' \r\n' | base64 -d > $RUNNER_TEMP/upload.jks
+      - name: 업로드 키 확인
+        env:
+          PW: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+        run: |
+          echo "::notice::keystore $(stat -c %s $RUNNER_TEMP/upload.jks) bytes, pw ${#PW} chars, alias ${#ALIAS} chars"
+          keytool -list -keystore $RUNNER_TEMP/upload.jks -storepass "$PW" -alias "$ALIAS" > /tmp/kt.txt 2>&1 || { echo "::error::keytool: $(tail -2 /tmp/kt.txt | tr '\n' ' ')"; exit 1; }
+          echo "::notice::$(grep -i 'SHA-256' /tmp/kt.txt)"
       - name: 서명된 AAB 빌드
         working-directory: android
         env:
@@ -42,7 +50,8 @@ jobs:
           VERSION_NAME: ${{ inputs.version_name || '1.0.0' }}
         run: |
           chmod +x gradlew
-          ./gradlew bundleRelease --no-daemon
+          ./gradlew bundleRelease --no-daemon > /tmp/gradle.txt 2>&1 || { grep -A6 "What went wrong" /tmp/gradle.txt | head -8 | while read -r l; do echo "::error::$l"; done; tail -5 /tmp/gradle.txt; exit 1; }
+          tail -3 /tmp/gradle.txt
       - uses: actions/upload-artifact@v4
         with:
           name: capybara-onsen-${{ inputs.version_name || '1.0.0' }}-${{ github.run_number }}-aab
