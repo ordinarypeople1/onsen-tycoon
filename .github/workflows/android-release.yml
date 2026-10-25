@@ -1,10 +1,9 @@
 name: Android 출시용 AAB
 
-# Actions 탭에서 수동 실행. 결과 AAB를 Play Console에 업로드
+# v로 시작하는 태그(예: v1.0.1)를 올리거나 Actions 탭에서 수동 실행. 결과 AAB를 Play Console에 업로드
 on:
   push:
-    branches: [feat/capacitor]
-    paths-ignore: ['docs/**', '*.md']
+    tags: ['v*']
   workflow_dispatch:
     inputs:
       version_name:
@@ -47,13 +46,13 @@ jobs:
           UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
           UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
           VERSION_CODE: ${{ github.run_number }}
-          VERSION_NAME: ${{ inputs.version_name || '1.0.0' }}
+          VERSION_NAME: ${{ inputs.version_name || (startsWith(github.ref_name, 'v') && github.ref_name) || '1.0.0' }}
         run: |
           chmod +x gradlew
           ./gradlew bundleRelease --no-daemon > /tmp/gradle.txt 2>&1 || { grep -A6 "What went wrong" /tmp/gradle.txt | head -8 | while read -r l; do echo "::error::$l"; done; tail -5 /tmp/gradle.txt; exit 1; }
           tail -3 /tmp/gradle.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: capybara-onsen-${{ inputs.version_name || '1.0.0' }}-${{ github.run_number }}-aab
+          name: capybara-onsen-${{ inputs.version_name || (startsWith(github.ref_name, 'v') && github.ref_name) || '1.0.0' }}-${{ github.run_number }}-aab
           path: android/app/build/outputs/bundle/release/app-release.aab
           retention-days: 90

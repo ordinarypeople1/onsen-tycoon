@@ -3,7 +3,7 @@ name: Android 테스트 APK
 on:
   workflow_dispatch:
   push:
-    branches: [main, feat/capacitor]
+    branches: [main]
     paths-ignore: ['docs/**', '*.md']
 
 jobs:
