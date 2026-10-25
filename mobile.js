@@ -30,6 +30,7 @@
  const IC={'재정':'fin','손님':'guest','철거':'del','퀘스트':'quest','도감':'book','리뷰':'review','엽서':'mail','초대·방문':'invite','연출':'fx','감상':'zen','중앙':'home','사운드':'sound','음소거':'sound','일시정지':'pause'};
  const tagIcons=()=>{for(const b of tools.querySelectorAll('.tool')){if(b.dataset.ic||b===menu)continue;const t=b.textContent.trim();for(const k in IC)if(t.startsWith(k)||t.startsWith(window.L?L(k):k)){b.dataset.ic=IC[k];break}}};
  menu.dataset.ic='menu';const bo=$('bOpen');if(bo)bo.dataset.ic='build';
+ for(const [id,ic] of [['bMute','sound'],['bInvite','invite'],['bPause','pause']]){const e=$(id);if(e)e.dataset.ic=ic}
  tagIcons();let tn=0;const ti=setInterval(()=>{tagIcons();if(++tn>20)clearInterval(ti)},500);
  // ---- 건설·철거 중 하단 바: [회전] [취소] (모든 기기). 휴대폰은 배치하는 동안 건설 시트를 내려 화면을 비움 ----
  const bar=document.createElement('div');bar.id='ghBar';bar.className='box';
