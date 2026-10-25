@@ -29,10 +29,14 @@ const QX=(()=>{
  function render_(){const m=M();ensureSets();
   if(m.tut<TUT.length){const[t,f,rw]=TUT[m.tut];const[a,b]=f();const done=a>=b;
    box.innerHTML=`<div class="qh">튜토리얼 <span>${m.tut+1}/${TUT.length}</span></div><div class="qt">${t}</div><div class="bar"><i style="width:${Math.min(100,a/b*100)}%"></i></div><div class="qf"><span>${Math.min(a,b)}/${b} · 보상 ¥${fmt(rw)}</span>${done?'<button class="b" id="qClaim">받기</button>':''}</div>`;
-   if(done)$('qClaim').onclick=()=>{m.tut++;reward(rw,'튜토리얼')}}
+   if(done)$('qClaim').onclick=()=>{m.tut++;reward(rw,'튜토리얼')};readyMark(done?1:0,done?`튜토리얼 달성! 퀘스트 카드에서 ¥${fmt(rw)} 받기`:'')}
   else{const ready=[...m.daily.list,...m.weekly.list].filter(q=>!q.claimed&&cur(q)>=q.goal).length+milesReady().length;
    box.innerHTML=`<div class="qh">오늘의 퀘스트 ${ready?`<b class="dot">${ready}</b>`:''}</div>`+m.daily.list.map(q=>`<div class="qs ${q.claimed?'ok':''}"><span class="q-bullet">${q.claimed?'✓':cur(q)>=q.goal?'●':'·'}</span> ${q.txt} <small>${fmt(Math.min(cur(q),q.goal))}/${fmt(q.goal)}</small></div>`).join('')+`<div class="qf"><span></span><button class="b g" id="qOpen">전체 보기</button></div>`;
-   $('qOpen').onclick=modalQuest}}
+   $('qOpen').onclick=modalQuest;readyMark(ready,ready?'퀘스트 달성! 보상을 받아가세요':'')}}
+ // 달성 알림: 카드 빛남·독 배지, 새로 달성되면 알림+효과음 (접힌 카드도 받기 버튼은 보임)
+ let lastReady=-1,questBtn=null;
+ function readyMark(n,msg){box.classList.toggle('ready',n>0);if(questBtn){if(n>0)questBtn.dataset.badge=n;else delete questBtn.dataset.badge}
+  if(lastReady>=0&&n>lastReady&&msg&&!window.__warm&&!window.READONLY){toast(msg);try{SND.quest()}catch(e){}box.classList.remove('pop');void box.offsetWidth;box.classList.add('pop')}lastReady=n}
  function milesReady(){const m=M(),out=[];for(const[key,steps,txt,rw]of MILES){for(const n of steps){const id=key+n;if(m.ms.includes(id))continue;const v=key=='served'?S.served:(st()[key]||0);if(v>=n)out.push({id,txt:txt.replace('{n}',fmt(n)),rw:Math.round(rw(n))});break}}return out}
  function modalQuest(){const m=M();ensureSets();const el=$('modal');
   const row=(q,grp,i)=>{const c=cur(q),ok=c>=q.goal;return`<div class="row"><span>${q.claimed?'✓':ok?'●':'·'} ${q.txt} <small>(${fmt(Math.min(c,q.goal))}/${fmt(q.goal)})</small></span>${q.claimed?'<small>완료</small>':ok?`<button class="b" data-q="${grp}:${i}">¥${fmt(q.rw)} 받기</button>`:`<small>¥${fmt(q.rw)}</small>`}</div>`};
@@ -105,7 +109,7 @@ const QX=(()=>{
  document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('[data-p]'))st().price++;if(e.target.closest&&e.target.closest('button,.card,.tab'))SND.click()},true);
  // 도구 버튼 (아이콘 없이 깔끔한 텍스트 알약 버튼)
  const tools=$('tools');const mkT=(ic,lb,fn)=>{const b=document.createElement('button');b.className='tool';b.innerHTML=`<i>${lb}</i>`;b.onclick=fn;tools.insertBefore(b,tools.querySelector('.zoom'));return b};
- mkT('','퀘스트',modalQuest);mkT('','도감',modalBook);mkT('','리뷰',modalReviews);const cardBtn=mkT('','엽서',modalCards);
+ questBtn=mkT('','퀘스트',modalQuest);questBtn.dataset.ic='quest';mkT('','도감',modalBook);mkT('','리뷰',modalReviews);const cardBtn=mkT('','엽서',modalCards);
  function cardBadge(){const n=((S&&S.meta&&S.meta.cards)||[]).filter(c=>!c.read).length;cardBtn.innerHTML=`<i>엽서${n?`<b class="pbadge">${n}</b>`:''}</i>`}cardBadge();
  const mute=document.createElement('div');mute.className='box btn';mute.id='bMute';mute.textContent=SND.muted()?'음소거':'사운드';mute.onclick=()=>{mute.textContent=SND.toggle()?'음소거':'사운드'};$('bSpeed').before(mute);
  setInterval(()=>{if(S){render_();cardBadge()}},1000);
