@@ -58,11 +58,15 @@ const SHELL=(()=>{
 
  // ---- 추천 이웃 료칸 프리셋 생성기 ----
  const NEIGHBORS=[
+  {id:'yuzu',name:'유자향 카피바라 료칸',stars:0,tag:'운영자의 료칸',desc:'이 게임을 만든 사람이 직접 꾸민 료칸'},
   {id:'moonlight',name:'할머니의 달빛 료칸',stars:5,tag:'5★ 대표 쇼케이스',desc:'달빛 노천탕과 등불 정원 · Day 15'},
   {id:'forest',name:'안개숲 편백 온천',stars:4,tag:'4★ 치유의 숲',desc:'대나무 숲과 폭포 노천탕 · Day 9'},
   {id:'neon',name:'쇼와 네온 온천 거리',stars:3,tag:'3★ 야시장 골목',desc:'네온사인과 라멘·이자카야 거리 · Day 6'}
  ];
  async function buildNeighborData(id){
+  if(id==='yuzu'){
+   try{const r=await fetch('assets/visits/yuzu.json');if(r.ok){const d=cleanSave(await r.json());d.t=Date.now();return d}}catch(_){}
+  }
   if(id==='moonlight'){
    try{
     const r=await fetch('assets/showcase.json');
@@ -474,7 +478,7 @@ const SHELL=(()=>{
  function visitUI(meta={}){
   document.body.classList.add('visit');
   const old=document.getElementById('visitBar');if(old)old.remove();
-  const nm=meta.name||(window.SHOWCASE?'할머니의 달빛 료칸':(window.S&&S.ryokanName)||'이웃 카피바라 료칸');
+  const nm=meta.name||(window.SHOWCASE?'할머니의 달빛 료칸':(window.VISIT_SAVE&&VISIT_SAVE.ryokanName)||(window.S&&S.ryokanName)||'이웃 카피바라 료칸');
   const st=meta.stars||(window.SHOWCASE?5:(window.stars?stars():4));
   const b=el(`<div id="visitBar" class="box">
    <span class="vb-badge">방문 중</span>

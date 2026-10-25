@@ -1,5 +1,10 @@
 # CHANGELOG — 카피바라 온센 료칸 타이쿤
  
+## v4.19 — 짧은 방문 주소
+- `#이름` 형태의 짧은 방문 주소 추가: assets/visits/<이름>.json에 저장된 료칸을 구경 (예: #yuzu → 운영자의 료칸)
+- '다른 이웃 보기' 목록 맨 위에 운영자의 료칸 추가
+- 방문 바에 방문한 료칸 이름이 '이웃 카피바라 료칸'으로만 나오던 문제 수정
+
 ## v4.18 — 라이선스·크레딧
 - LICENSE 추가: All rights reserved (Pretendard 폰트는 OFL 1.1 별도)
 - 크레딧: 기획·개발·문의를 youkim.official@gmail.com 으로 표기, 사운드에 'Suno로 제작한 배경음악' 추가
