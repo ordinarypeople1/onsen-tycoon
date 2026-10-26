@@ -5,8 +5,8 @@ const SHELL=(()=>{
  const saveSet=()=>{try{localStorage.onsenSet=JSON.stringify(SET)}catch(e){}};
  const I18N={
   ko:{
-   eyebrow:L('CAPYBARA ONSEN · 료칸 타이쿤'),
-   gameTitle:L('카피바라 온센'),
+   eyebrow:L('CAPYBARA ONSEN TYCOON'),
+   gameTitle:L('카피바라 온천 타이쿤'),
    tagline:L('따스한 온천 김 너머, 카피바라가 쉬어가는 계절 료칸'),
    show:L('이웃 온천 놀러가기'),cont:L('이어하기'),newg:L('새로 시작하기'),startNew:L('온천 시작하기'),
    slots:L('저장 슬롯'),set:L('설정'),cred:L('크레딧'),resume:L('계속하기'),title:L('타이틀로'),
@@ -270,7 +270,7 @@ const SHELL=(()=>{
   g.fillStyle='rgba(244,239,230,0.6)';g.font='500 13px monospace';
   g.fillText((code||'').slice(0,22)+'…',514,324);
   g.fillStyle='#6fd4a6';g.font='600 13px Pretendard, sans-serif';
-  g.fillText(L('카피바라 온센 · 초대 · 방문'),514,348);
+  g.fillText(L('카피바라 온천 타이쿤 · 초대 · 방문'),514,348);
 
   const a=document.createElement('a');
   a.download=`capybara-onsen-${Date.now().toString(36)}.png`;
@@ -497,7 +497,7 @@ const SHELL=(()=>{
 
  // ---- 크레딧 ----
  function credits(){const o=overlay('ovCred',L`<div class="m-head"><div class="m-head-left"><span class="m-eyebrow">CREDITS</span><h2>${T('cred')}</h2></div><button class="m-close-x" data-x>${T('close')}</button></div><div class="cred">
-  <p><b>카피바라 온센 · 료칸 타이쿤</b><br>CAPYBARA ONSEN · v3.0</p>
+  <p><b>카피바라 온천 타이쿤</b><br>CAPYBARA ONSEN · v3.0</p>
   <p><b>기획 · 개발 · 문의</b><br><a href="mailto:youkim.official@gmail.com">youkim.official@gmail.com</a></p>
   <p><b>아트</b><br>이미지 생성 후 수작업 파이프라인(크로마키·디스필·박스 축소·팔레트 정리)으로 픽셀화</p>
   <p><b>사운드</b><br>배경음악 — Suno로 제작<br>효과음·환경음 — WebAudio 절차적 합성 (물소리, 풍경)</p>

@@ -5,7 +5,7 @@
 const fs=require('fs'),path=require('path'),acorn=require('acorn'),walk=require('acorn-walk');
 const root=path.join(__dirname,'..');
 const FILES=['game.js','meta.js','ambient.js','shell.js','photo.js','fx.js','mobile.js','save.js'];
-const STATIC=['카피바라 온센 — CAPYBARA ONSEN · 료칸 타이쿤','카피바라 손님이 쉬어가는 픽셀 아트 온천 료칸 타이쿤','수익','등급','시설 건설','닫기','재정','손님','철거','중앙','회전 (R)','이동 중 — 놓을 곳을 눌러주세요','회전 R','취소','료칸 등급 · 승급 조건 보기','속도','축소','확대','중앙으로','접기','펼치기','한국어',
+const STATIC=['카피바라 온천 타이쿤 — CAPYBARA ONSEN','카피바라 손님이 쉬어가는 픽셀 아트 온천 료칸 타이쿤','수익','등급','시설 건설','닫기','재정','손님','철거','중앙','회전 (R)','이동 중 — 놓을 곳을 눌러주세요','회전 R','취소','료칸 등급 · 승급 조건 보기','속도','축소','확대','중앙으로','접기','펼치기','한국어',
  '유자','모모','코타로','하나','텐','소라','키나코','단고',
  '초대·방문','연출','감상']; // index.html 고정 문구, 단골 이름(저장 ID라 감싸지 않음), mobile.js 아이콘 매칭
 const keys=new Set(STATIC);

@@ -284,7 +284,7 @@ canvas{display:block;position:fixed;left:0;top:0}#tc{pointer-events:none}
  opacity:0.94;
 }
 #title h1{margin:0;text-align:left}
-#title h1 .k{
+#title h1 .k{word-break:keep-all;
  display:block;
  font:800 48px/1.08 Pretendard,sans-serif;
  color:#faf8f5;

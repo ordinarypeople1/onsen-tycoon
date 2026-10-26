@@ -2,7 +2,7 @@
   "name": "capybara-onsen",
   "version": "1.0.0",
   "private": true,
-  "description": "카피바라 온센 료칸 타이쿤 — 웹(GitHub Pages)과 Android/iOS 앱(Capacitor)",
+  "description": "카피바라 온천 타이쿤 료칸 타이쿤 — 웹(GitHub Pages)과 Android/iOS 앱(Capacitor)",
   "scripts": {
     "build:www": "node tools/build_www.js",
     "sync": "npm run build:www && npx cap sync",

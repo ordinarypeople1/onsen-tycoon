@@ -2699,12 +2699,12 @@
   "鑑賞モード（Z）",
   "欣賞模式（Z）"
  ],
- "CAPYBARA ONSEN · 료칸 타이쿤": [
+ "CAPYBARA ONSEN TYCOON": [
   "CAPYBARA ONSEN · RYOKAN TYCOON",
   "CAPYBARA ONSEN · 旅館タイクーン",
   "CAPYBARA ONSEN · 旅館大亨"
  ],
- "카피바라 온센": [
+ "카피바라 온천 타이쿤": [
   "Capybara Onsen",
   "カピバラ温泉",
   "水豚溫泉"
@@ -3024,7 +3024,7 @@
   "招待コードで遊びに来てね",
   "用邀請碼來玩吧"
  ],
- "카피바라 온센 · 초대 · 방문": [
+ "카피바라 온천 타이쿤 · 초대 · 방문": [
   "Capybara Onsen · Invite · Visit",
   "カピバラ温泉 · 招待・訪問",
   "水豚溫泉 · 邀請・拜訪"
@@ -3149,7 +3149,7 @@
   "{0}に応援（♥）を送りました！自分の旅館に応援ボーナス+¥500がたまりました",
   "已向{0}送出應援（♥）！你的旅館獲得應援獎勵+¥500"
  ],
- "<div class=\"m-head\"><div class=\"m-head-left\"><span class=\"m-eyebrow\">CREDITS</span><h2>{}</h2></div><button class=\"m-close-x\" data-x>{}</button></div><div class=\"cred\">\n  <p><b>카피바라 온센 · 료칸 타이쿤</b><br>CAPYBARA ONSEN · v3.0</p>\n  <p><b>기획 · 개발 · 문의</b><br><a href=\"mailto:youkim.official@gmail.com\">youkim.official@gmail.com</a></p>\n  <p><b>아트</b><br>이미지 생성 후 수작업 파이프라인(크로마키·디스필·박스 축소·팔레트 정리)으로 픽셀화</p>\n  <p><b>사운드</b><br>배경음악 — Suno로 제작<br>효과음·환경음 — WebAudio 절차적 합성 (물소리, 풍경)</p>\n  <p><b>폰트</b><br>Pretendard — © Kil Hyung-jin, <a href=\"https://github.com/orioncactus/pretendard\" target=\"_blank\" rel=\"noopener\">github.com/orioncactus/pretendard</a><br>SIL Open Font License 1.1 (<a href=\"assets/fonts/LICENSE.txt\" target=\"_blank\">전문</a>)</p>\n  <p><b>특별히 감사</b><br>느긋한 모든 카피바라에게</p></div><div class=\"btns\"><button class=\"mb sec\" data-x>{}</button></div>": [
+ "<div class=\"m-head\"><div class=\"m-head-left\"><span class=\"m-eyebrow\">CREDITS</span><h2>{}</h2></div><button class=\"m-close-x\" data-x>{}</button></div><div class=\"cred\">\n  <p><b>카피바라 온천 타이쿤</b><br>CAPYBARA ONSEN · v3.0</p>\n  <p><b>기획 · 개발 · 문의</b><br><a href=\"mailto:youkim.official@gmail.com\">youkim.official@gmail.com</a></p>\n  <p><b>아트</b><br>이미지 생성 후 수작업 파이프라인(크로마키·디스필·박스 축소·팔레트 정리)으로 픽셀화</p>\n  <p><b>사운드</b><br>배경음악 — Suno로 제작<br>효과음·환경음 — WebAudio 절차적 합성 (물소리, 풍경)</p>\n  <p><b>폰트</b><br>Pretendard — © Kil Hyung-jin, <a href=\"https://github.com/orioncactus/pretendard\" target=\"_blank\" rel=\"noopener\">github.com/orioncactus/pretendard</a><br>SIL Open Font License 1.1 (<a href=\"assets/fonts/LICENSE.txt\" target=\"_blank\">전문</a>)</p>\n  <p><b>특별히 감사</b><br>느긋한 모든 카피바라에게</p></div><div class=\"btns\"><button class=\"mb sec\" data-x>{}</button></div>": [
   "<div class=\"m-head\"><div class=\"m-head-left\"><span class=\"m-eyebrow\">CREDITS</span><h2>{0}</h2></div><button class=\"m-close-x\" data-x>{1}</button></div><div class=\"cred\">\n  <p><b>Capybara Onsen · Ryokan Tycoon</b><br>CAPYBARA ONSEN · v3.0</p>\n  <p><b>Design · Development · Contact</b><br><a href=\"mailto:youkim.official@gmail.com\">youkim.official@gmail.com</a></p>\n  <p><b>Art</b><br>Generated images turned into pixel art through a hand-tuned pipeline (chroma key, despill, box downscale, palette cleanup)</p>\n  <p><b>Sound</b><br>Music — made with Suno<br>Effects & ambience — procedural WebAudio synthesis (water, wind chimes)</p>\n  <p><b>Fonts</b><br>Pretendard — © Kil Hyung-jin, <a href=\"https://github.com/orioncactus/pretendard\" target=\"_blank\" rel=\"noopener\">github.com/orioncactus/pretendard</a><br>Nunito · M PLUS Rounded 1c · jf open-huninn — SIL Open Font License 1.1 (<a href=\"assets/fonts/LICENSE.txt\" target=\"_blank\">full text</a>)</p>\n  <p><b>Special thanks</b><br>To every laid-back capybara</p></div><div class=\"btns\"><button class=\"mb sec\" data-x>{2}</button></div>",
   "<div class=\"m-head\"><div class=\"m-head-left\"><span class=\"m-eyebrow\">CREDITS</span><h2>{0}</h2></div><button class=\"m-close-x\" data-x>{1}</button></div><div class=\"cred\">\n  <p><b>カピバラ温泉 · 旅館タイクーン</b><br>CAPYBARA ONSEN · v3.0</p>\n  <p><b>企画・開発・お問い合わせ</b><br><a href=\"mailto:youkim.official@gmail.com\">youkim.official@gmail.com</a></p>\n  <p><b>アート</b><br>生成画像を手作業のパイプライン（クロマキー・デスピル・ボックス縮小・パレット整理）でドット絵化</p>\n  <p><b>サウンド</b><br>BGM — Sunoで制作<br>効果音・環境音 — WebAudioによるプロシージャル合成（水音、風鈴）</p>\n  <p><b>フォント</b><br>Pretendard — © Kil Hyung-jin, <a href=\"https://github.com/orioncactus/pretendard\" target=\"_blank\" rel=\"noopener\">github.com/orioncactus/pretendard</a><br>Nunito · M PLUS Rounded 1c · jf open-huninn — SIL Open Font License 1.1（<a href=\"assets/fonts/LICENSE.txt\" target=\"_blank\">全文</a>）</p>\n  <p><b>スペシャルサンクス</b><br>のんびり屋のすべてのカピバラへ</p></div><div class=\"btns\"><button class=\"mb sec\" data-x>{2}</button></div>",
   "<div class=\"m-head\"><div class=\"m-head-left\"><span class=\"m-eyebrow\">CREDITS</span><h2>{0}</h2></div><button class=\"m-close-x\" data-x>{1}</button></div><div class=\"cred\">\n  <p><b>水豚溫泉 · 旅館大亨</b><br>CAPYBARA ONSEN · v3.0</p>\n  <p><b>企劃・開發・聯絡</b><br><a href=\"mailto:youkim.official@gmail.com\">youkim.official@gmail.com</a></p>\n  <p><b>美術</b><br>以手工流程（去背・去溢色・方塊縮小・色盤整理）將生成圖像像素化</p>\n  <p><b>音效</b><br>背景音樂 — 以Suno製作<br>音效・環境音 — WebAudio程序化合成（水聲、風鈴）</p>\n  <p><b>字型</b><br>Pretendard — © Kil Hyung-jin, <a href=\"https://github.com/orioncactus/pretendard\" target=\"_blank\" rel=\"noopener\">github.com/orioncactus/pretendard</a><br>Nunito · M PLUS Rounded 1c · jf open 粉圓 — SIL Open Font License 1.1（<a href=\"assets/fonts/LICENSE.txt\" target=\"_blank\">全文</a>）</p>\n  <p><b>特別感謝</b><br>獻給每一隻悠哉的水豚</p></div><div class=\"btns\"><button class=\"mb sec\" data-x>{2}</button></div>"
@@ -3409,7 +3409,7 @@
   "だんご",
   "糰子"
  ],
- "카피바라 온센 — CAPYBARA ONSEN · 료칸 타이쿤": [
+ "카피바라 온천 타이쿤 — CAPYBARA ONSEN": [
   "Capybara Onsen — Ryokan Tycoon",
   "カピバラ温泉 — 旅館タイクーン",
   "水豚溫泉 — 旅館大亨"
