@@ -1083,11 +1083,6 @@ function unlock(s){const k=s.px+','+s.py;if(S.yen<s.price)return toast(L`구역 
  for(let i=0;i<40;i++)parts.push({k:'petal',x:s.px*PS+Math.random()*PS,y:s.py*PS+Math.random()*PS,h:20+Math.random()*30,l:3,L:3,ph:Math.random()*6});save()}
 const ev={shift:false};
 function initInput(){
- // Remember the grabbed point so tall sprites do not jump down to the finger.
- const beginObjectDrag=o=>{
-  const[a,b]=toTile(drag.x,drag.y);startMove(o);if(moving!==o)return;
-  drag.placing=true;drag.startedMove=o;drag.grab=[a-o.x,b-o.y];hoverT=[o.x,o.y];lastTap={};
- };
  const overMap=e=>document.elementFromPoint(e.clientX,e.clientY)===cv;
  const cancelPointer=e=>{
   if(!ptrs.has(e.pointerId))return;
@@ -1115,16 +1110,13 @@ function initInput(){
    }
    updatePlacementHover(e.clientX,e.clientY,drag.grab);return;
   }
-  if(e.pointerType!='mouse'&&e.button!=2&&!moving&&!ghost&&mode!='del'&&!window.READONLY){
-   const o=pickObj(e.clientX,e.clientY);drag.object=o&&!DEF[o.k].isPath?o:null;
-   if(drag.object)lp=setTimeout(()=>{if(drag&&drag.id===e.pointerId&&!drag.m&&ptrs.size==1){drag.lp=true;beginObjectDrag(drag.object)}},550);
-  }
+  // Existing objects enter move mode only through the double-tap handler below.
  });
  let rcT=0;
  cv.addEventListener('pointermove',e=>{if(e.button==2&&paint){escCancel();return}lastMouse=[e.clientX,e.clientY];if(e.pointerType=='mouse'&&!ptrs.size){const h=ghost||moving?null:pickObj(e.clientX,e.clientY);window.HOVER=h&&!DEF[h.k].isPath?h:null;cv.style.cursor=window.HOVER?'pointer':''}updatePlacementHover(e.clientX,e.clientY,drag&&drag.placing?drag.grab:null);if(!ptrs.has(e.pointerId))return;const prevP=ptrs.get(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:prevP.sx,sy:prevP.sy});
   if(paint){const[a,b]=toTile(e.clientX,e.clientY);paint.x1=a|0;paint.y1=b|0;paint.area=paint.area||e.shiftKey;paintCursor=[e.clientX,e.clientY];return}
   if(pinch&&ptrs.size==2){const p=[...ptrs.values()],mx=(p[0].x+p[1].x)/2,my=(p[0].y+p[1].y)/2,nd=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y),v0x=p[0].x-p[0].sx,v0y=p[0].y-p[0].sy,v1x=p[1].x-p[1].sx,v1y=p[1].y-p[1].sy,opp=(v0x*v1x+v0y*v1y)<-40&&Math.hypot(v0x,v0y)>12&&Math.hypot(v1x,v1y)>12;homeAnim=null;cam.x+=mx-pinch.mx;cam.y+=my-pinch.my;pinch.mx=mx;pinch.my=my;if(pinch.zooming||(opp&&Math.abs(nd-pinch.d)>24)){if(!pinch.zooming){pinch.zooming=true;pinch.d=nd;pinch.z=cam.z}zoomAt(mx,my,pinch.z*nd/pinch.d);cam.tz=cam.z}syncGhostHover()}
-  else if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>6){drag.m=true;clearTimeout(lp);clearTimeout(infoT);if(drag.object&&!drag.placing)beginObjectDrag(drag.object)}if(drag.placing){if(ghost)updatePlacementHover(e.clientX,e.clientY,drag.grab)}else if(drag.m){cam.x=drag.cx+dx;cam.y=drag.cy+dy}}});
+  else if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>6){drag.m=true;clearTimeout(lp);clearTimeout(infoT);lastTap={}}if(drag.placing){if(ghost)updatePlacementHover(e.clientX,e.clientY,drag.grab)}else if(drag.m){cam.x=drag.cx+dx;cam.y=drag.cy+dy}}});
  cv.addEventListener('pointerup',e=>{if(!ptrs.has(e.pointerId))return;clearTimeout(lp);if(e.button==2){rcT=performance.now();if(!(drag&&drag.m))escCancel();ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;drag=null;return}
   if(paint){const[a,b]=toTile(e.clientX,e.clientY);paint.x1=a|0;paint.y1=b|0;if(overMap(e))applyPaint();paint=null;paintCursor=null;ptrs.delete(e.pointerId);drag=null;return}
   if(drag&&drag.placing){
