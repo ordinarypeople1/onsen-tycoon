@@ -356,7 +356,14 @@ function gateInfo(){const g=gateObj();if(!g)return null;const t=gTiles(g.x,g.y,g
 function ensureGate(){if(gateObj())return;OCC=occ();let sp=null,bd=1e9;for(let x=0;x<N;x++)for(let y=0;y<N;y++)for(const dir of['x','y'])if(gateValid(x,y,dir)){const m=gTiles(x,y,dir)[1];const d=Math.hypot(m[0]-24,m[1]-31.5)+(dir=='y'?0.5:0);if(d<bd){bd=d;sp={x,y,dir}}}
  if(!sp)return;placeGate(sp);const gi=gateInfo(),b=S.objs.find(o=>DEF[o.k].bath);OCC=occ();if(b){const d=doorTile(b);const p=d&&findPath(gi.m[0],gi.m[1],d[0],d[1]);if(p)for(const[px,py]of p){const x=px|0,y=py|0;if(!OCC[x+','+y])S.objs.push({k:'path',x,y,lv:1,price:0,uses:0,earn:0})}}OCC=occ();groundDirty=true}
 function placeGate(sp){const t=gTiles(sp.x,sp.y,sp.dir);const set=new Set(t.map(p=>p.join(',')));S.objs=S.objs.filter(o=>!(DEF[o.k].isPath&&set.has(o.x+','+o.y)));let g=gateObj();if(!g){g={k:'gate',lv:1,price:0,uses:0,earn:0};S.objs.push(g)}g.x=sp.x;g.y=sp.y;g.dir=sp.dir}
-let OCC={};let ROT=0,lastMouse=null;function syncGhostHover(){if(!ghost||!lastMouse)return;const[a,b]=toTile(lastMouse[0],lastMouse[1]),[gfw,gfh]=fpOf(ghost,moving?moving.rot:ROT);hoverT=[Math.floor(a-(gfw/2-0.5)),Math.floor(b-(gfh/2-0.5))]}
+let OCC={};let ROT=0,lastMouse=null;
+function updatePlacementHover(sx,sy,grab){
+ const[a,b]=toTile(sx,sy);
+ if(ghost&&grab){hoverT=[Math.round(a-grab[0]),Math.round(b-grab[1])];return}
+ const[fw,fh]=ghost?fpOf(ghost,moving?moving.rot:ROT):[1,1];
+ hoverT=[Math.floor(a-(ghost?fw/2-0.5:0)),Math.floor(b-(ghost?fh/2-0.5:0))];
+}
+function syncGhostHover(){if(ghost&&lastMouse)updatePlacementHover(...lastMouse,drag&&drag.placing?drag.grab:null)}
 function rotateObj(o){if(!o||o.k=="gate"||DEF[o.k].isPath)return false;const old=(o.rot|0)&1,ox=o.x,oy=o.y;try{const next=old^1,[fw0,fh0]=fpOf(o.k,old),[fw1,fh1]=fpOf(o.k,next);const wasReach=(fw0!==fh0&&!moving&&DEF[o.k].price)?window.__dbg.reachOK():false;o.rot=next;if(fw0!==fh0&&!moving){const prevM=moving;moving=o;OCC=occ();const cx0=ox+fw0/2,cy0=oy+fh0/2,cands=[];for(let dx=-2;dx<=2;dx++)for(let dy=-2;dy<=2;dy++)cands.push([dx,dy,Math.hypot((ox+dx+fw1/2)-cx0,(oy+dy+fh1/2)-cy0)]);cands.sort((a,b)=>a[2]-b[2]);let placed=false;for(const[dx,dy]of cands)if(canPlace(o.k,ox+dx,oy+dy,next)){o.x=ox+dx;o.y=oy+dy;placed=true;break}moving=prevM;if(!placed){o.rot=old;o.x=ox;o.y=oy;OCC=occ();toast(L("회전할 공간이 부족해요"));return false}clearPaths(o.k,o.x,o.y,next)}OCC=occ();if(wasReach&&!window.__dbg.reachOK()){o.rot=old;o.x=ox;o.y=oy;OCC=occ();toast(L("그 방향으론 손님이 들어갈 수 없어요"));return false}groundDirty=true;guests.forEach(g=>{if(g.cur===o&&g.inBath){const[a,b]=bathSlot(o,g.slot||0);g.x=a;g.y=b}if(g.target===o&&g.st=="walk"){g.target=null;g.path=[]}});if(window.SND&&SND.click)SND.click();if(INFO_O===o)showInfo(o);save();return true}catch(e){console.warn("rotate failed",e);o.rot=old;o.x=ox;o.y=oy;try{OCC=occ()}catch(_){}groundDirty=true;toast(L("회전하지 못했어요"));return false}}
 window.rotateObj=rotateObj;
 function rotateGate(){const g=gateObj();if(!g)return;const cur=gateOut(g.x,g.y,g.dir);const key=d=>d[0]+','+d[1];const order=['0,1','1,0','0,-1','-1,0'];const gm=gTiles(g.x,g.y,g.dir)[1];const save_=[g.x,g.y,g.dir];const wasReach=window.__dbg.reachOK();
@@ -368,7 +375,7 @@ function rotateGate(){const g=gateObj();if(!g)return;const cur=gateOut(g.x,g.y,g
 window.rotateGate=rotateGate;setTimeout(()=>{const gb=document.getElementById('ghRot');if(gb){gb.onclick=e=>{e.stopPropagation();ROT^=1;syncGhostHover();if(window.SND&&SND.click)SND.click();gb.blur()};setInterval(()=>{gb.style.display=(ghost&&ghost!='gate'&&DEF[ghost]&&!DEF[ghost].isPath&&!DEF[ghost].erase&&!moving)?'block':'none'},200)}const b=document.getElementById('mvRot');if(b)b.onclick=e=>{e.stopPropagation();if(moving)moving.k=='gate'?rotateGate():rotateObj(moving);syncGhostHover();b.blur()}},0);let moving=null,infoT=null;
 function startMove(o){if(window.READONLY)return;clearTimeout(infoT);if(moving)cancelMove();hideInfo();mode=null;
  guests.forEach(g=>{if(g.cur===o)finish(g);if(g.target===o){g.target=null;g.path=[]}});
- moving=o;o._from=[o.x,o.y,o.dir,o.rot|0];ghost=o.k;OCC=occ();groundDirty=true;$('moveBar').style.display='flex';toast(document.body.classList.contains('phone')?L('놓을 곳을 눌러주세요'):L('놓을 곳을 눌러주세요 · R키로 회전 (Esc·우클릭 취소)'))}
+ moving=o;o._from=[o.x,o.y,o.dir,o.rot|0];ghost=o.k;OCC=occ();groundDirty=true;$('moveBar').style.display='flex';toast(document.body.classList.contains('phone')?L('끌어서 놓거나 놓을 곳을 눌러주세요'):L('놓을 곳을 눌러주세요 · R키로 회전 (Esc·우클릭 취소)'))}
 function dropMove(x,y){const o=moving;if(o.k=='gate'){const sp=gateSpot(x,y);if(!sp){toast(L('대문은 열린 땅의 가장자리에만 놓을 수 있어요'));return}endMove();placeGate(sp);OCC=occ();groundDirty=true;guests.forEach(g=>{if(g.st=='walk'){g.target=null;g.path=[]}});save();return}if(!canPlace(o.k,x,y,o.rot)){toast(L('여기엔 놓을 수 없어요'));return}clearPaths(o.k,x,y,o.rot);o.x=x;o.y=y;endMove();anims['o'+S.objs.indexOf(o)]={t:0};
  const[fw,fh]=fpOf(o.k,o.rot);for(let i=0;i<8;i++)parts.push({k:'steam',x:x+fw/2+(Math.random()-0.5)*fw,y:y+fh/2,h:0,vx:0,l:1,L:1,s:2});save()}
 function cancelMove(){if(!moving)return;moving.x=moving._from[0];moving.y=moving._from[1];if(moving._from[2])moving.dir=moving._from[2];if(moving._from[3]!==undefined)moving.rot=moving._from[3];endMove()}
@@ -1059,16 +1066,60 @@ function unlock(s){const k=s.px+','+s.py;if(S.yen<s.price)return toast(L`구역 
  for(let i=0;i<40;i++)parts.push({k:'petal',x:s.px*PS+Math.random()*PS,y:s.py*PS+Math.random()*PS,h:20+Math.random()*30,l:3,L:3,ph:Math.random()*6});save()}
 const ev={shift:false};
 function initInput(){
- cv.addEventListener('pointerdown',e=>{lastMouse=[e.clientX,e.clientY];if(ghost&&DEF[ghost].fp==1&&(DEF[ghost].isPath||DEF[ghost].erase)&&e.button!=2){const[a,b]=toTile(e.clientX,e.clientY);paint={x0:a|0,y0:b|0,x1:a|0,y1:b|0,area:e.shiftKey};return}ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY});clearTimeout(lp);if(e.pointerType!='mouse'&&!moving&&!ghost){const sx=e.clientX,sy=e.clientY;lp=setTimeout(()=>{if(drag&&!drag.m&&ptrs.size==1){const o=pickObj(sx,sy);if(o&&!DEF[o.k].isPath){drag.lp=true;startMove(o)}}},550)}ev.shift=e.shiftKey;if(ptrs.size==1)drag={x:e.clientX,y:e.clientY,cx:cam.x,cy:cam.y,m:false};else{const p=[...ptrs.values()];pinch={d:Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y),z:cam.z,mx:(p[0].x+p[1].x)/2,my:(p[0].y+p[1].y)/2,zooming:false};drag=null}});
+ // Remember the grabbed point so tall sprites do not jump down to the finger.
+ const beginObjectDrag=o=>{
+  const[a,b]=toTile(drag.x,drag.y);startMove(o);if(moving!==o)return;
+  drag.placing=true;drag.startedMove=o;drag.grab=[a-o.x,b-o.y];hoverT=[o.x,o.y];lastTap={};
+ };
+ const overMap=e=>document.elementFromPoint(e.clientX,e.clientY)===cv;
+ const cancelPointer=e=>{
+  if(!ptrs.has(e.pointerId))return;
+  clearTimeout(lp);clearTimeout(infoT);paint=null;paintCursor=null;
+  if(drag&&drag.startedMove&&moving===drag.startedMove)cancelMove();
+  ptrs.delete(e.pointerId);drag=null;pinch=null;
+ };
+ cv.addEventListener('pointerdown',e=>{
+  lastMouse=[e.clientX,e.clientY];ev.shift=e.shiftKey;clearTimeout(lp);
+  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY});
+  cv.setPointerCapture(e.pointerId);
+  if(ptrs.size>1){
+   paint=null;paintCursor=null;clearTimeout(infoT);
+   if(drag&&drag.startedMove&&moving===drag.startedMove)cancelMove();
+   const p=[...ptrs.values()];pinch={d:Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y),z:cam.z,mx:(p[0].x+p[1].x)/2,my:(p[0].y+p[1].y)/2,zooming:false};drag=null;return;
+  }
+  homeAnim=null;
+  drag={id:e.pointerId,x:e.clientX,y:e.clientY,cx:cam.x,cy:cam.y,m:false};
+  if(ghost&&DEF[ghost].fp==1&&(DEF[ghost].isPath||DEF[ghost].erase)&&e.button!=2){const[a,b]=toTile(e.clientX,e.clientY);paint={x0:a|0,y0:b|0,x1:a|0,y1:b|0,area:e.shiftKey};return}
+  if(ghost&&e.button!=2){
+   drag.placing=true;
+   // Re-grab the visible preview without shifting it; elsewhere, center it on the pointer.
+   if(hoverT){const o={k:ghost,x:hoverT[0],y:hoverT[1],rot:moving?moving.rot:ROT,dir:moving&&moving.dir},g=objGeom(o),[a,b]=toTile(e.clientX,e.clientY),wx=(e.clientX-cam.x)/cam.z,wy=(e.clientY-cam.y)/cam.z;
+    if(wx>=g.X-g.W/2&&wx<=g.X+g.W/2&&wy>=g.Y-g.H&&wy<=g.Y)drag.grab=[a-o.x,b-o.y];
+   }
+   updatePlacementHover(e.clientX,e.clientY,drag.grab);return;
+  }
+  if(e.pointerType!='mouse'&&e.button!=2&&!moving&&!ghost&&mode!='del'&&!window.READONLY){
+   const o=pickObj(e.clientX,e.clientY);drag.object=o&&!DEF[o.k].isPath?o:null;
+   if(drag.object)lp=setTimeout(()=>{if(drag&&drag.id===e.pointerId&&!drag.m&&ptrs.size==1){drag.lp=true;beginObjectDrag(drag.object)}},550);
+  }
+ });
  let rcT=0;
- cv.addEventListener('pointermove',e=>{if(e.button==2&&paint){escCancel();return}lastMouse=[e.clientX,e.clientY];if(e.pointerType=='mouse'&&!ptrs.size){const h=ghost||moving?null:pickObj(e.clientX,e.clientY);window.HOVER=h&&!DEF[h.k].isPath?h:null;cv.style.cursor=window.HOVER?'pointer':''}const[a,b]=toTile(e.clientX,e.clientY);if(paint){paint.x1=a|0;paint.y1=b|0;paint.area=paint.area||e.shiftKey;paintCursor=[e.clientX,e.clientY]}const[gfw,gfh]=ghost?fpOf(ghost,moving?moving.rot:ROT):[1,1];hoverT=[Math.floor(a-(ghost?gfw/2-0.5:0)),Math.floor(b-(ghost?gfh/2-0.5:0))];if(!ptrs.has(e.pointerId))return;const prevP=ptrs.get(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:prevP.sx,sy:prevP.sy});
+ cv.addEventListener('pointermove',e=>{if(e.button==2&&paint){escCancel();return}lastMouse=[e.clientX,e.clientY];if(e.pointerType=='mouse'&&!ptrs.size){const h=ghost||moving?null:pickObj(e.clientX,e.clientY);window.HOVER=h&&!DEF[h.k].isPath?h:null;cv.style.cursor=window.HOVER?'pointer':''}updatePlacementHover(e.clientX,e.clientY,drag&&drag.placing?drag.grab:null);if(!ptrs.has(e.pointerId))return;const prevP=ptrs.get(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:prevP.sx,sy:prevP.sy});
+  if(paint){const[a,b]=toTile(e.clientX,e.clientY);paint.x1=a|0;paint.y1=b|0;paint.area=paint.area||e.shiftKey;paintCursor=[e.clientX,e.clientY];return}
   if(pinch&&ptrs.size==2){const p=[...ptrs.values()],mx=(p[0].x+p[1].x)/2,my=(p[0].y+p[1].y)/2,nd=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y),v0x=p[0].x-p[0].sx,v0y=p[0].y-p[0].sy,v1x=p[1].x-p[1].sx,v1y=p[1].y-p[1].sy,opp=(v0x*v1x+v0y*v1y)<-40&&Math.hypot(v0x,v0y)>12&&Math.hypot(v1x,v1y)>12;homeAnim=null;cam.x+=mx-pinch.mx;cam.y+=my-pinch.my;pinch.mx=mx;pinch.my=my;if(pinch.zooming||(opp&&Math.abs(nd-pinch.d)>24)){if(!pinch.zooming){pinch.zooming=true;pinch.d=nd;pinch.z=cam.z}zoomAt(mx,my,pinch.z*nd/pinch.d);cam.tz=cam.z}syncGhostHover()}
-  else if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>6){drag.m=true;clearTimeout(lp)}if(drag.m){cam.x=drag.cx+dx;cam.y=drag.cy+dy}}});
- cv.addEventListener('pointerup',e=>{clearTimeout(lp);if(e.button==2){rcT=performance.now();if(!(drag&&drag.m))escCancel();ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;drag=null;return}if(paint){applyPaint();paint=null;return}if(drag&&drag.lp){ptrs.delete(e.pointerId);drag=null;return}
+  else if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>6){drag.m=true;clearTimeout(lp);clearTimeout(infoT);if(drag.object&&!drag.placing)beginObjectDrag(drag.object)}if(drag.placing){if(ghost)updatePlacementHover(e.clientX,e.clientY,drag.grab)}else if(drag.m){cam.x=drag.cx+dx;cam.y=drag.cy+dy}}});
+ cv.addEventListener('pointerup',e=>{if(!ptrs.has(e.pointerId))return;clearTimeout(lp);if(e.button==2){rcT=performance.now();if(!(drag&&drag.m))escCancel();ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;drag=null;return}
+  if(paint){const[a,b]=toTile(e.clientX,e.clientY);paint.x1=a|0;paint.y1=b|0;if(overMap(e))applyPaint();paint=null;paintCursor=null;ptrs.delete(e.pointerId);drag=null;return}
+  if(drag&&drag.placing){
+   if(overMap(e)&&ghost&&!(drag.lp&&!drag.m)){lastMouse=[e.clientX,e.clientY];updatePlacementHover(e.clientX,e.clientY,drag.grab);placeAt()}
+   else if(!overMap(e)&&drag.startedMove&&moving===drag.startedMove)cancelMove();
+   ptrs.delete(e.pointerId);drag=null;return;
+  }
   if(drag&&!drag.m&&!moving&&!ghost&&mode!='del'){const now=performance.now();const o=pickObj(e.clientX,e.clientY);
    if(o&&lastTap.o===o&&now-lastTap.t<400){lastTap={};ptrs.delete(e.pointerId);drag=null;startMove(o);return}lastTap={o,t:now}}
-  if(drag&&!drag.m&&ptrs.size==1){if(ghost){const[a,b]=toTile(e.clientX,e.clientY),[gfw,gfh]=fpOf(ghost,moving?moving.rot:ROT);hoverT=[Math.floor(a-(gfw/2-0.5)),Math.floor(b-(gfh/2-0.5))];placeAt()}else onTap(e.clientX,e.clientY)}ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;drag=null});
- cv.addEventListener('pointercancel',e=>{ptrs.delete(e.pointerId);drag=null;pinch=null});
+  if(drag&&!drag.m&&ptrs.size==1&&overMap(e))onTap(e.clientX,e.clientY);ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;drag=null});
+ cv.addEventListener('pointercancel',cancelPointer);
+ cv.addEventListener('lostpointercapture',cancelPointer);
  cv.addEventListener('wheel',e=>{e.preventDefault();if(e.ctrlKey||e.metaKey){zoomTarget=[e.clientX,e.clientY];const f=Math.abs(e.deltaY)<40?Math.exp(-e.deltaY*0.012):(e.deltaY<0?1.15:1/1.15);cam.tz=Math.max(zmin(),Math.min(8,cam.tz*f))}else{homeAnim=null;const m=e.deltaMode==1?16:e.deltaMode==2?100:1;cam.x-=e.deltaX*m;cam.y-=e.deltaY*m;syncGhostHover()}},{passive:false});
  // 우클릭 메뉴 이벤트: Windows는 버튼을 뗀 뒤(위 pointerup에서 이미 처리), macOS는 누를 때 옴 → 직전에 처리했으면 건너뜀
  cv.addEventListener('contextmenu',e=>{e.preventDefault();if(performance.now()-rcT<400)return;escCancel()});

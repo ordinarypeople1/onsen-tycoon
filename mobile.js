@@ -46,7 +46,7 @@
   const on=!!(g||m=='del')&&!mv;bar.classList.toggle('on',on);document.body.classList.toggle('placing',on);
   if(!on)return;const d=g&&DEF[g];
   ghR.style.display=(d&&g!='gate'&&!d.isPath&&!d.erase)?'':'none';
-  ghT.textContent=m=='del'?L('철거할 시설을 눌러주세요'):d?(d.isPath||d.erase?L`${d.n} · 눌러서 칠하기`:L`${d.n} · 놓을 곳을 눌러주세요`):'';
+  ghT.textContent=m=='del'?L('철거할 시설을 눌러주세요'):d?(d.isPath||d.erase?L`${d.n} · 눌러서 칠하기`:L`${d.n} · 끌어서 놓으세요`):'';
  },150);
  const apply=()=>{const on=mq.matches;document.body.classList.toggle('phone',on);document.body.classList.toggle('phone-land',on&&innerWidth>innerHeight);if(!on)close()};
  mq.addEventListener?mq.addEventListener('change',apply):mq.addListener(apply);addEventListener('resize',apply);apply();

@@ -548,7 +548,9 @@ body.visit #toast{top:126px}
  box-shadow:var(--shadow-sm);
  padding:10px 20px;border-radius:999px;display:none;font-size:14.5px;font-weight:550;z-index:70;
 }
-#moveBar{position:fixed;top:72px;left:50%;transform:translateX(-50%);display:none;z-index:8;gap:8px}
+#moveBar{position:fixed;top:72px;left:50%;transform:translateX(-50%);display:none;z-index:8;gap:8px;max-width:calc(100vw - 16px)}
+#moveBar>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#moveBar button{flex-shrink:0}
 #moveBar button{font:600 13.5px Pretendard,sans-serif;background:var(--bg-ivory);color:var(--ink-dark);border:0;border-radius:8px;padding:6px 12px;cursor:pointer}
 #warn{position:fixed;top:116px;left:50%;transform:translateX(-50%);display:none;background:rgba(235, 107, 100, 0.92);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.25);color:#fff;border-radius:999px;padding:8px 18px;font-size:13.5px;font-weight:600;z-index:7}
 #visitBar{
