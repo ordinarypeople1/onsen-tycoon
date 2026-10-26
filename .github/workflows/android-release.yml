@@ -3,6 +3,7 @@ name: Android 출시용 AAB
 # v로 시작하는 태그(예: v1.0.1)를 올리거나 Actions 탭에서 수동 실행. 결과 AAB를 Play Console에 업로드
 on:
   push:
+    branches: ['build/aab-20261026-anchor']
     tags: ['v*']
   workflow_dispatch:
     inputs:
