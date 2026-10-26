@@ -358,6 +358,8 @@ function ensureGate(){if(gateObj())return;OCC=occ();let sp=null,bd=1e9;for(let x
 function placeGate(sp){const t=gTiles(sp.x,sp.y,sp.dir);const set=new Set(t.map(p=>p.join(',')));S.objs=S.objs.filter(o=>!(DEF[o.k].isPath&&set.has(o.x+','+o.y)));let g=gateObj();if(!g){g={k:'gate',lv:1,price:0,uses:0,earn:0};S.objs.push(g)}g.x=sp.x;g.y=sp.y;g.dir=sp.dir}
 let OCC={};let ROT=0,lastMouse=null;
 function updatePlacementHover(sx,sy,grab){
+ // Keep the selected object anchored until an explicit placement gesture begins.
+ if(moving&&!(drag&&drag.placing))return;
  const[a,b]=toTile(sx,sy);
  if(ghost&&grab){hoverT=[Math.round(a-grab[0]),Math.round(b-grab[1])];return}
  const[fw,fh]=ghost?fpOf(ghost,moving?moving.rot:ROT):[1,1];
@@ -375,7 +377,7 @@ function rotateGate(){const g=gateObj();if(!g)return;const cur=gateOut(g.x,g.y,g
 window.rotateGate=rotateGate;setTimeout(()=>{const gb=document.getElementById('ghRot');if(gb){gb.onclick=e=>{e.stopPropagation();ROT^=1;syncGhostHover();if(window.SND&&SND.click)SND.click();gb.blur()};setInterval(()=>{gb.style.display=(ghost&&ghost!='gate'&&DEF[ghost]&&!DEF[ghost].isPath&&!DEF[ghost].erase&&!moving)?'block':'none'},200)}const b=document.getElementById('mvRot');if(b)b.onclick=e=>{e.stopPropagation();if(moving)moving.k=='gate'?rotateGate():rotateObj(moving);syncGhostHover();b.blur()}},0);let moving=null,infoT=null;
 function startMove(o){if(window.READONLY)return;clearTimeout(infoT);if(moving)cancelMove();hideInfo();mode=null;
  guests.forEach(g=>{if(g.cur===o)finish(g);if(g.target===o){g.target=null;g.path=[]}});
- moving=o;o._from=[o.x,o.y,o.dir,o.rot|0];ghost=o.k;OCC=occ();groundDirty=true;$('moveBar').style.display='flex';toast(document.body.classList.contains('phone')?L('끌어서 놓거나 놓을 곳을 눌러주세요'):L('놓을 곳을 눌러주세요 · R키로 회전 (Esc·우클릭 취소)'))}
+ moving=o;o._from=[o.x,o.y,o.dir,o.rot|0];ghost=o.k;hoverT=[o.x,o.y];OCC=occ();groundDirty=true;$('moveBar').style.display='flex';toast(document.body.classList.contains('phone')?L('끌어서 놓거나 놓을 곳을 눌러주세요'):L('놓을 곳을 눌러주세요 · R키로 회전 (Esc·우클릭 취소)'))}
 function dropMove(x,y){const o=moving;if(o.k=='gate'){const sp=gateSpot(x,y);if(!sp){toast(L('대문은 열린 땅의 가장자리에만 놓을 수 있어요'));return}endMove();placeGate(sp);OCC=occ();groundDirty=true;guests.forEach(g=>{if(g.st=='walk'){g.target=null;g.path=[]}});save();return}if(!canPlace(o.k,x,y,o.rot)){toast(L('여기엔 놓을 수 없어요'));return}clearPaths(o.k,x,y,o.rot);o.x=x;o.y=y;endMove();anims['o'+S.objs.indexOf(o)]={t:0};
  const[fw,fh]=fpOf(o.k,o.rot);for(let i=0;i<8;i++)parts.push({k:'steam',x:x+fw/2+(Math.random()-0.5)*fw,y:y+fh/2,h:0,vx:0,l:1,L:1,s:2});save()}
 function cancelMove(){if(!moving)return;moving.x=moving._from[0];moving.y=moving._from[1];if(moving._from[2])moving.dir=moving._from[2];if(moving._from[3]!==undefined)moving.rot=moving._from[3];endMove()}
