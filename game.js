@@ -385,7 +385,7 @@ function endMove(){if(moving)delete moving._from;moving=null;ghost=null;OCC=occ(
 function canPlace(k,x,y,rot){if(k=='gate')return !!gateSpot(x,y);const r=rot!==undefined?rot:(moving?moving.rot:ROT),[fw,fh]=fpOf(k,r);for(let i=0;i<fw;i++)for(let j=0;j<fh;j++){const o=OCC[(x+i)+','+(y+j)];if(!tileOpen(x+i,y+j)||(o&&!(DEF[o.k].isPath&&!DEF[k].isPath)))return false}return true}
 function clearPaths(k,x,y,rot){const r=rot!==undefined?rot:(moving?moving.rot:ROT),[fw,fh]=fpOf(k,r);S.objs=S.objs.filter(o=>!(DEF[o.k].isPath&&o.x>=x&&o.x<x+fw&&o.y>=y&&o.y<y+fh))}
 function starScore(){let s=S.rep*0.5,b=0;for(const o of S.objs){const d=DEF[o.k];s+=(d.appeal||0)*(1+0.35*(o.lv-1))*0.4;b+=(d.beauty||0)*bMul(d)}s+=Math.sqrt(b)*3+Object.keys(S.plots).length*4+setsDone().length*15;return s}
-const STAR_REQ=[0,0,[55,250,1],[105,850,2],[190,2500,3],[320,4500,4]]; // [점수, 누적손님, 구역수] — 동시 손님을 절반으로 줄이면서 누적손님 조건도 절반
+const STAR_REQ=[0,0,[55,500,1],[105,1700,2],[190,5000,3],[320,9000,4]]; // [점수, 누적손님, 구역수]
 let _stC={k:''};function stars(){const ck=Math.floor(S.min/10)+'|'+S.objs.length+'|'+S.served+'|'+Object.keys(S.plots).length+'|'+Math.floor(S.rep||0);if(_stC.k===ck)return _stC.v;_stC.k=ck;return _stC.v=stars_()}
 function stars_(){const s=starScore(),pl=Object.keys(S.plots).length;let r=1;for(let i=2;i<=5;i++){const[q,sv,p]=STAR_REQ[i];if(s>=q&&S.served>=sv&&pl>=p)r=i;else break}return r}
 function nextStarInfo(){const r=stars();if(r>=5)return null;const[q,sv,p]=STAR_REQ[r+1];return{r:r+1,score:[Math.floor(starScore()),q],served:[S.served,sv],plots:[Object.keys(S.plots).length,p]}}
@@ -411,9 +411,10 @@ const THOUGHT={
 function entrance(){const s=START_PLOT;return[s[0]*PS+PS/2,s[1]*PS+PS]}
 function wageNow(h){const nt=(h%24)>=23||(h%24)<6;return Math.round(S.objs.reduce((s,o)=>{const d=DEF[o.k];if(!d.wage)return s;const w=d.wage*(1+0.5*(o.lv-1))*(0.35+0.65*Math.min(1,(o.hu||0)/2));o.hu=0;return s+(nt&&!d.stay&&!d.night?w*0.3:w)},0)+S.objs.filter(o=>!DEF[o.k].isPath&&!DEF[o.k].wage).length*4)}
 function capTotal(){return S.objs.reduce((a,o)=>{const d=DEF[o.k];return a+(d.cap&&!d.stay?capOf(o):0)},0)}
-const TUNE=window.TUNE||{spread:1,dur:1.5,funFix:0,starK:6,fill:1.5};
-// 동시 방문 손님 상한: 탕·시설 정원 합계×0.75에 비례(평판 0~100 → ×0.8~1.2), 등급별 상한 6+★×6 (이전 대비 약 절반)
-function maxGuests(){const ct=capTotal(),rp=0.8+0.4*Math.min(100,Math.max(0,S.rep||0))/100;return Math.max(2,Math.min(6+stars()*(TUNE.starK||6),Math.round(ct*0.75*rp)+1))}
+const TUNE=window.TUNE||{spread:1,dur:1.5,funFix:0,starK:12,fill:1.5};
+// 동시 방문 손님 상한: 탕·식당 등 시설 정원 합계×0.75에 비례(평판 0~100 → ×0.8~1.2). 시작 규모에선 이전의 절반,
+// 시설을 늘릴수록 손님도 늘어 승급 속도는 플레이 적극성에 따라 유지. 등급별 상한 12+★×12는 경제 폭주 방지용
+function maxGuests(){const ct=capTotal(),rp=0.8+0.4*Math.min(100,Math.max(0,S.rep||0))/100;return Math.max(2,Math.min(12+stars()*(TUNE.starK||12),Math.round(ct*0.75*rp)+1))}
 function spawnRate(){const h=hour();const f=h<6?0.05:h<9?0.5:h<12?0.7:h<15?0.6:h<17?0.8:h<21?1.15:h<23?0.5:0.15;return f*(0.12+stars()*0.06)}
 function spawn(){const gi=gateInfo();if(!gi)return;const[mx,my]=gi.m,[ox,oy]=gi.o;const vip=Math.random()<0.1*stars();const c=(k)=>[mx+0.5+ox*k,my+0.5+oy*k];const s0=c(5);
  guests.push({x:s0[0]+(Math.random()-0.5)*0.3,y:s0[1],tx:s0[0],ty:s0[1],path:[c(3),c(1),c(0)],st:'walk',spr:'cw'+(1+(Math.random()*4|0)),cb:'cb'+(1+(Math.random()*4|0)),
@@ -1191,7 +1192,7 @@ function step(dt){if(_pb<=0)_pb=2;
   S.fin.hist.push((S.fin._h||0)-wages);S.fin._h=0;if(S.fin.hist.length>48)S.fin.hist.shift();if(nowH%24==0){S.fin.inc=0;S.fin.exp=0}}
  const before=S.yen;
  {const mg=maxGuests(),fill=1+(TUNE.fill||0)*Math.max(0,1-guests.length/mg); // 빈자리가 많을수록 손님이 조금 더 빨리 들어옴
-  if(Math.random()<dt*spawnRate()*1.5*fill&&guests.length<mg)spawn()}
+  if(Math.random()<dt*spawnRate()*3*fill&&guests.length<mg)spawn()}
  for(const g of guests)updGuest(g,dt);guests=guests.filter(g=>!g.dead);
  emit(dt);updParts(dt);
  const earned=Math.max(0,S.yen-before);S.fin._h=(S.fin._h||0)+earned;
