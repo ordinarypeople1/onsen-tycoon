@@ -3159,11 +3159,6 @@
   "<div class=\"box btn\" id=\"bInvite\" title=\"わたしの温泉の招待状 · となりの温泉へ\">招待・訪問</div>",
   "<div class=\"box btn\" id=\"bInvite\" title=\"我的溫泉邀請函 · 去鄰居的溫泉玩\">邀請・拜訪</div>"
  ],
- "<div class=\"box btn\" id=\"bPause\" title=\"일시정지 (Esc)\">일시정지</div>": [
-  "<div class=\"box btn\" id=\"bPause\" title=\"Pause (Esc)\">Pause</div>",
-  "<div class=\"box btn\" id=\"bPause\" title=\"一時停止（Esc）\">一時停止</div>",
-  "<div class=\"box btn\" id=\"bPause\" title=\"暫停（Esc）\">暫停</div>"
- ],
  "<button class=\"tool\" id=\"tInvite\" title=\"초대 · 방문\"><i>초대·방문</i></button>": [
   "<button class=\"tool\" id=\"tInvite\" title=\"Invite · Visit\"><i>Invite</i></button>",
   "<button class=\"tool\" id=\"tInvite\" title=\"招待・訪問\"><i>招待・訪問</i></button>",
@@ -3523,5 +3518,75 @@
   "Moving — drag to place",
   "移動中 — ドラッグして配置",
   "移動中 — 拖曳放置"
+ ],
+ "<div class=\"box btn\" id=\"bPause\" title=\"일시정지\">일시정지</div>": [
+  "<div class=\"box btn\" id=\"bPause\" title=\"Pause\">Pause</div>",
+  "<div class=\"box btn\" id=\"bPause\" title=\"一時停止\">一時停止</div>",
+  "<div class=\"box btn\" id=\"bPause\" title=\"暫停\">暫停</div>"
+ ],
+ "보상 {}": [
+  "Reward {0}",
+  "報酬 {0}",
+  "獎勵 {0}"
+ ],
+ "감상 모드 · 아무 곳이나 누르면 나가요": [
+  "View mode · Tap anywhere to exit",
+  "鑑賞モード · どこかをタップで終了",
+  "觀賞模式 · 點擊任意處離開"
+ ],
+ "친구 초대 링크로 입장": [
+  "Visit with a friend's invite link",
+  "友だちの招待リンクで入る",
+  "用好友邀請連結進入"
+ ],
+ "복사한 초대 링크나 코드를 여기에 붙여넣으면 바로 이동해요": [
+  "Paste a copied invite link or code here to go right away",
+  "コピーした招待リンクやコードを貼り付けるとすぐ移動します",
+  "貼上複製的邀請連結或代碼即可立即前往"
+ ],
+ "클립보드에 초대 링크가 없어요. 입력창에 붙여넣어 주세요!": [
+  "No invite link in the clipboard. Please paste it into the box!",
+  "クリップボードに招待リンクがありません。入力欄に貼り付けてください!",
+  "剪貼簿中沒有邀請連結,請貼到輸入框中!"
+ ],
+ "입력창에 초대 링크를 붙여넣으면 바로 이동해요!": [
+  "Paste an invite link into the box to go right away!",
+  "入力欄に招待リンクを貼り付けるとすぐ移動します!",
+  "在輸入框貼上邀請連結即可立即前往!"
+ ],
+ "화면을 누르면 계속해요": [
+  "Tap the screen to continue",
+  "画面をタップすると再開します",
+  "點擊畫面繼續"
+ ],
+ "나가기": [
+  "Exit",
+  "終了",
+  "離開"
+ ],
+ "현재 진행을 저장했어요": [
+  "Your progress has been saved",
+  "現在の進行を保存しました",
+  "已儲存目前進度"
+ ],
+ "저장한 료칸은 슬롯에 그대로 남아요": [
+  "Your saved ryokan stays in its slot",
+  "保存した旅館はスロットにそのまま残ります",
+  "已儲存的旅館會保留在存檔欄位中"
+ ],
+ "<button class=\"tool\" id=\"tSet\" data-ic=\"set\" title=\"설정\"><i>설정</i></button>": [
+  "<button class=\"tool\" id=\"tSet\" data-ic=\"set\" title=\"Settings\"><i>Settings</i></button>",
+  "<button class=\"tool\" id=\"tSet\" data-ic=\"set\" title=\"設定\"><i>設定</i></button>",
+  "<button class=\"tool\" id=\"tSet\" data-ic=\"set\" title=\"設定\"><i>設定</i></button>"
+ ],
+ "<button class=\"tool\" id=\"tExit\" data-ic=\"exit\" title=\"저장하고 나가기\"><i>나가기</i></button>": [
+  "<button class=\"tool\" id=\"tExit\" data-ic=\"exit\" title=\"Save and exit\"><i>Exit</i></button>",
+  "<button class=\"tool\" id=\"tExit\" data-ic=\"exit\" title=\"保存して終了\"><i>終了</i></button>",
+  "<button class=\"tool\" id=\"tExit\" data-ic=\"exit\" title=\"儲存並離開\"><i>離開</i></button>"
+ ],
+ "회전": [
+  "Rotate",
+  "回転",
+  "旋轉"
  ]
 }

@@ -130,7 +130,7 @@ window.applyState=function(newS,ro){
  migrateLayout();migrate();OCC=occ();ensureGate();OCC=occ();
  groundDirty=true;ghost=null;moving=null;paint=null;hideInfo();
  guests=[];parts=[];floats=[];bubbles=[];
- for(let i=0;i<5;i++)spawn();guests.forEach((g,i)=>{g.x-=i*0.3});
+ for(let i=0,n=Math.min(2,maxGuests());i<n;i++)spawn();guests.forEach((g,i)=>{g.x-=i*0.3});
  if(ro)warmUp();
  const b=S.objs.find(o=>DEF[o.k].bath)||S.objs[0];
  if(b){const[bfw,bfh]=fpOf(b.k,b.rot);focus(b.x+bfw/2,b.y+bfh/2,VW>820?5.2:3.6)}
@@ -377,7 +377,7 @@ function rotateGate(){const g=gateObj();if(!g)return;const cur=gateOut(g.x,g.y,g
 window.rotateGate=rotateGate;setTimeout(()=>{const gb=document.getElementById('ghRot');if(gb){gb.onclick=e=>{e.stopPropagation();ROT^=1;syncGhostHover();if(window.SND&&SND.click)SND.click();gb.blur()};setInterval(()=>{gb.style.display=(ghost&&ghost!='gate'&&DEF[ghost]&&!DEF[ghost].isPath&&!DEF[ghost].erase&&!moving)?'block':'none'},200)}const b=document.getElementById('mvRot');if(b)b.onclick=e=>{e.stopPropagation();if(moving)moving.k=='gate'?rotateGate():rotateObj(moving);syncGhostHover();b.blur()}},0);let moving=null,infoT=null;
 function startMove(o){if(window.READONLY)return;clearTimeout(infoT);if(moving)cancelMove();hideInfo();mode=null;
  guests.forEach(g=>{if(g.cur===o)finish(g);if(g.target===o){g.target=null;g.path=[]}});
- moving=o;o._from=[o.x,o.y,o.dir,o.rot|0];ghost=o.k;hoverT=[o.x,o.y];OCC=occ();groundDirty=true;$('moveBar').style.display='flex';toast(document.body.classList.contains('phone')?L('끌어서 놓거나 놓을 곳을 눌러주세요'):L('놓을 곳을 눌러주세요 · R키로 회전 (Esc·우클릭 취소)'))}
+ moving=o;o._from=[o.x,o.y,o.dir,o.rot|0];ghost=o.k;hoverT=[o.x,o.y];OCC=occ();groundDirty=true;$('moveBar').style.display='flex';toast(!window.KBD||document.body.classList.contains('phone')?L('끌어서 놓거나 놓을 곳을 눌러주세요'):L('놓을 곳을 눌러주세요 · R키로 회전 (Esc·우클릭 취소)'))}
 function dropMove(x,y){const o=moving;if(o.k=='gate'){const sp=gateSpot(x,y);if(!sp){toast(L('대문은 열린 땅의 가장자리에만 놓을 수 있어요'));return}endMove();placeGate(sp);OCC=occ();groundDirty=true;guests.forEach(g=>{if(g.st=='walk'){g.target=null;g.path=[]}});save();return}if(!canPlace(o.k,x,y,o.rot)){toast(L('여기엔 놓을 수 없어요'));return}clearPaths(o.k,x,y,o.rot);o.x=x;o.y=y;endMove();anims['o'+S.objs.indexOf(o)]={t:0};
  const[fw,fh]=fpOf(o.k,o.rot);for(let i=0;i<8;i++)parts.push({k:'steam',x:x+fw/2+(Math.random()-0.5)*fw,y:y+fh/2,h:0,vx:0,l:1,L:1,s:2});save()}
 function cancelMove(){if(!moving)return;moving.x=moving._from[0];moving.y=moving._from[1];if(moving._from[2])moving.dir=moving._from[2];if(moving._from[3]!==undefined)moving.rot=moving._from[3];endMove()}
@@ -412,9 +412,9 @@ function entrance(){const s=START_PLOT;return[s[0]*PS+PS/2,s[1]*PS+PS]}
 function wageNow(h){const nt=(h%24)>=23||(h%24)<6;return Math.round(S.objs.reduce((s,o)=>{const d=DEF[o.k];if(!d.wage)return s;const w=d.wage*(1+0.5*(o.lv-1))*(0.35+0.65*Math.min(1,(o.hu||0)/2));o.hu=0;return s+(nt&&!d.stay&&!d.night?w*0.3:w)},0)+S.objs.filter(o=>!DEF[o.k].isPath&&!DEF[o.k].wage).length*4)}
 function capTotal(){return S.objs.reduce((a,o)=>{const d=DEF[o.k];return a+(d.cap&&!d.stay?capOf(o):0)},0)}
 const TUNE=window.TUNE||{spread:1,dur:1.5,funFix:0,starK:12,fill:1.5};
-// 동시 손님 상한: 12+★×starK (기존 8 → 시설이 더 북적이도록), 단 설치 정원×1.5+4를 넘지 않음
-// (설치 정원에 비례하게 하면 시설을 늘릴수록 손님·매출이 함께 불어나 경제가 폭주함 — 밸런스 봇으로 확인)
-function maxGuests(){const ct=capTotal();return Math.min(12+stars()*(TUNE.starK||8),Math.round(ct*1.5)+4)}
+// 동시 방문 손님 상한: 탕·식당 등 시설 정원 합계×0.75에 비례(평판 0~100 → ×0.8~1.2). 시작 규모에선 이전의 절반,
+// 시설을 늘릴수록 손님도 늘어 승급 속도는 플레이 적극성에 따라 유지. 등급별 상한 12+★×12는 경제 폭주 방지용
+function maxGuests(){const ct=capTotal(),rp=0.8+0.4*Math.min(100,Math.max(0,S.rep||0))/100;return Math.max(2,Math.min(12+stars()*(TUNE.starK||12),Math.round(ct*0.75*rp)+1))}
 function spawnRate(){const h=hour();const f=h<6?0.05:h<9?0.5:h<12?0.7:h<15?0.6:h<17?0.8:h<21?1.15:h<23?0.5:0.15;return f*(0.12+stars()*0.06)}
 function spawn(){const gi=gateInfo();if(!gi)return;const[mx,my]=gi.m,[ox,oy]=gi.o;const vip=Math.random()<0.1*stars();const c=(k)=>[mx+0.5+ox*k,my+0.5+oy*k];const s0=c(5);
  guests.push({x:s0[0]+(Math.random()-0.5)*0.3,y:s0[1],tx:s0[0],ty:s0[1],path:[c(3),c(1),c(0)],st:'walk',spr:'cw'+(1+(Math.random()*4|0)),cb:'cb'+(1+(Math.random()*4|0)),
@@ -971,7 +971,7 @@ function buildCards(){_stC.k='';const st=stars();
  const rest=sortSubItems(Object.entries(DEF).filter(([k,d])=>d.tab==tab&&!seen.has(k)),st);
  if(rest.length)blocks.push(L`<div class="sethd" data-sub="etc"><b>기타</b><span class="subcnt">건설 가능 ${rest.filter(([,d])=>(d.star||1)<=st).length}/${rest.length}</span></div>`+rest.map(card).join(''));
  $('cards').innerHTML=blocks.join('');if(window.ICFIX)ICFIX($('cards'));
- document.querySelectorAll('.card').forEach(e=>e.onclick=()=>{const k=e.dataset.k;if(moving)cancelMove();if(DEF[k].star>stars())return toast(L`료칸 등급 ${DEF[k].star}★ 에서 해금돼요`);ghost=ghost==k?null:k;mode=null;$('tDel').classList.remove('on');buildCards();if(ghost&&!document.body.classList.contains('phone'))toast(DEF[ghost].isPath||DEF[ghost].erase?L('드래그해서 칠하세요 · Shift+드래그 = 사각형 (Esc 취소)'):L('놓을 곳을 눌러주세요 (Esc 취소)'))})}
+ document.querySelectorAll('.card').forEach(e=>e.onclick=()=>{const k=e.dataset.k;if(moving)cancelMove();if(DEF[k].star>stars())return toast(L`료칸 등급 ${DEF[k].star}★ 에서 해금돼요`);ghost=ghost==k?null:k;mode=null;$('tDel').classList.remove('on');buildCards();if(ghost&&window.KBD&&!document.body.classList.contains('phone'))toast(DEF[ghost].isPath||DEF[ghost].erase?L('드래그해서 칠하세요 · Shift+드래그 = 사각형 (Esc 취소)'):L('놓을 곳을 눌러주세요 (Esc 취소)'))})}
 let lastStars=0;
 function hud(){const lt=light();$('yen').textContent=fmt(S.yen);const n=S.fin.hist.length?avgNet():(S.fin._h||0);$('ihr').textContent=(n>=0?'+':'')+fmt(n)+L(' ¥/시');
  const h=hour(),m=Math.floor(S.min%60);{const ap=h<12?L('오전'):L('오후'),hm=`${String(Math.floor(h%12)||12).padStart(2,'0')}:${String(m).padStart(2,'0')}`;$('time').textContent=window.LANG=='en'?`${hm} ${ap}`:`${ap} ${hm}`}
@@ -1092,8 +1092,9 @@ function initInput(){
   if(drag&&drag.startedMove&&moving===drag.startedMove)cancelMove();
   ptrs.delete(e.pointerId);drag=null;pinch=null;
  };
+ let lastPT='mouse';
  cv.addEventListener('pointerdown',e=>{
-  lastMouse=[e.clientX,e.clientY];ev.shift=e.shiftKey;clearTimeout(lp);
+  lastPT=e.pointerType||'mouse';lastMouse=[e.clientX,e.clientY];ev.shift=e.shiftKey;clearTimeout(lp);
   ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY});
   cv.setPointerCapture(e.pointerId);
   if(ptrs.size>1){
@@ -1112,7 +1113,10 @@ function initInput(){
    }
    updatePlacementHover(e.clientX,e.clientY,drag.grab);return;
   }
-  // Existing objects enter move mode only through the double-tap handler below.
+  // 기존 시설: 꾹 누르면(0.45초) 이동 모드 → 손을 떼지 않고 끌어 바로 옮길 수 있음. 더블탭 이동도 유지
+  if(!window.READONLY&&!moving&&mode!='del'&&e.button!=2&&ptrs.size==1){const o=pickObj(e.clientX,e.clientY);
+   if(o&&!DEF[o.k].isPath){const d0=drag;lp=setTimeout(()=>{if(drag!==d0||d0.m||ptrs.size!=1||moving||ghost)return;lastTap={};startMove(o);
+    const[a,b]=toTile(d0.x,d0.y);d0.placing=true;d0.lp=true;d0.startedMove=o;d0.grab=[a-o.x,b-o.y];updatePlacementHover(d0.x,d0.y,d0.grab)},450)}}
  });
  let rcT=0;
  cv.addEventListener('pointermove',e=>{if(e.button==2&&paint){escCancel();return}lastMouse=[e.clientX,e.clientY];if(e.pointerType=='mouse'&&!ptrs.size){const h=ghost||moving?null:pickObj(e.clientX,e.clientY);window.HOVER=h&&!DEF[h.k].isPath?h:null;cv.style.cursor=window.HOVER?'pointer':''}updatePlacementHover(e.clientX,e.clientY,drag&&drag.placing?drag.grab:null);if(!ptrs.has(e.pointerId))return;const prevP=ptrs.get(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:prevP.sx,sy:prevP.sy});
@@ -1133,7 +1137,7 @@ function initInput(){
  cv.addEventListener('lostpointercapture',cancelPointer);
  cv.addEventListener('wheel',e=>{e.preventDefault();if(e.ctrlKey||e.metaKey){zoomTarget=[e.clientX,e.clientY];const f=Math.abs(e.deltaY)<40?Math.exp(-e.deltaY*0.012):(e.deltaY<0?1.15:1/1.15);cam.tz=Math.max(zmin(),Math.min(8,cam.tz*f))}else{homeAnim=null;const m=e.deltaMode==1?16:e.deltaMode==2?100:1;cam.x-=e.deltaX*m;cam.y-=e.deltaY*m;syncGhostHover()}},{passive:false});
  // 우클릭 메뉴 이벤트: Windows는 버튼을 뗀 뒤(위 pointerup에서 이미 처리), macOS는 누를 때 옴 → 직전에 처리했으면 건너뜀
- cv.addEventListener('contextmenu',e=>{e.preventDefault();if(performance.now()-rcT<400)return;escCancel()});
+ cv.addEventListener('contextmenu',e=>{e.preventDefault();if(lastPT!='mouse'||performance.now()-rcT<400)return;escCancel()}); // 터치 길게 누름의 contextmenu는 무시 (꾹 눌러 이동)
  const objAt=(sx,sy)=>{const o=pickObj(sx,sy);return o&&!DEF[o.k].isPath?o:null};
  cv.addEventListener('dblclick',e=>{if(moving||ghost&&!moving)return;const o=objAt(e.clientX,e.clientY);if(o)startMove(o)});
  $('mvCancel').onclick=cancelMove;
@@ -1223,7 +1227,7 @@ async function boot(){resize();addEventListener('resize',resize);if(window.VISIT
   const L=splitLayers(IMG.gate,GATE_MASKS);for(const n in L){variants('gate_'+n,L[n]);const fn=flip(L[n]);variants('gate_f_'+n,fn);fn.width=fn.height=0;L[n].width=L[n].height=0}}
  for(const k in OVER){if(!IMG[k])continue;const L=splitLayers(IMG[k],[['over',(g,W,H)=>g.rect(0,0,W,H*OVER[k])]]);variants(k+'_over',L.over);for(const n in L)L[n].width=L[n].height=0}
  const b=S.objs.find(o=>DEF[o.k].bath)||S.objs[0];const[bfw,bfh]=fpOf(b.k,b.rot);focus(b.x+bfw/2,b.y+bfh/2,VW>820?5.2:3.6);
- for(let i=0;i<5;i++)spawn();guests.forEach((g,i)=>{g.x-=i*0.3});
+ for(let i=0,n=Math.min(2,maxGuests());i<n;i++)spawn();guests.forEach((g,i)=>{g.x-=i*0.3});
  if(window.READONLY)warmUp();
  buildTabs();initInput();window.__ready=true;requestAnimationFrame(t=>{last=t;frame(t)})}
 // 시설 표시용 키 매핑 (milk는 yuzu 이미지에 필터)

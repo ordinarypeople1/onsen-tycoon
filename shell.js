@@ -41,7 +41,8 @@ const SHELL=(()=>{
  }
  function close(id){
   if(id==='ovShare'&&pasteHandler){removeEventListener('paste',pasteHandler);pasteHandler=null}
-  const o=document.getElementById(id);if(!o)return;o.querySelectorAll('canvas').forEach(c=>{c.width=c.height=0});o.classList.remove('on');o.id='';setTimeout(()=>o.remove(),250);
+  const o=document.getElementById(id);if(!o)return;
+  if(id==='ovExit'&&!inTitle&&!document.getElementById('ovPause'))paused=false;o.querySelectorAll('canvas').forEach(c=>{c.width=c.height=0});o.classList.remove('on');o.id='';setTimeout(()=>o.remove(),250);
  }
  const top=()=>[...document.querySelectorAll('.ovl.on')].pop();
 
@@ -197,7 +198,7 @@ const SHELL=(()=>{
   o.querySelectorAll('input[data-v]').forEach(i=>i.oninput=()=>{v[i.dataset.v]=+i.value;saveSet();SND.applyVol&&SND.applyVol()});
   o.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{SET.gfx=b.dataset.g;if(SET.gfx!='auto'){autoLow=false;localStorage.onsenAutoLow='0'}saveSet();applyGfx();settings()});
   o.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{if(b.dataset.l==(window.LANG||'ko'))return;SET.lang=b.dataset.l;saveSet();try{save()}catch(_){}location.reload()});
-  o.querySelector('#sFps').onchange=e=>{SET.fps=e.target.checked;saveSet()};o.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>close('ovSet'))}
+  o.querySelector('#sFps').onchange=e=>{SET.fps=e.target.checked;saveSet()};{const bx=o.querySelector('#sDiag').parentNode,cb=el(`<button class="mb sm sec" id="sCred">${T('cred')}</button>`);bx.appendChild(cb);cb.onclick=()=>credits()}o.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>close('ovSet'))}
 
  // ---- 슬롯 ----
  function slots(fromTitle){const cur=SLOT;const rows=[1,2,3].map(n=>{const i=slotInfo(n);return`<div class="slot ${n==cur?'cur':''}"><b>${T('slot')} ${n}</b><span>${i?(i.bad?L('손상됨'):L`<b>${i.name}</b> · Day ${i.day} · ¥${fmt(i.yen)} · 손님 ${fmt(i.served||0)}명<br><small>${new Date(i.t).toLocaleString('ko-KR')}</small>`):T('empty')}</span>
@@ -368,6 +369,8 @@ const SHELL=(()=>{
    </details>
   `);
 
+  // 터치 기기: Ctrl+V 안내 빼기
+  if(!window.KBD){const cb=o.querySelector('.clip-bar'),h=cb&&cb.previousElementSibling;if(h)h.textContent=L('친구 초대 링크로 입장');const pi=o.querySelector('#invPaste');if(pi)pi.placeholder=L('복사한 초대 링크나 코드를 여기에 붙여넣으면 바로 이동해요')}
   // 1) 라이브 온천 캔버스 스냅샷 렌더링
   const snap=o.querySelector('#invSnap'),mainC=document.getElementById('c');
   if(snap&&mainC){
@@ -439,10 +442,10 @@ const SHELL=(()=>{
      return;
     }
     pasteInp.focus();
-    toast(L('클립보드에 초대 링크가 없어요. 입력창에 Ctrl+V로 붙여넣어 주세요!'));
+    toast(window.KBD?L('클립보드에 초대 링크가 없어요. 입력창에 Ctrl+V로 붙여넣어 주세요!'):L('클립보드에 초대 링크가 없어요. 입력창에 붙여넣어 주세요!'));
    }catch(_){
     pasteInp.focus();
-    toast(L('입력창에 초대 링크를 붙여넣으면(Ctrl+V) 바로 이동해요!'));
+    toast(window.KBD?L('입력창에 초대 링크를 붙여넣으면(Ctrl+V) 바로 이동해요!'):L('입력창에 초대 링크를 붙여넣으면 바로 이동해요!'));
    }
   };
 
@@ -504,25 +507,26 @@ const SHELL=(()=>{
   <p><b>폰트</b><br>Pretendard — © Kil Hyung-jin, <a href="https://github.com/orioncactus/pretendard" target="_blank" rel="noopener">github.com/orioncactus/pretendard</a><br>SIL Open Font License 1.1 (<a href="assets/fonts/LICENSE.txt" target="_blank">전문</a>)</p>
   <p><b>특별히 감사</b><br>느긋한 모든 카피바라에게</p></div><div class="btns"><button class="mb sec" data-x>${T('close')}</button></div>`);o.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>close('ovCred'))}
 
- // ---- 일시정지 ----
+ // ---- 일시정지: 메뉴 없이 게임만 멈춤. 화면을 누르면 계속 ----
  let inTitle=true;
  function pause(){if(inTitle||document.getElementById('ovPause'))return;paused=true;SND.suspend&&SND.suspend(false);
-  const o=overlay('ovPause',`<div class="m-head"><div class="m-head-left"><span class="m-eyebrow">CAPYBARA ONSEN</span><h2>${T('paused')}</h2></div><button class="m-close-x" data-a="resume">${T('close')}</button></div>
+  const o=el(`<div class="ovl pz" id="ovPause"><div class="pz-in"><b>${T('paused')}</b><span>${L('화면을 누르면 계속해요')}</span></div></div>`);
+  o.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();resume()});
+  document.body.appendChild(o);requestAnimationFrame(()=>o.classList.add('on'))}
+ // ---- 나가기: 지금 진행을 저장하고 새로 시작·슬롯 불러오기·타이틀로 ----
+ function exitMenu(){if(inTitle||window.READONLY)return;try{save()}catch(_){}paused=true;
+  const info=slotInfo(SLOT),day=info&&!info.bad?info.day:1;
+  const o=overlay('ovExit',`<div class="m-head"><div class="m-head-left"><span class="m-eyebrow">SAVE & EXIT</span><h2>${L('나가기')}</h2></div><button class="m-close-x" data-a="back">${T('close')}</button></div>
+   <p class="note" style="margin:0 0 12px">${L('현재 진행을 저장했어요')} · ${T('slot')} ${SLOT} · Day ${day}</p>
    <div class="col">
-    <button class="mb big pri" data-a="resume"><span class="mb-main">${T('resume')}</span><span class="mb-sub">ESC</span></button>
+    <button class="mb big pri" data-a="newg"><span class="mb-main">${T('newg')}</span><span class="mb-sub">${L('저장한 료칸은 슬롯에 그대로 남아요')}</span></button>
     <div class="m-grid">
-     <button class="mb sec" data-a="share">${T('share')}</button>
-     <button class="mb sec" data-a="newg">${T('newg')}</button>
      <button class="mb sec" data-a="slots">${T('slots')}</button>
-     <button class="mb sec" data-a="zen">${T('zen')}</button>
-     <button class="mb sec" data-a="set">${T('set')}</button>
-     <button class="mb sec" data-a="cred">${T('cred')}</button>
+     <button class="mb sec" data-a="title">${T('title')}</button>
     </div>
-    <div class="tl-nav">
-     <button class="tl-link" data-a="title">${T('title')}</button>
-    </div>
+    <button class="mb sec" data-a="back">${T('resume')}</button>
    </div>`);
-  o.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;if(a=='resume')resume();else if(a=='newg')newGameModal(false);else if(a=='slots')slots();else if(a=='share')share();else if(a=='set')settings();else if(a=='cred')credits();else if(a=='zen'){resume();AMB.setZen(true)}else if(a=='title'){save();resume();showTitle()}})}
+  o.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;close('ovExit');if(a=='newg')newGameModal(false);else if(a=='slots')slots();else if(a=='title'){save();showTitle()}})}
  function resume(){close('ovPause');paused=false}
 
  // ---- 타이틀 ----
@@ -546,6 +550,7 @@ const SHELL=(()=>{
     <button class="tl-link" data-a="cred">${T('cred')}</button>
    </div>
    <div class="ver">v3.0  ·  ESC 일시정지  ·  Z 감상 모드</div></div></div>`);
+  if(!window.KBD){const v=o.querySelector('.ver');if(v)v.textContent='v3.0'}
   document.body.appendChild(o);requestAnimationFrame(()=>o.classList.add('on'));
   o.querySelectorAll('[data-a]').forEach(b=>b.onclick=async e=>{e.stopPropagation();SND.init();const a=b.dataset.a;if(a=='cont')start();else if(a=='newg')newGameModal(true);else if(a=='slots')slots(true);else if(a=='share')share();else if(a=='set')settings();else if(a=='cred')credits();else if(a=='zen'){start();AMB.setZen(true)}else if(a=='show'){const d=await buildNeighborData('moonlight');enterVisit(d,{name:L('할머니의 달빛 료칸'),stars:5})}})}
  function start(){const o=document.getElementById('title');if(o){o.classList.remove('on');o.id='';setTimeout(()=>o.remove(),700)}inTitle=false;paused=false;document.body.classList.remove('titling');AMB.setZen(false);const zh=document.getElementById('zHome');zh&&zh.click()}
@@ -563,13 +568,17 @@ const SHELL=(()=>{
  const sp=$('bSpeed');
  const invBtn=el(L('<div class="box btn" id="bInvite" title="내 온천 초대장 · 이웃 온천 놀러가기">초대 · 방문</div>'));
  sp.parentNode.insertBefore(invBtn,sp);invBtn.onclick=()=>share();
- const pb=el(L('<div class="box btn" id="bPause" title="일시정지 (Esc)">일시정지</div>'));
+ const pb=el(L('<div class="box btn" id="bPause" title="일시정지">일시정지</div>'));
  sp.parentNode.insertBefore(pb,sp);pb.onclick=()=>pause();
  const tools=$('tools');
  if(tools){
   const tInv=el(L('<button class="tool" id="tInvite" title="초대 · 방문"><i>초대·방문</i></button>'));
   tInv.onclick=()=>share();
   tools.insertBefore(tInv,tools.querySelector('.zoom'));
+  const tSet=el(L('<button class="tool" id="tSet" data-ic="set" title="설정"><i>설정</i></button>'));
+  tSet.onclick=()=>settings();tools.insertBefore(tSet,tools.querySelector('.zoom'));
+  const tExit=el(L('<button class="tool" id="tExit" data-ic="exit" title="저장하고 나가기"><i>나가기</i></button>'));
+  tExit.onclick=()=>exitMenu();tools.insertBefore(tExit,tools.querySelector('.zoom'));
  }
 
  // ---- 오류 처리 ----
@@ -579,6 +588,6 @@ const SHELL=(()=>{
  BUS.on('info',(o,el)=>{if(window.READONLY){const b=el.lastElementChild;if(b)b.querySelectorAll('button').forEach(x=>{if(x.id!='iCl')x.remove()});el.querySelectorAll('[data-p]').forEach(x=>x.remove())}});
  const boot=()=>{if(window.READONLY){visitUI();inTitle=false;paused=false;return}if(localStorage.onsenSkipTitle==='1'||/[?&]notitle/.test(location.search)){localStorage.removeItem('onsenSkipTitle');inTitle=false;paused=false;return}showTitle()};
  if(window.__ready)boot();else{const iv=setInterval(()=>{if(window.__ready){clearInterval(iv);boot()}},50)}
- return{share,newGameModal,enterVisit,exitVisit,SET,T,pause,resume,settings,slots,credits,showTitle,start,get inTitle(){return inTitle}};
+ return{share,newGameModal,enterVisit,exitVisit,exitMenu,SET,T,pause,resume,settings,slots,credits,showTitle,start,get inTitle(){return inTitle}};
 })();
 window.SHELL=SHELL;

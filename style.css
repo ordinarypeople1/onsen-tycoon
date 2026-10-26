@@ -756,3 +756,23 @@ body:not(.phone) #tools>.tool[data-tip][data-badge]:hover::after{content:attr(da
 body:not(.phone) #bOpen[data-ic]{width:48px;height:48px;border-radius:14px}
 body.phone #bOpen[data-ic]{width:54px;height:54px;border-radius:16px}
 #bOpen[data-ic]::before{width:24px!important;height:24px!important}
+
+/* ===== v4.27 모바일 피드백: 설정·나가기 아이콘, 독 구성, 퀘스트 보상 배너, 단순 일시정지 ===== */
+[data-ic="set"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%223.2%22/%3E%3Cpath%20d%3D%22M12%202.8v2.4M12%2018.8v2.4M2.8%2012h2.4M18.8%2012h2.4M5.5%205.5l1.7%201.7M16.8%2016.8l1.7%201.7M5.5%2018.5l1.7-1.7M16.8%207.2l1.7-1.7%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%226.6%22/%3E%3C/svg%3E")}
+[data-ic="exit"]{--ic:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M14%204.5H6.5a1.5%201.5%200%200%200-1.5%201.5v12a1.5%201.5%200%200%200%201.5%201.5H14%22/%3E%3Cpath%20d%3D%22M10.5%2012h9.5M16.5%208.5L20%2012l-3.5%203.5%22/%3E%3C/svg%3E")}
+/* 휴대폰: 철거는 시설 정보창에서, 메뉴 시트에는 독 버튼을 중복으로 두지 않음 */
+body.phone #tools>#tDel{display:none!important}
+body.phone #tools.open>.dock:not(#tMenu){display:none}
+body.phone #tools.open>#tExit{order:98}
+@media (max-width:400px){body.phone #tools:not(.open){gap:5px}body.phone #tools:not(.open)>.tool[data-ic]{width:48px;height:48px}body.phone #tools:not(.open)>.tool[data-ic]::before{width:23px;height:23px}body.phone #bOpen[data-ic]{width:50px;height:50px}}
+/* 퀘스트 보상 대기 배너: 아이콘 위 '보상 N' */
+#tools>.tool[data-badge-lbl]::after{content:attr(data-badge-lbl);top:-13px;right:auto;left:50%;transform:translateX(-50%);min-width:0;white-space:nowrap;padding:0 7px;border-radius:9px;background:#e8c468;color:#2a2014;font:800 10.5px/18px Pretendard,sans-serif;box-shadow:0 0 0 2px rgba(14,17,23,.9),0 2px 8px rgba(232,196,104,.45);animation:qbn 1.6s ease-in-out infinite;pointer-events:none;z-index:2}
+@keyframes qbn{50%{transform:translateX(-50%) translateY(-2px) scale(1.06)}}
+body:not(.phone) #tools>.tool[data-tip][data-badge-lbl]:hover::after{content:attr(data-badge-lbl)}
+/* 일시정지: 메뉴 없이 반투명 화면 + 안내. 누르면 계속 */
+.ovl.pz{background:rgba(8,10,15,.42);cursor:pointer;z-index:70}
+.pz-in{display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 28px;border-radius:18px;background:rgba(12,15,21,.82);border:1px solid var(--border-glass);color:var(--txt-pri);font-family:Pretendard,sans-serif;pointer-events:none}
+.pz-in b{font-size:20px;font-weight:800;letter-spacing:.02em}
+.pz-in span{font-size:13px;color:var(--txt-sec)}
+#ovExit .mb.big{flex-direction:column;justify-content:center;gap:6px;padding-top:14px;padding-bottom:14px}
+#ovExit .mb.big .mb-sub{background:none;padding:0;font-size:12.5px;opacity:.7}

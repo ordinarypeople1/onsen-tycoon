@@ -52,6 +52,7 @@ async function main() {
    const [a,b]=await screen(0,0),[x,y]=await screen(dx,dy);return[p[0]+x-a,p[1]+y-b];
   };
   const tap=async p=>{await down(p);await up()};
+  const hold=async p=>{await down(p);await page.waitForTimeout(550)}; // 기존 시설은 꾹 눌러야 이동 모드
   const test=async(name,fn)=>{await fn();assert.equal((await state()).ptrs,0,'pointer leaked');console.log('PASS',name)};
 
   await test('new building follows finger, drops once and charges once',async()=>{
@@ -64,19 +65,19 @@ async function main() {
   });
   await test('existing tall object drags without a jump or camera pan',async()=>{
    await reset('sakura');const p=await grab(),q=await delta(p,2,1),before=await state();
-   await down(p);await move(q);const preview=await state();
+   await hold(p);await move(q);const preview=await state();
    assert.deepEqual(preview.hover,[25,24]);assert.deepEqual(preview.cam,before.cam);assert.deepEqual(preview.objs,before.objs);
    if(process.env.DRAG_SHOT_DIR){fs.mkdirSync(process.env.DRAG_SHOT_DIR,{recursive:true});await page.screenshot({path:path.join(process.env.DRAG_SHOT_DIR,'mobile-drag-preview.png')})}
    await up();const after=await state();assert.deepEqual([after.objs[0].x,after.objs[0].y],[25,24]);assert.equal(after.yen,before.yen);assert.equal(after.moving,false);
   });
   await test('rotated rectangular building keeps its rotation and grabbed point',async()=>{
    await reset('milk',1);const p=await grab(),q=await delta(p,1,2);
-   await down(p);await move(q);assert.deepEqual((await state()).hover,[24,25]);await up();
+   await hold(p);await move(q);assert.deepEqual((await state()).hover,[24,25]);await up();
    const o=(await state()).objs[0];assert.deepEqual([o.x,o.y,o.rot],[24,25,1]);
   });
   await test('blocked drop keeps the original object and allows retry',async()=>{
    await reset();await page.evaluate(()=>{S.objs.push({k:'lantern',x:25,y:24,lv:1});OCC=occ();groundDirty=true});
-   const p=await grab(),q=await delta(p,2,1);await down(p);await move(q);await up();
+   const p=await grab(),q=await delta(p,2,1);await hold(p);await move(q);await up();
    const invalid=await state();assert.deepEqual([invalid.objs[0].x,invalid.objs[0].y],[23,23]);assert.equal(invalid.moving,true);
    await page.evaluate(()=>cancelMove());assert.equal((await state()).moving,false);
   });
@@ -105,7 +106,7 @@ async function main() {
    await down(p);await move([b.x+b.width/2,b.y+b.height/2]);await up();const after=await state();assert.deepEqual(after.objs,before.objs);assert.equal(after.moving,false);assert.equal(after.yen,before.yen);
   });
   await test('second finger cancels object drag and leaves pinch available',async()=>{
-   await reset();const p=await grab(),q=await delta(p,1,1),before=await state();await down(p);await move(q);
+   await reset();const p=await grab(),q=await delta(p,1,1),before=await state();await hold(p);await move(q);
    await send('touchStart',[[...q,1],[q[0]+60,q[1]+20,2]]);assert.equal((await state()).moving,false);
    await send('touchMove',[[q[0]-35,q[1],1],[q[0]+95,q[1]+20,2]]);
    await send('touchMove',[[q[0]-55,q[1],1],[q[0]+115,q[1]+20,2]]);await up();
