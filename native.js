@@ -1,3 +1,5 @@
+// 키보드·마우스 기기 여부: 단축키 안내(R·Esc·Ctrl+V 등)는 이 경우에만 표시
+window.KBD=!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform())&&matchMedia('(hover:hover) and (pointer:fine)').matches;
 // 앱(Capacitor)에서만 동작하는 보정. 웹에서는 아무 것도 하지 않음
 (()=>{
  const C=window.Capacitor;if(!C||!C.isNativePlatform||!C.isNativePlatform())return;
@@ -13,15 +15,13 @@
  if(P.Preferences&&!localStorage.onsen2){P.Preferences.get({key:'ls'}).then(r=>{if(!r||!r.value)return;const o=JSON.parse(r.value);if(!o.onsen2||localStorage.onsen2)return;for(const k in o)localStorage[k]=o[k];location.reload()}).catch(()=>{})}
  setInterval(backup,30000);
 
- // ---- 햅틱 ----
- const H=P.Haptics;let lastPay=0;
+ // ---- 햅틱: 퀘스트 보상 수령·시설 업그레이드 완료 때만 ----
+ const H=P.Haptics;
  const tap=(style)=>H&&safe(()=>H.impact({style}));
  const hook=()=>{if(typeof BUS=='undefined'||!window.__ready)return setTimeout(hook,200);
-  BUS.on('build',()=>tap('MEDIUM'));
   BUS.on('upgrade',()=>{tap('HEAVY');setTimeout(()=>tap('LIGHT'),120)});
-  BUS.on('pay',()=>{const n=Date.now();if(n-lastPay>1500){lastPay=n;tap('LIGHT')}})};
+  BUS.on('reward',()=>{tap('MEDIUM');setTimeout(()=>tap('LIGHT'),120)})};
  hook();
- document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('button,.card,.tab,.tool'))H&&safe(()=>H.impact({style:'LIGHT'}))},true);
 
  // ---- 앱 생명주기: 백그라운드로 가면 저장·백업, 소리 정지 ----
  if(P.App){

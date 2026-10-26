@@ -58,7 +58,7 @@ const PHOTO=(()=>{
   $('pxC').oninput=e=>{opt.colors=+e.target.value;$('pxCv').textContent=opt.colors;later()};$('pxP').onchange=e=>{opt.pal=e.target.value;later()};$('pxD').onchange=e=>{opt.dither=e.target.value;later()};$('pxS').oninput=e=>{opt.ds=+e.target.value;later()};$('pxK').oninput=e=>{opt.contrast=+e.target.value;later()};
   $('pxX').onclick=()=>{m.style.display='none'};
   $('pxOk').onclick=async()=>{const id=Date.now().toString(36)+Math.random().toString(36).slice(2,5);pics()[id]={kind,w,h,d:out.toDataURL('image/png')};await register(id);m.style.display='none';
-   if(target){const old=target.pic;target.pic=id;gc(old);save();toast(L('사진을 바꿨어요 ✨'))}else{pending={kind,id};ghost=kind;buildCards();toast(L('놓을 곳을 눌러주세요 (Esc 취소)'))}};
+   if(target){const old=target.pic;target.pic=id;gc(old);save();toast(L('사진을 바꿨어요 ✨'))}else{pending={kind,id};ghost=kind;buildCards();toast(window.KBD?L('놓을 곳을 눌러주세요 (Esc 취소)'):L('끌어서 놓거나 놓을 곳을 눌러주세요'))}};
   draw()}
  function gc(id){if(!id)return;if(!S.objs.some(o=>o.pic===id))delete pics()[id]}
  // 건설 카드 가로채기: 사진 장식 카드는 먼저 업로드

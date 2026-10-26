@@ -180,10 +180,10 @@ const AMB=(()=>{
   else{const P=Object.keys(S.plots).map(k=>k.split(',').map(Number));tx_=P[0][0]*PS+PS/2;ty_=P[0][1]*PS+PS/2}
   const zz=((VW>820?3.6:2.8)+Math.sin(zT/23)*0.35)*Math.max(1,VW/1280);
   const[wx,wy]=iso(tx_,ty_);const k=Math.min(1,dt*(zT<3?1.6:0.45));cam.z+=(zz-cam.z)*Math.min(1,dt*0.4);cam.tz=cam.z;const gx=VW/2-wx*cam.z,gy=VH/2-wy*cam.z;cam.x+=(gx-cam.x)*k;cam.y+=(gy-cam.y)*k}
- function setZen(on,quiet){zen=on;zT=0;document.body.classList.toggle('zen',on);if(on&&!quiet){zHint=document.createElement('div');zHint.id='zenHint';zHint.textContent=L('감상 모드 · 아무 곳이나 누르거나 Esc로 나가기');document.body.appendChild(zHint);setTimeout(()=>zHint&&zHint.classList.add('fade'),2500);window.SND&&SND.init&&SND.init()}else{zHint&&zHint.remove();zHint=null}}
+ function setZen(on,quiet){zen=on;zT=0;document.body.classList.toggle('zen',on);if(on&&!quiet){zHint=document.createElement('div');zHint.id='zenHint';zHint.textContent=window.KBD?L('감상 모드 · 아무 곳이나 누르거나 Esc로 나가기'):L('감상 모드 · 아무 곳이나 누르면 나가요');document.body.appendChild(zHint);setTimeout(()=>zHint&&zHint.classList.add('fade'),2500);window.SND&&SND.init&&SND.init()}else{zHint&&zHint.remove();zHint=null}}
  addEventListener('keydown',e=>{if(window.SHELL&&SHELL.inTitle)return;if(e.key=='Escape'&&zen){setZen(false);e.stopPropagation()}else if((e.key=='z'||e.key=='Z')&&!e.ctrlKey&&document.activeElement.tagName!='INPUT')setZen(!zen)},true);
  addEventListener('pointerdown',e=>{if(zen&&!document.body.classList.contains('titling')&&!e.target.closest('#zenBtn,#title,.ovl')){setZen(false);e.stopPropagation();e.preventDefault()}},true);
- const tb=document.getElementById('tools');if(tb){const b=document.createElement('button');b.className='tool';b.id='zenBtn';b.innerHTML=L('<i>감상</i>');b.title=L('감상 모드 (Z)');b.onclick=e=>{e.stopPropagation();setZen(true)};tb.appendChild(b)}
+ const tb=document.getElementById('tools');if(tb){const b=document.createElement('button');b.className='tool';b.id='zenBtn';b.innerHTML=L('<i>감상</i>');b.title=window.KBD?L('감상 모드 (Z)'):L('감상 모드');b.onclick=e=>{e.stopPropagation();setZen(true)};tb.appendChild(b)}
  return{tap,setZen,get zen(){return zen},flies,butts,birds,fx};
 })();
 window.AMB=AMB;

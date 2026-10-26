@@ -23,7 +23,7 @@ const QX=(()=>{
  function mkSet(pool,seed,n){const r=rng(seed*31+7);return seedPick(pool,seed,n).map(([key,txt,goals,rw])=>{const goal=goals[Math.floor(r()*goals.length)];return{key,txt:txt.replace('{n}',fmt(goal)),goal,base:key=='served'?S.served:(st()[key]||0),rw:Math.round(rw<1?goal*rw:goal*rw),claimed:false}})}
  const cur=q=>(q.key=='served'?S.served:(st()[q.key]||0))-q.base;
  function ensureSets(){const m=M(),d=dayN();if(!m.daily||m.daily.day!=d){m.daily={day:d,list:mkSet(DPOOL,d,3)}}const w=Math.floor((d-1)/7);if(!m.weekly||m.weekly.w!=w){m.weekly={w,list:mkSet(WPOOL,w+100,2)}}}
- function reward(y,label){S.yen+=y;S.fin.inc+=y;toast(L`${label} 보상 ¥${fmt(y)}!`);SND.quest();burst();save();render_()}
+ function reward(y,label){S.yen+=y;S.fin.inc+=y;BUS.emit('reward',y);toast(L`${label} 보상 ¥${fmt(y)}!`);SND.quest();burst();save();render_()}
  // ----- UI -----
  const box=document.createElement('div');box.id='quest';document.body.appendChild(box);
  function render_(){const m=M();ensureSets();
@@ -35,7 +35,7 @@ const QX=(()=>{
    $('qOpen').onclick=modalQuest;readyMark(ready,ready?L('퀘스트 달성! 보상을 받아가세요'):'')}}
  // 달성 알림: 카드 빛남·독 배지, 새로 달성되면 알림+효과음 (접힌 카드도 받기 버튼은 보임)
  let lastReady=-1,questBtn=null;
- function readyMark(n,msg){box.classList.toggle('ready',n>0);if(questBtn){if(n>0)questBtn.dataset.badge=n;else delete questBtn.dataset.badge}
+ function readyMark(n,msg){box.classList.toggle('ready',n>0);if(questBtn){if(n>0){questBtn.dataset.badge=n;questBtn.dataset.badgeLbl=L`보상 ${n}`}else{delete questBtn.dataset.badge;delete questBtn.dataset.badgeLbl}}
   if(lastReady>=0&&n>lastReady&&msg&&!window.__warm&&!window.READONLY){toast(msg);try{SND.quest()}catch(e){}box.classList.remove('pop');void box.offsetWidth;box.classList.add('pop')}lastReady=n}
  function milesReady(){const m=M(),out=[];for(const[key,steps,txt,rw]of MILES){for(const n of steps){const id=key+n;if(m.ms.includes(id))continue;const v=key=='served'?S.served:(st()[key]||0);if(v>=n)out.push({id,txt:txt.replace('{n}',fmt(n)),rw:Math.round(rw(n))});break}}return out}
  function modalQuest(){const m=M();ensureSets();const el=$('modal');
@@ -110,7 +110,7 @@ const QX=(()=>{
  // 도구 버튼 (아이콘 없이 깔끔한 텍스트 알약 버튼)
  const tools=$('tools');const mkT=(ic,lb,fn)=>{const b=document.createElement('button');b.className='tool';b.innerHTML=`<i>${lb}</i>`;b.onclick=fn;tools.insertBefore(b,tools.querySelector('.zoom'));return b};
  questBtn=mkT('',L('퀘스트'),modalQuest);questBtn.dataset.ic='quest';mkT('',L('도감'),modalBook);mkT('',L('리뷰'),modalReviews);const cardBtn=mkT('',L('엽서'),modalCards);
- function cardBadge(){const n=((S&&S.meta&&S.meta.cards)||[]).filter(c=>!c.read).length;cardBtn.innerHTML=L`<i>엽서${n?`<b class="pbadge">${n}</b>`:''}</i>`}cardBadge();
+ function cardBadge(){const n=((S&&S.meta&&S.meta.cards)||[]).filter(c=>!c.read).length;cardBtn.innerHTML=L`<i>엽서${n?`<b class="pbadge">${n}</b>`:''}</i>`;if(n)cardBtn.dataset.badge=n;else delete cardBtn.dataset.badge}cardBadge();
  const mute=document.createElement('div');mute.className='box btn';mute.id='bMute';mute.textContent=SND.muted()?L('음소거'):L('사운드');mute.onclick=()=>{mute.textContent=SND.toggle()?L('음소거'):L('사운드')};$('bSpeed').before(mute);
  setInterval(()=>{if(S){render_();cardBadge()}},1000);
  return{render:render_,modalQuest,modalBook,modalReviews,M,TUT,milesReady}})();
