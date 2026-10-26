@@ -486,17 +486,23 @@ function bathSlot(o,i){if(o.k=='foot'){const G=objGeom(o),lv=Math.min(5,Math.max
  const sp=W.dia?0.9:0.85;const X=W.cX+u*W.rx*sp,Y=W.cY+v*W.ry*sp+2;return[(X/(TW/2)+Y/(TH/2))/2,(Y/(TH/2)-X/(TW/2))/2]}
 function bathClip(o){const W=wgeo(o);const{cX,cY,rx,ry}=W;cx.beginPath();if(W.dia){cx.moveTo(cX+rx,cY);cx.lineTo(cX,cY+ry);cx.lineTo(cX-rx,cY)}else{cx.moveTo(cX+rx,cY-1);cx.ellipse(cX,cY-1,rx,ry,0,0,Math.PI)}cx.lineTo(cX-rx,cY-40);cx.lineTo(cX+rx,cY-40);cx.lineTo(cX+rx,cY);cx.closePath();cx.clip()}
 function updGuest(g,dt){
+ const wasBath=!!g.inBath,wasHidden=!!g.hide;
+ try{updGuestLogic(g,dt)}finally{GuestMotion.update(g,dt,wasBath,wasHidden)}
+}
+function updGuestLogic(g,dt){
  g.life+=dt;if(g.leaving&&g.path&&g.path.length<=1){g.fade=Math.max(0,g.fade-dt*1.4);if(g.fade<=0){g.dead=1;return}}else g.fade=Math.min(1,g.fade+dt*1.5);for(const k of NEEDK)g.need[k]=Math.min(100,g.need[k]+dt*(k=='fatigue'?0.2:0.9));
  const nearSeat=S.objs.some(o=>DEF[o.k]&&DEF[o.k].seat&&Math.hypot(o.x+0.5-g.x,o.y+0.5-g.y)<3.2);if(nearSeat)g.need.fatigue=Math.max(0,g.need.fatigue-dt*0.45);g.happy=Math.max(0,Math.min(100,g.happy+(beautyAt(g.x,g.y)*0.02+(nearSeat?0.10:0)-0.03)*dt));
  {const oc=OCC[(g.x|0)+','+(g.y|0)];const zt=oc&&oc.k=='gate'?3:0;g.z=(g.z||0)+(zt-(g.z||0))*Math.min(1,dt*9);if(oc&&oc.k=='gate'&&g.st=='walk')oc.sway=Math.min(0.35,(oc.sway||0)+dt*1.2)}
- if(g.st=='walk'){if(g.path&&g.path.length&&(()=>{const q=OCC[(g.path[0][0]|0)+','+(g.path[0][1]|0)];return q&&q!==g.target&&!DEF[q.k].walk&&!DEF[q.k].isPath})()){const L=g.path[g.path.length-1];if(!goTo(g,L[0]|0,L[1]|0)){g.path=[];g.tx=g.x;g.ty=g.y}}if(g.path&&g.path.length){g.tx=g.path[0][0];g.ty=g.path[0][1]}const dx=g.tx-g.x,dy=g.ty-g.y,d=Math.hypot(dx,dy);
-  if(d<=0.05&&g.path&&g.path.length){g.path.shift();return}
-  if(d>0.05){const sp=1.3*dt;g.x+=dx/d*Math.min(sp,d);g.y+=dy/d*Math.min(sp,d);g.dir=(dx-dy)>=0?1:-1;return}
+ if(g.st=='walk'){if(g.path&&g.path.length&&(()=>{const q=OCC[(g.path[0][0]|0)+','+(g.path[0][1]|0)];return q&&q!==g.target&&!DEF[q.k].walk&&!DEF[q.k].isPath})()){const L=g.path[g.path.length-1];if(!goTo(g,L[0]|0,L[1]|0)){g.path=[];g.tx=g.x;g.ty=g.y}}// Consume reached waypoints in the same tick: no one-frame stop at every tile.
+  while(g.path&&g.path.length&&Math.hypot(g.path[0][0]-g.x,g.path[0][1]-g.y)<=0.05)g.path.shift();
+  if(g.path&&g.path.length){g.tx=g.path[0][0];g.ty=g.path[0][1]}
+  const dx=g.tx-g.x,dy=g.ty-g.y,d=Math.hypot(dx,dy);
+  if(d>0.05){GuestMotion.move(g,dx,dy,dt,1.3);return}
   if(g.target){arrive(g);return}
   if(g.view){look(g);return}
   if(g.leaving){g.dead=1;return}
   if(_pb-->0)decide(g)}
- else if(g.st=='wait'){g.t-=dt;if(g.wx!=null){const dx=g.wx-g.x,dy=g.wy-g.y,d=Math.hypot(dx,dy);if(d>0.03){const sp=Math.min(d,1.1*dt);g.x+=dx/d*sp;g.y+=dy/d*sp;g.dir=(dx-dy)>=0?1:-1}}if(g.t<=0){g.wx=g.wy=null;g.st='walk';arrive(g)}}
+ else if(g.st=='wait'){g.t-=dt;if(g.wx!=null){const dx=g.wx-g.x,dy=g.wy-g.y,d=Math.hypot(dx,dy);if(d>0.03){GuestMotion.move(g,dx,dy,dt,1.1)}}if(g.t<=0){g.wx=g.wy=null;g.st='walk';arrive(g)}}
  else if(g.st=='use'){g.waited=0;g.t-=dt;if(g.t<=0)finish(g)}
  else if(g.st=='look'){g.t-=dt;if(g.t<=0)g.st='walk'}
 }
@@ -825,12 +831,22 @@ function tintWater(o,d,cX,cY,rx,ry,t,lt){
  else if(d.wfx=='petal'){for(let i=0;i<12;i++){const a=R()*6.28+t/9000*(R()<0.5?1:-1),rr=0.25+R()*0.6;const X=cX+Math.cos(a)*rx*rr,Y=cY+Math.sin(a)*ry*rr;cx.globalAlpha=0.9;cx.fillStyle=i%3?'#ffd3df':'#fff1f4';cx.fillRect(X-1,Y-0.5,2,1.2)}}
  else if(d.wfx=='star'){const nn=0.35+0.65*lt.night;for(let i=0;i<16;i++){const a=R()*6.28,rr=Math.sqrt(R())*0.85,tw=Math.max(0,Math.sin(t/(500+R()*700)+i*1.7));const X=cX+Math.cos(a)*rx*rr,Y=cY+Math.sin(a)*ry*rr;cx.globalAlpha=nn*tw;cx.fillStyle='#fffbe6';cx.fillRect(X-0.5,Y-0.5,1,1);if(tw>0.85){cx.fillRect(X-1.6,Y-0.15,3.2,0.3);cx.fillRect(X-0.15,Y-1.6,0.3,3.2)}}}
  cx.globalAlpha=1}
+// Art-preserving cutout gait: alternate the two feet, keep the yukata/body intact.
+function drawGuestBody(im,W,h,p){
+ const cut=Math.floor(im.height*0.80),mid=Math.floor(im.width*0.55),lower=im.height-cut;
+ const y=-h+cut/im.height*h;
+ for(let i=0;i<2;i++){const x=i?mid:0,w=i?im.width-mid:mid,step=p.step*(i?-1:1);
+  cx.drawImage(im,x,cut,w,lower,-W/2+x/im.width*W+step*0.35,y-Math.max(0,step)*0.7,w/im.width*W,lower/im.height*h);}
+ const head=Math.floor(im.height*0.43),peek=Math.sin(p.clock*0.85)*0.18*(1-Math.abs(p.step));
+ cx.drawImage(im,0,head,im.width,cut-head,-W/2,-h+head/im.height*h,W,(cut-head)/im.height*h);
+ cx.drawImage(im,0,0,im.width,head,-W/2+peek,-h,W,head/im.height*h);
+}
 function drawGuest(g,t,lt,sv){if(g.inBath&&g.cur&&g.cur.k=='foot'){
   const o=g.cur;[g.x,g.y]=bathSlot(o,g.slot||0);const[X,Y]=iso(g.x,g.y);
   if(g.vip||g.reg){cx.save();cx.globalCompositeOperation='lighter';cx.globalAlpha=g.vip?0.35:0.28;cx.drawImage(blob(g.vip?'255,215,90':'140,200,255'),X-12,Y-18,24,24);cx.globalAlpha=1;cx.restore()}
   const v=VAR[g.spr];if(!v)return;
   const lv=o.lv||1,dir=(lv<=2)?((o.rot&1)?1:-1):((o.rot&1)?1:-1);
-  const W=13,h=W*v.base.height/v.base.width*0.85,bob=Math.sin(t/520+g.bob)*0.35-(g.hz||0)*0.4;
+  const W=13,h=W*v.base.height/v.base.width*0.85,bob=Math.sin(GuestMotion.pose(g).clock*2+g.bob)*0.35-(g.hz||0)*0.4;
   const fx=X+dir*2.4,fy=Y-0.6+bob*0.4;
   ao(X-dir*1.2,Y-1.2,4.2,1.8,0.20);
   cx.save();cx.translate(X,Y-bob);cx.scale(dir,1);
@@ -839,23 +855,24 @@ function drawGuest(g,t,lt,sv){if(g.inBath&&g.cur&&g.cur.k=='foot'){
   if(g.slot%3==1){cx.fillStyle='#f6c431';cx.beginPath();cx.arc(0.5,-h+1.2,1.6,0,6.283);cx.fill();cx.fillStyle='#58a832';cx.fillRect(0.2,-h-0.6,0.9,0.7)}
   else{cx.fillStyle='#faf6ec';cx.fillRect(-2.4,-h+0.4,4.8,1.6);cx.fillStyle='#d8cbb8';cx.fillRect(-2.4,-h+1.6,4.8,0.5)}
   cx.restore();
-  const ph=((t/750+g.bob)%1);
+  const ph=((GuestMotion.pose(g).clock/0.75+g.bob)%1);
   cx.strokeStyle=`rgba(205,252,255,${0.62*(1-ph*0.5)})`;cx.lineWidth=0.65;
   cx.beginPath();cx.ellipse(fx,fy,3.2+ph*2.2,1.3+ph*0.9,0,0,6.283);cx.stroke();
   cx.fillStyle='rgba(235,255,255,0.78)';
-  const kick=Math.sin(t/240+g.bob*2.1);
+  const kick=Math.sin(GuestMotion.pose(g).clock/0.24+g.bob*2.1);
   if(kick>0.2){cx.fillRect(fx+dir*1.8,fy-1.6-kick*1.4,0.9,0.9);cx.fillRect(fx-dir*0.8,fy-1.2-kick*1.0,0.7,0.7)}
   return}
  const[X,Y]=iso(g.x,g.y);if(g.vip||g.reg){cx.save();cx.globalCompositeOperation='lighter';cx.globalAlpha=g.vip?0.35:0.28;cx.drawImage(blob(g.vip?'255,215,90':'140,200,255'),X-12,Y-18,24,24);cx.globalAlpha=1;cx.restore()}
- if(g.inBath){const v=VAR[g.cb];if(!v)return;const W=17,h=W*v.base.height/v.base.width,bob=Math.sin(t/600+g.bob)*0.4-(g.hz||0)*0.5,ch=h*0.8;
+ if(g.inBath){const v=VAR[g.cb];if(!v)return;const W=17,h=W*v.base.height/v.base.width,bob=Math.sin(GuestMotion.pose(g).clock*1.6+g.bob)*0.4+GuestMotion.pose(g).settle-(g.hz||0)*0.5,ch=h*0.8;
   cx.drawImage(v.base,0,0,v.base.width,v.base.height*0.8,X-W/2,Y-ch+2+bob,W,ch);
   cx.fillStyle='rgba(180,240,240,0.55)';cx.beginPath();cx.ellipse(X,Y+2+bob,W*0.55,1.6,0,0,6.283);cx.fill();
   if(g.slot%3==1){const yx=X+W*0.7,yy=Y+2+Math.sin(t/700+g.bob)*0.6;cx.fillStyle='#f6c431';cx.beginPath();cx.arc(yx,yy,1.6,0,6.283);cx.fill();cx.fillStyle='#fff3a0';cx.fillRect(yx-0.8,yy-1,0.8,0.6)}
   return}
- const v=VAR[g.spr];if(!v)return;const W=14,h=W*v.base.height/v.base.width;const moving=Math.hypot(g.tx-g.x,g.ty-g.y)>0.05;const bob=(moving?Math.abs(Math.sin(t/120+g.bob))*1.2:0)+(g.z||0)+(g.hz||0);
+ const v=VAR[g.spr];if(!v)return;const W=14,h=W*v.base.height/v.base.width;const pose=GuestMotion.pose(g);const bob=pose.lift+(g.z||0)+(g.hz||0);
  cx.globalAlpha=g.fade;ao(X,Y,5,2.2,0.22);
  if(lt.sun>0.1){cx.save();cx.globalAlpha=0.15*lt.sun*g.fade;cx.translate(X,Y);cx.transform(1,0,-sv.kx,sv.ky,0,0);if(v.m)cx.scale(-1,1);cx.drawImage(v.sil,-W/2,-h,W,h);cx.restore()}
- cx.globalAlpha=g.fade;cx.save();cx.translate(X,Y-bob);cx.scale(g.dir,1);cx.drawImage(v.base,-W/2,-h,W,h);if(lt.sun>0.15){cx.globalAlpha=0.45*lt.sun*g.fade;cx.drawImage(sv.left?v.rimL:v.rimR,-W/2,-h,W,h)}cx.restore();cx.globalAlpha=1}
+ cx.globalAlpha=g.fade;cx.save();cx.translate(X,Y-bob);cx.scale(g.dir*pose.turn,1+pose.breath);cx.transform(1,0,pose.lean,1,0,0);
+ drawGuestBody(v.base,W,h,pose);if(lt.sun>0.15){cx.globalAlpha=0.45*lt.sun*g.fade;drawGuestBody(sv.left?v.rimL:v.rimR,W,h,pose)}cx.restore();cx.globalAlpha=1}
 // 잠긴 구역: 안개, 로프 울타리, 가격 표지판
 function drawPlots(t,lt){const P=N/PS;window._signs=[];
  for(let py=0;py<P;py++)for(let px=0;px<P;px++){const k=px+','+py,open=plotOpen(px,py);const an=anims['p'+k];
